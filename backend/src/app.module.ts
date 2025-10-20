@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { TenantConnectionService } from './common/tenant-connection.service';
 import { join } from 'path';
 import { AuthModule } from './modules/auth/auth.module';
 
@@ -27,6 +28,6 @@ import { AuthModule } from './modules/auth/auth.module';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, TenantConnectionService],
 })
 export class AppModule {}
