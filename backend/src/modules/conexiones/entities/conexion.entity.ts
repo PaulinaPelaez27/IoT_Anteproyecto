@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-// Ajusta la ruta si tu entidad Empresa está en otra ubicación
+// Ajusta la ruta si la entidad Empresa está en otra ubicación
 import { Empresa } from '../../empresas/entities/empresa.entity';
 
 @Entity('tb_conexiones')
@@ -19,10 +19,15 @@ export class Conexion {
   @Column({ name: 'c_id_empresa', type: 'int' })
   empresaId: number;
 
-  @ManyToOne(() => Empresa, (empresa) => (empresa as any).conexiones, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
+  @ManyToOne(
+    () => Empresa,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
+    (empresa) => (empresa as any).conexiones,
+    {
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  )
   @JoinColumn({ name: 'c_id_empresa' })
   empresa?: Empresa;
 

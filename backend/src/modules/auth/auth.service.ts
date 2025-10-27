@@ -7,7 +7,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TenantConnectionHelper } from 'src/common/tenant-helpers';
 import * as bcrypt from 'bcrypt';
-import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { Auth } from './entities/auth.entity';
 import { Conexion } from '../conexiones/entities/conexion.entity';
@@ -39,16 +38,14 @@ export class AuthService {
   async update(id: number, updateAuthDto: UpdateAuthDto) {
     const user = await this.authRepository.preload({
       u_id: id,
-      ...(updateAuthDto as any),
-    });
+      ...updateAuthDto,
+    } as Partial<Auth>);
     if (!user) throw new NotFoundException('User not found');
 
-    // si actualizan la contraseña, hashéala
-    if ((updateAuthDto as any).u_contrasena) {
-      user.u_contrasena = await bcrypt.hash(
-        (updateAuthDto as any).u_contrasena,
-        10,
-      );
+    // Si actualizan la contraseña, hashéala
+    if ('u_contrasena' in updateAuthDto) {
+      const dto = updateAuthDto as unknown as { u_contrasena: string };
+      user.u_contrasena = await bcrypt.hash(dto.u_contrasena, 10);
     }
 
     return this.authRepository.save(user);
@@ -56,7 +53,7 @@ export class AuthService {
 
   async remove(id: number) {
     const user = await this.findOne(id);
-    // borrado lógico: marcar u_borrado = true y u_borrado_en = now
+    // Borrado lógico: marcar u_borrado = true y u_borrado_en = now
     user.u_borrado = true;
     user.u_borrado_en = new Date();
     return this.authRepository.save(user);
@@ -66,21 +63,21 @@ export class AuthService {
     // Cargamos el usuario junto con sus perfiles y datos relacionados (empresa y rol)
     const user = await this.authRepository
       .createQueryBuilder('u')
-      // mapear perfiles en la propiedad runtime 'perfiles' (no requiere relación inversa en la entidad)
+      // Mapear perfiles en la propiedad runtime 'perfiles' (no requiere relación inversa en la entidad)
       .leftJoinAndMapMany(
         'u.perfiles',
         'tb_perfiles',
         'p',
         'p.p_id_usuario = u.u_id AND p.p_borrado = false',
       )
-      // mapear empresa relacionada a cada perfil
+      // Mapear empresa relacionada a cada perfil
       .leftJoinAndMapOne(
         'p.empresa',
         'tb_empresas',
         'e',
         'e.e_id = p.p_id_empresa',
       )
-      // mapear rol (tabla tb_roles_usuarios)
+      // Mapear rol (tabla tb_roles_usuarios)
       .leftJoinAndMapOne(
         'p.rol',
         'tb_roles_usuarios',
@@ -96,38 +93,45 @@ export class AuthService {
     const isMatch = await bcrypt.compare(password, user.u_contrasena);
     if (!isMatch) throw new ConflictException('Invalid credentials');
 
-    // Remover contraseña antes de devolver
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const safeUser = { ...user } as any;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (safeUser.u_contrasena) delete safeUser.u_contrasena;
 
     // Para cada perfil recuperado, adjuntamos las conexiones activas de la empresa
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       const perfiles: any[] = (user as any).perfiles ?? [];
       await Promise.all(
         perfiles.map(async (p) => {
-          // p may contain p.p_id_empresa or mapped empresa.e_id
+          // p puede contener p.p_id_empresa o empresa.e_id mapeado
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           const empresaId = p.p_id_empresa ?? p.empresa?.e_id ?? p.empresaId;
           if (!empresaId) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             p.conexiones = [];
             return;
           }
 
           const conexiones = await this.conexionRepository.find({
             where: {
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
               empresaId,
               borrado: false,
               estado: true,
             },
           });
 
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           p.conexiones = conexiones;
         }),
       );
-    } catch (err) {
+    } catch {
       // No detener el login si falla la carga de conexiones; devolver al menos el usuario
       // Puedes registrar el error en un logger si lo deseas
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return safeUser;
   }
 }

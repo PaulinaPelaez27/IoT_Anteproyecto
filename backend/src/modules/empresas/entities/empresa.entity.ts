@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-// Import tipo para evitar dependencia circular fuerte
+// Importación de tipo para evitar dependencia circular fuerte
 import { Conexion } from '../../conexiones/entities/conexion.entity';
 
 @Entity('tb_empresas')

@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { ConexionesService } from 'src/modules/conexiones/conexiones.service';
-import { Conexion } from 'src/modules/conexiones/entities/conexion.entity';
 
 type TenantCfg = {
   host?: string;
@@ -14,31 +13,20 @@ type TenantCfg = {
   username?: string;
   password?: string;
   database?: string;
-  // ajoute ici ssl, schema, etc. si tu les stockes
+  // Agrega aquí ssl, schema, etc. si los almacenas
 };
-
-/** Utilitaire pour convertir una entidad Conexion a TenantCfg */
-function tenantCfgFromConexion(row: Conexion): TenantCfg {
-  return {
-    host: row.host,
-    port: row.puerto ?? 5432,
-    username: row.usuario,
-    password: row.contrasena,
-    database: row.nombreBaseDeDatos,
-  };
-}
 
 @Injectable()
 export class TenantConnectionHelper implements OnModuleDestroy {
   private readonly logger = new Logger(TenantConnectionHelper.name);
 
-  // Cache des DataSources par empresaId
+  // Caché de DataSources por empresaId
   private readonly cache = new Map<number, DataSource>();
 
-  // Promesses en cours d'init par empresaId (pour éviter les doubles initialisations concurrentes)
+  // Promesas en curso de inicialización por empresaId (para evitar dobles inicializaciones concurrentes)
   private readonly inFlight = new Map<number, Promise<DataSource>>();
 
-  // Options communes
+  // Opciones comunes
   private readonly baseOptions: Omit<
     DataSourceOptions,
     'host' | 'username' | 'password' | 'database'
@@ -54,7 +42,7 @@ export class TenantConnectionHelper implements OnModuleDestroy {
     await this.closeAll();
   }
 
-  /** Récupère la config du tenant via le service (DI), pas de statique. */
+  /** Recupera la configuración del tenant mediante el servicio (DI), no estática. */
   private async fetchTenantConfig(empresaId: number): Promise<TenantCfg> {
     if (!empresaId) throw new Error('empresaId requerido');
 
@@ -70,13 +58,13 @@ export class TenantConnectionHelper implements OnModuleDestroy {
       username: row.usuario,
       password: row.contrasena,
       database: row.nombreBaseDeDatos,
-      // ajoute ici ssl, schema, etc. si tu les stockes
+      // Agrega aquí ssl, schema, etc. si los almacenas
     };
 
     return cfg;
   }
 
-  /** Construit les options TypeORM à partir d’une config. */
+  /** Construye las opciones de TypeORM a partir de una configuración. */
   private buildOptions(
     cfg: TenantCfg,
     entities: any[] = [],
@@ -93,7 +81,7 @@ export class TenantConnectionHelper implements OnModuleDestroy {
     return opts;
   }
 
-  /** Crée un DataSource, l'initialise et le met en cache. */
+  /** Crea un DataSource, lo inicializa y lo guarda en caché. */
   private async createAndInit(
     empresaId: number,
     cfg: TenantCfg,
@@ -145,20 +133,20 @@ export class TenantConnectionHelper implements OnModuleDestroy {
   }
 
   /**
-   * Public: crée un DataSource directement depuis une config (bypass fetch).
-   * Utile pour des scripts, tests, seeds, etc.
+   * Público: crea un DataSource directamente desde una configuración (omite la búsqueda).
+   * Útil para scripts, tests, seeds, etc.
    */
   async createFromConfig(
     empresaId: number,
     cfg: TenantCfg,
     entities: any[] = [],
   ): Promise<DataSource> {
-    // si déjà en cache, on le ferme d'abord pour éviter des surprises
+    // Si ya está en caché, lo cerramos primero para evitar sorpresas
     await this.close(empresaId);
     return this.createAndInit(empresaId, cfg, entities);
   }
 
-  /** Ferme et enlève du cache un tenant. */
+  /** Cierra y elimina del caché un tenant. */
   async close(empresaId: number) {
     const ds = this.cache.get(empresaId);
     if (ds) {
@@ -168,7 +156,7 @@ export class TenantConnectionHelper implements OnModuleDestroy {
     }
   }
 
-  /** Ferme tous les tenants. Appelé au shutdown module. */
+  /** Cierra todos los tenants. Llamado al apagar el módulo. */
   async closeAll() {
     for (const [k, ds] of this.cache) {
       if (ds.isInitialized) await ds.destroy();

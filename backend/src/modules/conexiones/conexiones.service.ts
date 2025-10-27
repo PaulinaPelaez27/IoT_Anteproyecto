@@ -12,18 +12,20 @@ export class ConexionesService {
     private readonly conexionRepo: Repository<Conexion>,
   ) {}
 
-  // CRUD stubs can be implemented as needed; provide focused helpers below.
+  // Los métodos CRUD básicos pueden implementarse según sea necesario; se proporcionan helpers específicos a continuación.
   async create(createConexioneDto: CreateConexioneDto) {
-    const ent = this.conexionRepo.create(createConexioneDto as any);
+    const ent = this.conexionRepo.create(
+      createConexioneDto as Partial<Conexion>,
+    );
     return this.conexionRepo.save(ent);
   }
 
   async findAll() {
-    return this.conexionRepo.find({ where: { borrado: false } as any });
+    return this.conexionRepo.find({ where: { borrado: false } });
   }
 
   async findOne(id: number) {
-    const e = await this.conexionRepo.findOne({ where: { id } as any });
+    const e = await this.conexionRepo.findOne({ where: { id } });
     if (!e) throw new NotFoundException('Conexione not found');
     return e;
   }
@@ -31,32 +33,32 @@ export class ConexionesService {
   async update(id: number, updateConexioneDto: UpdateConexioneDto) {
     const ent = await this.findOne(id);
     Object.assign(ent, updateConexioneDto);
-    return this.conexionRepo.save(ent as any);
+    return this.conexionRepo.save(ent);
   }
 
   async remove(id: number) {
     const ent = await this.findOne(id);
-    ent.borrado = true as any;
-    ent.borradoEn = new Date() as any;
-    return this.conexionRepo.save(ent as any);
+    ent.borrado = true;
+    ent.borradoEn = new Date();
+    return this.conexionRepo.save(ent);
   }
 
   /**
-   * Récupère la connexion (row) dans `tb_conexiones` pour une entreprise donnée.
-   * Utilisation prévue : fournir les credentials/infos de connexion pour créer/obtenir
-   * un DataSource vers la DB tenant.
+   * Recupera la conexión (fila) en `tb_conexiones` para una empresa determinada.
+   * Uso previsto: proporcionar las credenciales/información de conexión para crear/obtener
+   * un DataSource hacia la BD tenant.
    */
   async findByEmpresaId(empresaId: number): Promise<Conexion | null> {
     if (!empresaId) throw new Error('empresaId requerido');
     return this.conexionRepo.findOne({
-      where: { empresaId, borrado: false } as any,
+      where: { empresaId, borrado: false },
     });
   }
 
   /**
-   * Exemple d'aide : récupère la ligne de connexion ET tente d'obtenir
-   * le DataSource tenant via TenantConnectionService (si implémenté).
-   * Retourne un objet { conexion, dataSource }.
+   * Ejemplo de ayuda: recupera la fila de conexión E intenta obtener
+   * el DataSource tenant mediante TenantConnectionService (si está implementado).
+   * Retorna un objeto { conexion, dataSource }.
    */
   async getTenantDataSourceForEmpresaId(empresaId: number): Promise<Conexion> {
     const conexion = await this.findByEmpresaId(empresaId);
