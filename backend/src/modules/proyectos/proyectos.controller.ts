@@ -11,7 +11,6 @@ import {
 import { ProyectosService } from './proyectos.service';
 import { CreateProyectoDto } from './dto/create-proyecto.dto';
 import { UpdateProyectoDto } from './dto/update-proyecto.dto';
-import { log } from 'node:console';
 
 @Controller('proyectos')
 export class ProyectosController {

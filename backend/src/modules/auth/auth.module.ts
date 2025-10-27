@@ -4,12 +4,12 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { Auth } from './entities/auth.entity';
 import { Conexion } from '../conexiones/entities/conexion.entity';
-import { TenantConnectionService } from '../../common/tenant-connection.service';
+import { CommonModule } from 'src/common/common-module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Auth, Conexion])],
+  imports: [TypeOrmModule.forFeature([Auth, Conexion]), CommonModule],
   controllers: [AuthController],
-  providers: [AuthService, TenantConnectionService],
+  providers: [AuthService],
   exports: [TypeOrmModule],
 })
 export class AuthModule {}

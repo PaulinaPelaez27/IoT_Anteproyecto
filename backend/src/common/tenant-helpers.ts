@@ -1,169 +1,179 @@
-import { DataSource } from 'typeorm';
-import * as typeorm from 'typeorm';
-import { Conexion } from '../modules/conexiones/entities/conexion.entity';
+import {
+  Injectable,
+  NotFoundException,
+  OnModuleDestroy,
+  Logger,
+} from '@nestjs/common';
+import { DataSource, DataSourceOptions } from 'typeorm';
+import { ConexionesService } from 'src/modules/conexiones/conexiones.service';
+import { Conexion } from 'src/modules/conexiones/entities/conexion.entity';
 
-const cache = new Map<number, DataSource>();
-
-const baseOptions = {
-  type: 'postgres' as const,
-  port: 5432,
-  synchronize: false,
-  logging: false,
+type TenantCfg = {
+  host?: string;
+  port?: number;
+  username?: string;
+  password?: string;
+  database?: string;
+  // ajoute ici ssl, schema, etc. si tu les stockes
 };
 
-async function fetchTenantConfig(empresaId: number) {
-  try {
-    // try to access the application's default DataSource
-    const defaultDataSource =
-      (typeorm as any).getDataSource?.('default') ||
-      (typeorm as any).AppDataSource ||
-      undefined;
-    if (!defaultDataSource || !defaultDataSource.isInitialized) {
-      return null;
+/** Utilitaire pour convertir una entidad Conexion a TenantCfg */
+function tenantCfgFromConexion(row: Conexion): TenantCfg {
+  return {
+    host: row.host,
+    port: row.puerto ?? 5432,
+    username: row.usuario,
+    password: row.contrasena,
+    database: row.nombreBaseDeDatos,
+  };
+}
+
+@Injectable()
+export class TenantConnectionHelper implements OnModuleDestroy {
+  private readonly logger = new Logger(TenantConnectionHelper.name);
+
+  // Cache des DataSources par empresaId
+  private readonly cache = new Map<number, DataSource>();
+
+  // Promesses en cours d'init par empresaId (pour éviter les doubles initialisations concurrentes)
+  private readonly inFlight = new Map<number, Promise<DataSource>>();
+
+  // Options communes
+  private readonly baseOptions: Omit<
+    DataSourceOptions,
+    'host' | 'username' | 'password' | 'database'
+  > = {
+    type: 'postgres',
+    synchronize: false,
+    logging: false,
+  };
+
+  constructor(private readonly conexiones: ConexionesService) {}
+
+  async onModuleDestroy() {
+    await this.closeAll();
+  }
+
+  /** Récupère la config du tenant via le service (DI), pas de statique. */
+  private async fetchTenantConfig(empresaId: number): Promise<TenantCfg> {
+    if (!empresaId) throw new Error('empresaId requerido');
+
+    const row = await this.conexiones.findByEmpresaId(empresaId);
+    if (!row) {
+      throw new NotFoundException(
+        `No existe configuración de conexión para empresaId=${empresaId}`,
+      );
     }
-    const repo = defaultDataSource.getRepository(Conexion);
-    const conn = await repo.findOne({
-      where: { empresaId, estado: true, borrado: false },
-    } as any);
-    if (!conn) return null;
-    return {
-      host: conn.host || 'localhost',
-      port: conn.puerto || 5432,
-      username: conn.usuario,
-      password: conn.contrasena,
-      database: conn.nombreBaseDeDatos,
+
+    const cfg: TenantCfg = {
+      host: row.host,
+      username: row.usuario,
+      password: row.contrasena,
+      database: row.nombreBaseDeDatos,
+      // ajoute ici ssl, schema, etc. si tu les stockes
     };
-  } catch (err) {
-    return null;
+
+    return cfg;
   }
-}
 
-export async function getDataSourceForEmpresa(
-  empresaId: number,
-  entities: any[] = [],
-): Promise<DataSource | null> {
-  if (!empresaId) throw new Error('empresaId requerido');
-  const cached = cache.get(empresaId);
-  if (cached) {
-    if (!cached.isInitialized) await cached.initialize();
-    return cached;
+  /** Construit les options TypeORM à partir d’une config. */
+  private buildOptions(
+    cfg: TenantCfg,
+    entities: any[] = [],
+  ): DataSourceOptions {
+    const opts = {
+      ...this.baseOptions,
+      host: cfg.host,
+      port: cfg.port ?? 5432,
+      username: cfg.username,
+      password: cfg.password,
+      database: cfg.database,
+      entities,
+    } as DataSourceOptions;
+    return opts;
   }
-  const cfg = await fetchTenantConfig(empresaId);
-  if (!cfg) return null;
-  const options = {
-    ...baseOptions,
-    type: 'postgres',
-    host: cfg.host,
-    port: cfg.port ?? 5432,
-    username: cfg.username,
-    password: cfg.password,
-    database: cfg.database,
-    entities,
-  } as any;
-  const ds = new DataSource(options);
-  await ds.initialize();
-  cache.set(empresaId, ds);
-  console.log(`Initialized tenant DataSource for empresaId=${empresaId}`);
-  return ds;
-}
 
-export async function createDataSourceFromConfig(
-  empresaId: number,
-  cfg: {
-    host: string;
-    port?: number;
-    username: string;
-    password: string;
-    database: string;
-  },
-  entities: any[] = [],
-): Promise<DataSource> {
-  const options = {
-    ...baseOptions,
-    type: 'postgres',
-    host: cfg.host,
-    port: cfg.port ?? 5432,
-    username: cfg.username,
-    password: cfg.password,
-    database: cfg.database,
-    entities,
-  } as any;
-  const ds = new DataSource(options);
-  await ds.initialize();
-  cache.set(empresaId, ds);
-  console.log(`Initialized tenant DataSource for empresaId=${empresaId}`);
-  return ds;
-}
-
-export async function getDataSourceForEmpresaId(
-  empresaId: number,
-): Promise<DataSource | null> {
-  if (!empresaId) throw new Error('empresaId requerido');
-  const cached = cache.get(empresaId);
-  if (cached) {
-    if (!cached.isInitialized) await cached.initialize();
-    return cached;
+  /** Crée un DataSource, l'initialise et le met en cache. */
+  private async createAndInit(
+    empresaId: number,
+    cfg: TenantCfg,
+    entities: any[] = [],
+  ): Promise<DataSource> {
+    const options = this.buildOptions(cfg, entities);
+    const ds = new DataSource(options);
+    await ds.initialize();
+    this.cache.set(empresaId, ds);
+    this.logger.log(`Initialized tenant DataSource for empresaId=${empresaId}`);
+    return ds;
   }
-  const cfg = await fetchTenantConfig(empresaId);
-  if (!cfg) return null;
-  const options = {
-    ...baseOptions,
-    type: 'postgres',
-    host: cfg.host,
-    port: cfg.port ?? 5432,
-    username: cfg.username,
-    password: cfg.password,
-    database: cfg.database,
-  } as any;
-  const ds = new DataSource(options);
-  await ds.initialize();
-  cache.set(empresaId, ds);
-  console.log(`Initialized tenant DataSource for empresaId=${empresaId}`);
-  return ds;
-}
 
-export async function getDataSourceFromConexion(
-  conn: any,
-  entities: any[] = [],
-) {
-  const empresaId = conn.empresaId ?? conn.id;
-  console.log('getDataSourceFromConexion called with empresaId:', empresaId);
-  if (!empresaId) return null;
-  const cached = cache.get(empresaId);
-  if (cached) {
-    if (!cached.isInitialized) await cached.initialize();
-    return cached;
+  /**
+   * Public: récupère un DataSource pour un empresaId.
+   * - utilise le cache
+   * - charge la config depuis la DB “maîtresse”
+   * - évite la double init concurrente
+   */
+  async getDataSource(
+    empresaId: number,
+    entities: any[] = [],
+  ): Promise<DataSource> {
+    if (!empresaId) throw new Error('empresaId requerido');
+
+    // 1) cache
+    const cached = this.cache.get(empresaId);
+    if (cached) {
+      if (!cached.isInitialized) await cached.initialize();
+      return cached;
+    }
+
+    // 2) si une init est déjà en cours, on attend la même promesse
+    const pending = this.inFlight.get(empresaId);
+    if (pending) return pending;
+
+    // 3) sinon, on lance l’init avec verrou
+    const promise = (async () => {
+      try {
+        const cfg = await this.fetchTenantConfig(empresaId);
+        return await this.createAndInit(empresaId, cfg, entities);
+      } finally {
+        this.inFlight.delete(empresaId);
+      }
+    })();
+
+    this.inFlight.set(empresaId, promise);
+    return promise;
   }
-  const cfg = {
-    host: conn.host ?? 'localhost',
-    port: conn.puerto ?? 5432,
-    username: conn.usuario,
-    password: conn.contrasena,
-    database: conn.nombreBaseDeDatos,
-  } as any;
-  return createDataSourceFromConfig(empresaId, cfg, entities);
-}
 
-export async function closeTenant(empresaId: number) {
-  const ds = cache.get(empresaId);
-  if (ds) {
-    if (ds.isInitialized) await ds.destroy();
-    cache.delete(empresaId);
+  /**
+   * Public: crée un DataSource directement depuis une config (bypass fetch).
+   * Utile pour des scripts, tests, seeds, etc.
+   */
+  async createFromConfig(
+    empresaId: number,
+    cfg: TenantCfg,
+    entities: any[] = [],
+  ): Promise<DataSource> {
+    // si déjà en cache, on le ferme d'abord pour éviter des surprises
+    await this.close(empresaId);
+    return this.createAndInit(empresaId, cfg, entities);
   }
-}
 
-export async function closeAllTenants() {
-  for (const [k, ds] of cache) {
-    if (ds.isInitialized) await ds.destroy();
-    cache.delete(k);
+  /** Ferme et enlève du cache un tenant. */
+  async close(empresaId: number) {
+    const ds = this.cache.get(empresaId);
+    if (ds) {
+      if (ds.isInitialized) await ds.destroy();
+      this.cache.delete(empresaId);
+      this.logger.log(`Closed tenant DataSource for empresaId=${empresaId}`);
+    }
   }
-}
 
-export class TenantHelpers {
-  static getDataSourceForEmpresaId = getDataSourceForEmpresaId;
-  static getDataSourceForEmpresa = getDataSourceForEmpresa;
-  static getDataSourceFromConexion = getDataSourceFromConexion;
-  static createDataSourceFromConfig = createDataSourceFromConfig;
-  static closeTenant = closeTenant;
-  static closeAllTenants = closeAllTenants;
+  /** Ferme tous les tenants. Appelé au shutdown module. */
+  async closeAll() {
+    for (const [k, ds] of this.cache) {
+      if (ds.isInitialized) await ds.destroy();
+      this.cache.delete(k);
+    }
+    this.logger.log('Closed all tenant DataSources');
+  }
 }

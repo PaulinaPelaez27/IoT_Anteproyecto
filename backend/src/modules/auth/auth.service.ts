@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { TenantConnectionService } from '../../common/tenant-connection.service';
+import { TenantConnectionHelper } from 'src/common/tenant-helpers';
 import * as bcrypt from 'bcrypt';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
@@ -19,39 +19,8 @@ export class AuthService {
     private readonly authRepository: Repository<Auth>,
     @InjectRepository(Conexion)
     private readonly conexionRepository: Repository<Conexion>,
-    private readonly tenantConnectionService: TenantConnectionService,
+    private readonly tenantConnectionHelper: TenantConnectionHelper,
   ) {}
-
-  /**
-   * Devuelve un DataSource inicializado para la empresa del perfil dado.
-   * Retorna null si no existe configuración de conexión.
-   */
-  async getTenantDataSourceForPerfil(perfil: any, entities: Function[] = []) {
-    const empresaId =
-      perfil.p_id_empresa ?? perfil.empresa?.e_id ?? perfil.empresaId;
-    if (!empresaId) return null;
-    return this.tenantConnectionService.getDataSourceForEmpresaId(empresaId);
-  }
-
-  async create(createAuthDto: CreateAuthDto) {
-    // asumimos que createAuthDto tiene u_nombre, u_email, u_contrasena
-    const { u_nombre, u_email, u_contrasena } = createAuthDto as any;
-
-    const existing = await this.authRepository.findOne({ where: { u_email } });
-    if (existing) {
-      throw new ConflictException('Email already registered');
-    }
-
-    const hashed = await bcrypt.hash(u_contrasena, 10);
-
-    const user = this.authRepository.create({
-      u_nombre,
-      u_email,
-      u_contrasena: hashed,
-    } as Partial<Auth>);
-
-    return this.authRepository.save(user);
-  }
 
   async findAll() {
     return this.authRepository.find();

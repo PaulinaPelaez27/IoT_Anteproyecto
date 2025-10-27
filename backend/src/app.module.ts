@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TenantConnectionService } from './common/tenant-connection.service';
+import { CommonModule } from './common/common-module';
 import { join } from 'path';
 import { AuthModule } from './modules/auth/auth.module';
 import { ProyectosModule } from './modules/proyectos/proyectos.module';
@@ -28,8 +28,9 @@ import { ProyectosModule } from './modules/proyectos/proyectos.module';
     }),
     AuthModule,
     ProyectosModule,
+    CommonModule,
   ],
   controllers: [AppController],
-  providers: [AppService, TenantConnectionService],
+  providers: [AppService],
 })
 export class AppModule {}

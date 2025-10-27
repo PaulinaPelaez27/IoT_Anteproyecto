@@ -4,14 +4,12 @@ import { Repository } from 'typeorm';
 import { CreateConexioneDto } from './dto/create-conexione.dto';
 import { UpdateConexioneDto } from './dto/update-conexione.dto';
 import { Conexion } from './entities/conexion.entity';
-import { TenantConnectionService } from '../../common/tenant-connection.service';
 
 @Injectable()
 export class ConexionesService {
   constructor(
     @InjectRepository(Conexion)
     private readonly conexionRepo: Repository<Conexion>,
-    private readonly tenantConnectionService: TenantConnectionService,
   ) {}
 
   // CRUD stubs can be implemented as needed; provide focused helpers below.
@@ -60,17 +58,13 @@ export class ConexionesService {
    * le DataSource tenant via TenantConnectionService (si implémenté).
    * Retourne un objet { conexion, dataSource }.
    */
-  async getTenantDataSourceForEmpresaId(empresaId: number) {
+  async getTenantDataSourceForEmpresaId(empresaId: number): Promise<Conexion> {
     const conexion = await this.findByEmpresaId(empresaId);
     if (!conexion)
       throw new NotFoundException('Conexion para empresa no encontrada');
 
-    // TenantConnectionService propose getDataSourceForEmpresaId(empresaId)
-    // qui encapsule la logique de création/récupération du DataSource tenant.
-    const ds =
-      await this.tenantConnectionService.getDataSourceForEmpresaId(empresaId);
-    if (!ds) throw new Error(`No tenant datasource for empresa ${empresaId}`);
+    console.log(`Obtained conexion for empresaId=${empresaId}:`, conexion);
 
-    return { conexion, dataSource: ds };
+    return conexion;
   }
 }

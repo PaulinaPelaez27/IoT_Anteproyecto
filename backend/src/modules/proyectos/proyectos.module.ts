@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ProyectosService } from './proyectos.service';
 import { ProyectosController } from './proyectos.controller';
-import { TenantConnectionService } from '../../common/tenant-connection.service';
+import { CommonModule } from 'src/common/common-module';
 
 @Module({
+  imports: [CommonModule],
   controllers: [ProyectosController],
-  providers: [ProyectosService, TenantConnectionService],
+  providers: [ProyectosService],
 })
 export class ProyectosModule {}
