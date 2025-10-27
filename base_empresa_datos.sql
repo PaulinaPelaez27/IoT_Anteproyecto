@@ -3,12 +3,12 @@ BEGIN;
 -- ============================
 -- 1) CATÁLOGO: Tipos de dato
 -- ============================
-INSERT INTO tb_sensores_tipos_dato (std_nombre, std_unidad, std_descripcion)
+INSERT INTO tb_sensores_tipos_dato (std_nombre, std_unidad, std_descripcion, std_var_json)
 VALUES
-  ('Temperatura', 'C',   'Grados Celsius'),
-  ('Humedad',     '%',   'Humedad relativa'),
-  ('Presión',     'kPa', 'Presión manométrica'),
-  ('Caudal',      'L/min', 'Caudal instantáneo')
+  ('Temperatura', 'C',   'Grados Celsius', 'temperatura'),
+  ('Humedad',     '%',   'Humedad relativa', 'humedad'),
+  ('Presión',     'kPa', 'Presión manométrica', 'presion'),
+  ('Caudal',      'L/min', 'Caudal instantáneo', 'caudal')
 ON CONFLICT (LOWER(std_nombre)) DO NOTHING;
 
 -- ============================
