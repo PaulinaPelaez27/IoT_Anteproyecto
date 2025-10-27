@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TenantConnectionService } from '../../common/tenant-connection.service';
@@ -22,15 +26,16 @@ export class AuthService {
    * Devuelve un DataSource inicializado para la empresa del perfil dado.
    * Retorna null si no existe configuración de conexión.
    */
-  async getTenantDataSourceForPerfil(perfil: any, entities: Function[] = [] ) {
-    const empresaId = perfil.p_id_empresa ?? perfil.empresa?.e_id ?? perfil.empresaId;
+  async getTenantDataSourceForPerfil(perfil: any, entities: Function[] = []) {
+    const empresaId =
+      perfil.p_id_empresa ?? perfil.empresa?.e_id ?? perfil.empresaId;
     if (!empresaId) return null;
-    return this.tenantConnectionService.getDataSourceForEmpresa(empresaId, entities);
+    return this.tenantConnectionService.getDataSourceForEmpresaId(empresaId);
   }
 
   async create(createAuthDto: CreateAuthDto) {
-  // asumimos que createAuthDto tiene u_nombre, u_email, u_contrasena
-  const { u_nombre, u_email, u_contrasena } = createAuthDto as any;
+    // asumimos que createAuthDto tiene u_nombre, u_email, u_contrasena
+    const { u_nombre, u_email, u_contrasena } = createAuthDto as any;
 
     const existing = await this.authRepository.findOne({ where: { u_email } });
     if (existing) {
@@ -63,12 +68,18 @@ export class AuthService {
   }
 
   async update(id: number, updateAuthDto: UpdateAuthDto) {
-    const user = await this.authRepository.preload({ u_id: id, ...(updateAuthDto as any) } as any);
+    const user = await this.authRepository.preload({
+      u_id: id,
+      ...(updateAuthDto as any),
+    } as any);
     if (!user) throw new NotFoundException('User not found');
 
     // si actualizan la contraseña, hashéala
     if ((updateAuthDto as any).u_contrasena) {
-      user.u_contrasena = await bcrypt.hash((updateAuthDto as any).u_contrasena, 10);
+      user.u_contrasena = await bcrypt.hash(
+        (updateAuthDto as any).u_contrasena,
+        10,
+      );
     }
 
     return this.authRepository.save(user);
@@ -76,8 +87,8 @@ export class AuthService {
 
   async remove(id: number) {
     const user = await this.findOne(id);
-  // borrado lógico: marcar u_borrado = true y u_borrado_en = now
-  user.u_borrado = true;
+    // borrado lógico: marcar u_borrado = true y u_borrado_en = now
+    user.u_borrado = true;
     user.u_borrado_en = new Date();
     return this.authRepository.save(user);
   }
@@ -94,9 +105,19 @@ export class AuthService {
         'p.p_id_usuario = u.u_id AND p.p_borrado = false',
       )
       // mapear empresa relacionada a cada perfil
-      .leftJoinAndMapOne('p.empresa', 'tb_empresas', 'e', 'e.e_id = p.p_id_empresa')
+      .leftJoinAndMapOne(
+        'p.empresa',
+        'tb_empresas',
+        'e',
+        'e.e_id = p.p_id_empresa',
+      )
       // mapear rol (tabla tb_roles_usuarios)
-      .leftJoinAndMapOne('p.rol', 'tb_roles_usuarios', 'r', 'r.ru_id = p.p_id_rol')
+      .leftJoinAndMapOne(
+        'p.rol',
+        'tb_roles_usuarios',
+        'r',
+        'r.ru_id = p.p_id_rol',
+      )
       .where('u.u_email = :email', { email: username })
       .andWhere('u.u_borrado = false')
       .getOne();
