@@ -3,8 +3,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { CommonModule } from './common/common-module';
 import { join } from 'path';
 import { AuthModule } from './modules/auth/auth.module';
+import { ProyectosModule } from './modules/proyectos/proyectos.module';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { AuthModule } from './modules/auth/auth.module';
       }),
     }),
     AuthModule,
+    ProyectosModule,
+    CommonModule,
   ],
   controllers: [AppController],
   providers: [AppService],

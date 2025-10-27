@@ -36,13 +36,14 @@ ON CONFLICT (ru_nombre) DO NOTHING;
 -- =========================
 -- USUARIOS globales
 -- (contraseñas de ejemplo: hashes/placeholder)
+-- user123
 -- =========================
 INSERT INTO tb_usuarios (u_nombre, u_email, u_contrasena)
 VALUES
-  ('Ana Admin',     'ana@acme.test',    '$2b$12$aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), -- bcrypt dummy
-  ('Oscar Oper',    'oscar@acme.test',  '$2b$12$bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'),
-  ('Violeta View',  'violeta@acme.test','$2b$12$cccccccccccccccccccccccccccccccccccccccccccccccccccccccc'),
-  ('Greta Farm',    'greta@greenfarm.test', '$2b$12$dddddddddddddddddddddddddddddddddddddddddddddddddddd')
+  ('Ana Admin',     'ana@acme.test',    '$2a$12$zCL7OmPEfyU87N.wYg.hQuDHAHmt8wrwfq2eqiL/71mQKkTyXid6G'), -- bcrypt dummy
+  ('Oscar Oper',    'oscar@acme.test',  '$2a$12$zCL7OmPEfyU87N.wYg.hQuDHAHmt8wrwfq2eqiL/71mQKkTyXid6G'),
+  ('Violeta View',  'violeta@acme.test','$2a$12$zCL7OmPEfyU87N.wYg.hQuDHAHmt8wrwfq2eqiL/71mQKkTyXid6G'),
+  ('Greta Farm',    'greta@greenfarm.test', '$2a$12$zCL7OmPEfyU87N.wYg.hQuDHAHmt8wrwfq2eqiL/71mQKkTyXid6G')
 ON CONFLICT (u_email) DO NOTHING;
 
 -- =========================
