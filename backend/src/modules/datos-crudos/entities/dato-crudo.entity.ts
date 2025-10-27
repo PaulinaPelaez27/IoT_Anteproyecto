@@ -2,23 +2,23 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity({ name: 'tb_datos_crudos' })
 export class DatoCrudo {
-  // Primary generated BIGINT. Use string to avoid JS precision loss for bigints.
+  // BIGINT generado automáticamente. Usa string para evitar pérdida de precisión en JS con bigints.
   @PrimaryGeneratedColumn('increment', { type: 'bigint', name: 'dc_id' })
   dc_id: string;
 
-  // If you have an Empresa entity, you can replace this numeric column with a proper relation.
+  // Si tienes una entidad Empresa, puedes reemplazar esta columna numérica con una relación adecuada.
   @Column({ name: 'dc_id_empresa', type: 'int', nullable: true })
   dc_id_empresa: number | null;
 
-  // optional cross-DB id (may be null)
+  // ID opcional entre bases de datos (puede ser null)
   @Column({ name: 'dc_id_nodo', type: 'bigint', nullable: true })
   dc_id_nodo: string | null;
 
-  // JSONB message, NOT NULL
+  // Mensaje JSONB, NOT NULL
   @Column({ name: 'dc_mensaje', type: 'jsonb' })
   dc_mensaje: any;
 
-  // timestamptz with default NOW()
+  // timestamptz con valor predeterminado NOW()
   @Column({
     name: 'dc_recibido_en',
     type: 'timestamptz',

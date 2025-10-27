@@ -24,25 +24,39 @@ export class Perfil {
   @Column({ name: 'p_id_usuario', type: 'int' })
   usuarioId: number;
 
-  @ManyToOne(() => Auth, (u) => (u as any).perfiles, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
+  @ManyToOne(
+    () => Auth,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
+    (u) => (u as any).perfiles,
+    {
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  )
   @JoinColumn({ name: 'p_id_usuario' })
   usuario?: Auth;
 
   @Column({ name: 'p_id_rol', type: 'int' })
   rolId: number;
 
-  // If you later add a Rol entity, replace this numeric column with a relation.
+  // Si más adelante agregas una entidad Rol, reemplaza esta columna numérica con una relación.
 
   @Column({ name: 'p_id_empresa', type: 'int' })
   empresaId: number;
 
-  @ManyToOne(() => Empresa, (e) => (e as any).conexiones, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
+  @ManyToOne(
+    () => Empresa,
+    // TODO: Esta relación inversa debería apuntar a una propiedad 'perfiles' en Empresa,
+    // pero actualmente Empresa no tiene esa relación OneToMany definida.
+    // Por ahora se mantiene como 'conexiones' para no romper el código existente.
+    // Considerar agregar OneToMany(() => Perfil) perfiles en la entidad Empresa.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
+    (e) => (e as any).conexiones,
+    {
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+  )
   @JoinColumn({ name: 'p_id_empresa' })
   empresa?: Empresa;
 

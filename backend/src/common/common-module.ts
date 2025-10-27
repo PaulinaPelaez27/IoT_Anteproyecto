@@ -4,7 +4,7 @@ import { TenantConnectionHelper } from './tenant-helpers';
 import { ConexionesModule } from 'src/modules/conexiones/conexiones.module';
 
 @Module({
-  imports: [ConexionesModule], // <- ConexionesModule doit exporter ConexionesService
+  imports: [ConexionesModule], // <- ConexionesModule debe exportar ConexionesService
   providers: [TenantConnectionHelper],
   exports: [TenantConnectionHelper],
 })
