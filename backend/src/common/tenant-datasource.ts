@@ -89,6 +89,57 @@ export async function getDataSourceForEmpresa(empresaId: number, entities: Funct
   return ds;
 }
 
+/**
+ * Crea un DataSource a partir de una configuración explícita y lo cachea por empresaId.
+ */
+export async function createDataSourceFromConfig(
+  empresaId: number,
+  cfg: TenantConfig,
+  entities: Function[] = [],
+): Promise<DataSource> {
+  const options = {
+    ...(baseOptions as any),
+    type: 'postgres',
+    host: cfg.host,
+    port: cfg.port ?? 5432,
+    username: cfg.username,
+    password: cfg.password,
+    database: cfg.database,
+    entities,
+  } as DataSourceOptions;
+
+  const ds = new DataSource(options);
+  await ds.initialize();
+  cache.set(empresaId, ds);
+  console.log(`Initialized tenant DataSource for empresaId=${empresaId}`);
+  return ds;
+}
+
+/**
+ * Obtiene un DataSource directo a partir de un objeto Conexion (registro de tb_conexiones).
+ * Si ya existe un DataSource cacheado para la empresa, lo retorna.
+ */
+export async function getDataSourceFromConexion(conn: Conexion, entities: Function[] = []): Promise<DataSource | null> {
+  const empresaId = (conn as any).empresaId ?? (conn as any).id;
+  if (!empresaId) return null;
+
+  const cached = cache.get(empresaId);
+  if (cached) {
+    if (!cached.isInitialized) await cached.initialize();
+    return cached;
+  }
+
+  const cfg: TenantConfig = {
+    host: (conn as any).host ?? 'localhost',
+    port: (conn as any).puerto ?? 5432,
+    username: (conn as any).usuario,
+    password: (conn as any).contrasena,
+    database: (conn as any).nombreBaseDeDatos,
+  };
+
+  return createDataSourceFromConfig(empresaId, cfg, entities);
+}
+
 export async function closeTenant(empresaId: number) {
   const ds = cache.get(empresaId);
   if (ds) {

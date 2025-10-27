@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { TenantConnectionService } from './common/tenant-connection.service';
 import { join } from 'path';
 import { AuthModule } from './modules/auth/auth.module';
+import { ProyectosModule } from './modules/proyectos/proyectos.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { AuthModule } from './modules/auth/auth.module';
         logging: config.get<string>('DB_LOGGING', 'false') === 'true',
       }),
     }),
-    AuthModule,
+  AuthModule,
+  ProyectosModule,
   ],
   controllers: [AppController],
   providers: [AppService, TenantConnectionService],

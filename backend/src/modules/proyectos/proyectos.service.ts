@@ -25,8 +25,8 @@ export class ProyectosService {
   async findAll(perfil: PerfilLike) {
     const empresaId = perfil.p_id_empresa ?? perfil.empresa?.e_id;
     if (!empresaId) throw new Error('empresaId requerido');
-    const ds = await this.tenantConnectionService.getDataSourceForEmpresa(empresaId, [Proyecto]);
-    if (!ds) throw new Error('No tenant datasource for empresa');
+    const ds = await this.tenantConnectionService.getDataSourceFromConexion(empresaId, [Proyecto]);
+    if (!ds) throw new Error(`No tenant datasource for empresa ${empresaId}`);
     const repo: Repository<Proyecto> = ds.getRepository(Proyecto);
     return repo.find({ where: { borrado: false } });
   }
