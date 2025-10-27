@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS tb_sensores_tipos_dato (
   std_nombre        VARCHAR(100) NOT NULL,
   std_unidad        VARCHAR(15),
   std_descripcion   VARCHAR(250),
+  std_var_json      VARCHAR(15),  -- nombre de la variable en el JSON recibido
   std_estado        BOOLEAN NOT NULL DEFAULT TRUE,
   std_borrado       BOOLEAN NOT NULL DEFAULT FALSE,
   std_creado_en     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
