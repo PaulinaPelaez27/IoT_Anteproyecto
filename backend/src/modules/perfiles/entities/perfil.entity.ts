@@ -46,12 +46,8 @@ export class Perfil {
 
   @ManyToOne(
     () => Empresa,
-    // TODO: Esta relación inversa debería apuntar a una propiedad 'perfiles' en Empresa,
-    // pero actualmente Empresa no tiene esa relación OneToMany definida.
-    // Por ahora se mantiene como 'conexiones' para no romper el código existente.
-    // Considerar agregar OneToMany(() => Perfil) perfiles en la entidad Empresa.
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-    (e) => (e as any).conexiones,
+    (e) => (e as any).perfiles,
     {
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',

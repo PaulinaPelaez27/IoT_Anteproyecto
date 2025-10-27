@@ -1,6 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 // Importación de tipo para evitar dependencia circular fuerte
 import { Conexion } from '../../conexiones/entities/conexion.entity';
+// Nueva relación a Perfiles (asegúrate de que exista Perfil.entit y su ManyToOne hacia Empresa)
+import { Perfil } from '../../perfiles/entities/perfil.entity';
 
 @Entity('tb_empresas')
 export class Empresa {
@@ -59,4 +61,8 @@ export class Empresa {
 
   @OneToMany(() => Conexion, (conexion: Conexion) => conexion.empresa)
   conexiones?: Conexion[];
+
+  // Relación OneToMany hacia Perfil.
+  @OneToMany(() => Perfil, (perfil: Perfil) => perfil.empresa)
+  perfiles?: Perfil[];
 }

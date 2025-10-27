@@ -10,6 +10,9 @@ import * as bcrypt from 'bcrypt';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { Auth } from './entities/auth.entity';
 import { Conexion } from '../conexiones/entities/conexion.entity';
+import { AuthDto } from './dto/auth.dto';
+import { Perfil } from '../perfiles/entities/perfil.entity';
+import { Empresa } from '../empresas/entities/empresa.entity';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +21,10 @@ export class AuthService {
     private readonly authRepository: Repository<Auth>,
     @InjectRepository(Conexion)
     private readonly conexionRepository: Repository<Conexion>,
+    @InjectRepository(Perfil)
+    private readonly perfilRepository: Repository<Perfil>,
+    @InjectRepository(Empresa)
+    private readonly empresaRepository: Repository<Empresa>,
     private readonly tenantConnectionHelper: TenantConnectionHelper,
   ) {}
 
@@ -59,79 +66,45 @@ export class AuthService {
     return this.authRepository.save(user);
   }
 
-  async login(username: string, password: string) {
-    // Cargamos el usuario junto con sus perfiles y datos relacionados (empresa y rol)
-    const user = await this.authRepository
-      .createQueryBuilder('u')
-      // Mapear perfiles en la propiedad runtime 'perfiles' (no requiere relación inversa en la entidad)
-      .leftJoinAndMapMany(
-        'u.perfiles',
-        'tb_perfiles',
-        'p',
-        'p.p_id_usuario = u.u_id AND p.p_borrado = false',
-      )
-      // Mapear empresa relacionada a cada perfil
-      .leftJoinAndMapOne(
-        'p.empresa',
-        'tb_empresas',
-        'e',
-        'e.e_id = p.p_id_empresa',
-      )
-      // Mapear rol (tabla tb_roles_usuarios)
-      .leftJoinAndMapOne(
-        'p.rol',
-        'tb_roles_usuarios',
-        'r',
-        'r.ru_id = p.p_id_rol',
-      )
-      .where('u.u_email = :email', { email: username })
-      .andWhere('u.u_borrado = false')
-      .getOne();
+  async login(username: string, password: string): Promise<AuthDto> {
+    const user = await this.authRepository.findOne({
+      where: { u_email: username, u_borrado: false },
+    });
+
+    console.log('Authenticating user:', user);
 
     if (!user) throw new NotFoundException('User not found');
 
     const isMatch = await bcrypt.compare(password, user.u_contrasena);
     if (!isMatch) throw new ConflictException('Invalid credentials');
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const safeUser = { ...user } as any;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    if (safeUser.u_contrasena) delete safeUser.u_contrasena;
+    const safeUser = {
+      id: user.u_id,
+      email: user.u_email,
+      empresaId: null,
+      empresaNombre: null,
+    } as AuthDto;
 
-    // Para cada perfil recuperado, adjuntamos las conexiones activas de la empresa
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      const perfiles: any[] = (user as any).perfiles ?? [];
-      await Promise.all(
-        perfiles.map(async (p) => {
-          // p puede contener p.p_id_empresa o empresa.e_id mapeado
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          const empresaId = p.p_id_empresa ?? p.empresa?.e_id ?? p.empresaId;
-          if (!empresaId) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            p.conexiones = [];
-            return;
-          }
+      const perfiles = await this.perfilRepository.find({
+        where: { usuarioId: user.u_id, borrado: false },
+      });
 
-          const conexiones = await this.conexionRepository.find({
-            where: {
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-              empresaId,
-              borrado: false,
-              estado: true,
-            },
+      if (perfiles && perfiles.length > 0) {
+        const firstPerfil = perfiles[0];
+        const empresaId = firstPerfil.empresaId;
+        if (empresaId) {
+          const empresa = await this.empresaRepository.findOne({
+            where: { id: empresaId, borrado: false },
           });
+          if (empresa) {
+            safeUser.empresaId = empresa.id;
+            safeUser.empresaNombre = empresa.nombre;
+          }
+        }
+      }
+    } catch {}
 
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          p.conexiones = conexiones;
-        }),
-      );
-    } catch {
-      // No detener el login si falla la carga de conexiones; devolver al menos el usuario
-      // Puedes registrar el error en un logger si lo deseas
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return safeUser;
   }
 }
