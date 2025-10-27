@@ -40,7 +40,7 @@ export class AuthService {
     const user = await this.authRepository.preload({
       u_id: id,
       ...(updateAuthDto as any),
-    } as any);
+    });
     if (!user) throw new NotFoundException('User not found');
 
     // si actualizan la contraseña, hashéala

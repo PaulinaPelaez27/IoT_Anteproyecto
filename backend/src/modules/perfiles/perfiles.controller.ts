@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { PerfilesService } from './perfiles.service';
 import { CreatePerfileDto } from './dto/create-perfile.dto';
 import { UpdatePerfileDto } from './dto/update-perfile.dto';
