@@ -65,8 +65,6 @@ export class ConexionesService {
     if (!conexion)
       throw new NotFoundException('Conexion para empresa no encontrada');
 
-    console.log(`Obtained conexion for empresaId=${empresaId}:`, conexion);
-
     return conexion;
   }
 }
