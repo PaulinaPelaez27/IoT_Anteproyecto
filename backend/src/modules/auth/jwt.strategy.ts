@@ -27,7 +27,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super(opts);
   }
 
-  validate(payload: JwtPayload) {
+  validate(payload: JwtPayload): {
+    sub: number;
+    email: string;
+    empresa: string;
+    rol: string;
+  } {
     // `payload` is the decoded JWT payload.
     // Return what will be available as req.user
     return {

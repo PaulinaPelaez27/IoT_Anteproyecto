@@ -79,8 +79,6 @@ export class AuthService {
       where: { u_email: username, u_borrado: false },
     });
 
-    console.log('Authenticating user:', user);
-
     if (!user) throw new NotFoundException('Usuario no encontrado');
 
     const isMatch = await bcrypt.compare(password, user.u_contrasena);
@@ -90,14 +88,15 @@ export class AuthService {
       id: user.u_id,
       nombre: user.u_nombre,
       email: user.u_email,
+      empresa: '',
+      rol: '',
     } as LoginResponseDto;
 
     try {
       const perfiles = await this.perfilRepository.find({
         where: { usuarioId: user.u_id, borrado: false },
+        relations: ['empresa', 'rol'],
       });
-
-      console.log('User perfiles:', perfiles);
 
       if (perfiles && perfiles.length > 0) {
         safeUser.empresa = perfiles[0].empresa?.nombre || '';

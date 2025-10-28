@@ -27,10 +27,6 @@ export class ProyectosController {
 
   @Get()
   findAll(@Headers('x-empresa-id') empresaId: string | undefined) {
-    console.log(
-      'ProyectosController.findAll called with empresaId:',
-      empresaId,
-    );
     const perfil = { p_id_empresa: empresaId ? Number(empresaId) : undefined };
     return this.proyectosService.findAll(perfil);
   }
