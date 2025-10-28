@@ -6,11 +6,13 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 
 // Ajusta la ruta si la entidad Empresa está en otra ubicación
 import { Empresa } from '../../empresas/entities/empresa.entity';
 
+@Index('idx_conexiones_empresa', ['empresaId'])
 @Entity('tb_conexiones')
 export class Conexion {
   @PrimaryGeneratedColumn({ name: 'c_id', type: 'int' })

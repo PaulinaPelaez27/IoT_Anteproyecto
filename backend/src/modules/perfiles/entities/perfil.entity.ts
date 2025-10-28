@@ -12,6 +12,7 @@ import {
 
 import { Auth } from '../../auth/entities/auth.entity';
 import { Empresa } from '../../empresas/entities/empresa.entity';
+import { RolUsuario } from 'src/modules/roles-usuarios/entities/rol-usuario.entity';
 
 @Entity('tb_perfiles')
 @Unique('uq_perfil', ['usuarioId', 'rolId', 'empresaId'])
@@ -36,10 +37,20 @@ export class Perfil {
   @JoinColumn({ name: 'p_id_usuario' })
   usuario?: Auth;
 
+  @ManyToOne(
+    () => RolUsuario,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
+    (r) => (r as any).perfiles,
+    {
+      onDelete: 'RESTRICT',
+      onUpdate: 'CASCADE',
+    },
+  )
+  @JoinColumn({ name: 'p_id_rol' })
+  rol?: RolUsuario;
+
   @Column({ name: 'p_id_rol', type: 'int' })
   rolId: number;
-
-  // Si más adelante agregas una entidad Rol, reemplaza esta columna numérica con una relación.
 
   @Column({ name: 'p_id_empresa', type: 'int' })
   empresaId: number;
