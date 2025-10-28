@@ -1,0 +1,2 @@
+- Necesito que los comentarios y textos de errores sean en español.
+- Todas las reviews y otros tipos de comentarios, deben ser en español.
