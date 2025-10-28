@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UpdateAuthDto } from './dto/update-auth.dto';
-import { AuthDto } from './dto/auth.dto';
+import { LoginResponseDto } from './dto/login-response.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -36,7 +36,9 @@ export class AuthController {
   }
 
   @Post('login')
-  login(@Body() body: { email: string; password: string }): Promise<AuthDto> {
+  login(
+    @Body() body: { email: string; password: string },
+  ): Promise<LoginResponseDto> {
     return this.authService.login(body.email, body.password);
   }
 }

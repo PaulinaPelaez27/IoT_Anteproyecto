@@ -10,9 +10,13 @@ import * as bcrypt from 'bcrypt';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { Auth } from './entities/auth.entity';
 import { Conexion } from '../conexiones/entities/conexion.entity';
-import { AuthDto } from './dto/auth.dto';
 import { Perfil } from '../perfiles/entities/perfil.entity';
 import { Empresa } from '../empresas/entities/empresa.entity';
+
+// jwt token
+import { JwtService } from '@nestjs/jwt';
+import { LoginResponseDto } from './dto/login-response.dto';
+import { JwtPayload } from './jwt.strategy';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +30,7 @@ export class AuthService {
     @InjectRepository(Empresa)
     private readonly empresaRepository: Repository<Empresa>,
     private readonly tenantConnectionHelper: TenantConnectionHelper,
+    private readonly jwtService: JwtService,
   ) {}
 
   async findAll() {
@@ -66,44 +71,51 @@ export class AuthService {
     return this.authRepository.save(user);
   }
 
-  async login(username: string, password: string): Promise<AuthDto> {
+  /*
+   * Autenticación y generación de JWT
+   */
+  async login(username: string, password: string): Promise<LoginResponseDto> {
     const user = await this.authRepository.findOne({
       where: { u_email: username, u_borrado: false },
     });
 
     console.log('Authenticating user:', user);
 
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundException('Usuario no encontrado');
 
     const isMatch = await bcrypt.compare(password, user.u_contrasena);
-    if (!isMatch) throw new ConflictException('Invalid credentials');
+    if (!isMatch) throw new ConflictException('Credenciales inválidas');
 
     const safeUser = {
       id: user.u_id,
+      nombre: user.u_nombre,
       email: user.u_email,
-      empresaId: null,
-      empresaNombre: null,
-    } as AuthDto;
+    } as LoginResponseDto;
 
     try {
       const perfiles = await this.perfilRepository.find({
         where: { usuarioId: user.u_id, borrado: false },
       });
 
+      console.log('User perfiles:', perfiles);
+
       if (perfiles && perfiles.length > 0) {
-        const firstPerfil = perfiles[0];
-        const empresaId = firstPerfil.empresaId;
-        if (empresaId) {
-          const empresa = await this.empresaRepository.findOne({
-            where: { id: empresaId, borrado: false },
-          });
-          if (empresa) {
-            safeUser.empresaId = empresa.id;
-            safeUser.empresaNombre = empresa.nombre;
-          }
-        }
+        safeUser.empresa = perfiles[0].empresa?.nombre || '';
+        safeUser.rol = perfiles[0].rol?.ru_nombre || '';
       }
-    } catch {}
+
+      // Generar el JWT
+      const payload: JwtPayload = {
+        sub: user.u_id,
+        email: user.u_email,
+        empresa: safeUser.empresa,
+        rol: safeUser.rol,
+      };
+
+      safeUser.access_token = this.jwtService.sign(payload);
+    } catch (error) {
+      console.error('Error fetching empresa info during login:', error);
+    }
 
     return safeUser;
   }
