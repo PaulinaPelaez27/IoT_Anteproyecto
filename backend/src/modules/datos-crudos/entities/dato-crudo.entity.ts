@@ -34,8 +34,8 @@ export class DatoCrudo {
   @Column({ name: 'dc_id_nodo', type: 'bigint', nullable: true })
   dc_id_nodo: string | null;
 
-  // Mensaje JSONB, NOT NULL
-  @Column({ name: 'dc_mensaje', type: 'jsonb' })
+  // Mensaje JSON, NOT NULL
+  @Column({ name: 'dc_mensaje', type: 'json' })
   dc_mensaje: any;
 
   // timestamptz con valor predeterminado NOW()

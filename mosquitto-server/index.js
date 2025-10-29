@@ -44,13 +44,14 @@ client.on("connect", () => {
   });
 });
 
+//TODO: AUTOMATIZAR PARA QUE SE SUBSCRIBA A TODOS LOS TOPICS DE FORMA DINÁMICA
+
 // Prueba de recepción
 client.on("message", (topic, message) => {
   
   console.log(`📨 Mensaje recibido en ${topic}: ${message.toString()}`);
   try {
-    const msg = JSON.parse(message.toString());
-    console.dir(msg, { depth: null });
+    guardarMensajeBruto(topic, message);
   } catch (error) {
     console.error("❌ Error al parsear JSON:", error.message);
   }
@@ -79,4 +80,13 @@ client.on("error", (error) => {
 console.log("⏳ Intentando conectar...");
 
 // Funciones auxiliares para interactuar con la base de datos
-async function guardarMensaje(topic, message) {}
+async function guardarMensajeBruto(topic, message) {
+    const query = 'INSERT INTO tb_datos_crudos(dc_mensaje) VALUES($1)';
+    const values = [message];
+    try {
+        await pool.query(query, values);
+        console.log("✅ Mensaje guardado en la base de datos");
+    } catch (error) {
+        console.error("❌ Error al guardar mensaje en la base de datos:", error.message);
+    }
+}
