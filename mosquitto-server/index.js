@@ -1,7 +1,21 @@
-const mqtt = require("mqtt");
-const dotenv = require("dotenv");
+import { connect } from "mqtt";
+import { config } from "dotenv";
+import { Pool } from 'pg';
 
-dotenv.config();
+config();
+
+// Conexion a la base de datos PostgreSQL
+const pool = new Pool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT,
+});
+
+pool.connect()
+    .then(() => console.log("✅ Conectado a la base de datos PostgreSQL"))
+    .catch(err => console.error("❌ Error al conectar a la base de datos PostgreSQL:", err));
 
 // Leer credenciales desde .env y pasarlas como opciones de conexión
 const mqttOptions = {
@@ -15,7 +29,7 @@ if (!mqttOptions.username || !mqttOptions.password) {
     console.warn("⚠️ MQTT_USERNAME o MQTT_PASSWORD no están definidos en el .env");
 }
 
-const client = mqtt.connect(process.env.MQTTSERVER, mqttOptions);
+const client = connect(process.env.MQTTSERVER, mqttOptions);
 
 // Prueba de conexión
 client.on("connect", () => {
@@ -58,8 +72,11 @@ client.on("error", (error) => {
   }
 });
 
-client.on("offline", () => {
+/*client.on("offline", () => {
   console.warn("⚠️ Cliente fuera de línea");
-});
+});*/
 
 console.log("⏳ Intentando conectar...");
+
+// Funciones auxiliares para interactuar con la base de datos
+async function guardarMensaje(topic, message) {}
