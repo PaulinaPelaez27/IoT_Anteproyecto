@@ -1,0 +1,65 @@
+const mqtt = require("mqtt");
+const dotenv = require("dotenv");
+
+dotenv.config();
+
+// Leer credenciales desde .env y pasarlas como opciones de conexión
+const mqttOptions = {
+    username: process.env.MQTT_USERNAME,
+    password: process.env.PASSWORD_MQ,
+    // opcional: definir clientId si lo necesitas
+    clientId: process.env.CLIENTID || `client_${Math.random().toString(16).slice(2, 10)}`
+};
+
+if (!mqttOptions.username || !mqttOptions.password) {
+    console.warn("⚠️ MQTT_USERNAME o MQTT_PASSWORD no están definidos en el .env");
+}
+
+const client = mqtt.connect(process.env.MQTTSERVER, mqttOptions);
+
+// Prueba de conexión
+client.on("connect", () => {
+  console.log("✅ ¡CONEXIÓN OK!");
+  console.log("🎯 Los datos son correctos");
+
+  // Prueba de suscripción a un topic simple
+  client.subscribe("Extensometer/get", (err) => {
+    if (!err) {
+      console.log("📡 Suscrito al topic Extensometer/get");
+    }
+  });
+});
+
+// Prueba de recepción
+client.on("message", (topic, message) => {
+  
+  console.log(`📨 Mensaje recibido en ${topic}: ${message.toString()}`);
+  try {
+    const msg = JSON.parse(message.toString());
+    console.dir(msg, { depth: null });
+  } catch (error) {
+    console.error("❌ Error al parsear JSON:", error.message);
+  }
+});
+
+// Gestión de errores
+client.on("error", (error) => {
+  console.error("❌ ¡ERROR DE CONEXIÓN!");
+  console.error("Detalles:", error.message);
+
+  if (error.code === 4) {
+    console.error(
+      "🚫 Credenciales rechazadas (usuario/contraseña incorrectos)",
+    );
+  } else if (error.code === 5) {
+    console.error("🚫 Conexión no autorizada");
+  } else {
+    console.error("🚫 Error de red o servidor inaccesible");
+  }
+});
+
+client.on("offline", () => {
+  console.warn("⚠️ Cliente fuera de línea");
+});
+
+console.log("⏳ Intentando conectar...");
