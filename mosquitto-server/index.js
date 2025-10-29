@@ -82,7 +82,7 @@ console.log("⏳ Intentando conectar...");
 // Funciones auxiliares para interactuar con la base de datos
 async function guardarMensajeBruto(topic, message) {
     const query = 'INSERT INTO tb_datos_crudos(dc_mensaje) VALUES($1)';
-    const values = [message];
+    const values = [message.toString()];
     try {
         await pool.query(query, values);
         console.log("✅ Mensaje guardado en la base de datos");
