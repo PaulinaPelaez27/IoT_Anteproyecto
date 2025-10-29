@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS tb_datos_crudos (
   dc_id_empresa   INT REFERENCES tb_empresas(e_id)
                      ON UPDATE CASCADE ON DELETE SET NULL,
   dc_id_nodo      BIGINT,             -- puede ser NULL (sin FK cross-DB)
-  dc_mensaje      JSON NOT NULL,
+  dc_mensaje      JSONB NOT NULL,
   dc_recibido_en  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   dc_error_log    TEXT,
   dc_estado       BOOLEAN NOT NULL DEFAULT TRUE,
