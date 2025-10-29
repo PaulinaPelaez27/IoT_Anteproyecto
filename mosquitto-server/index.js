@@ -2,8 +2,31 @@ import { connect } from "mqtt";
 import { config } from "dotenv";
 import { Pool } from 'pg';
 
-config();
+const dotenvResult = config();
 
+// Check for dotenv errors
+if (dotenvResult.error) {
+    console.error("❌ Error cargando el archivo .env:", dotenvResult.error.message);
+    process.exit(1);
+}
+
+// Validar variables de entorno requeridas
+const requiredEnv = [
+    "DB_HOST",
+    "DB_USER",
+    "DB_PASS",
+    "DB_NAME",
+    "DB_PORT",
+    "MQTT_USERNAME",
+    "PASSWORD_MQ",
+    "MQTTSERVER"
+];
+
+const missingEnv = requiredEnv.filter((key) => !process.env[key]);
+if (missingEnv.length > 0) {
+    console.error("❌ Faltan las siguientes variables de entorno en el archivo .env:", missingEnv.join(", "));
+    process.exit(1);
+}
 // Conexion a la base de datos PostgreSQL
 const pool = new Pool({
     host: process.env.DB_HOST,
