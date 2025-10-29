@@ -80,6 +80,7 @@ client.on("error", (error) => {
 console.log("⏳ Intentando conectar...");
 
 // Funciones auxiliares para interactuar con la base de datos
+//TODO: Mejorar manejo de errores y validaciones
 async function guardarMensajeBruto(topic, message) {
     const query = 'INSERT INTO tb_datos_crudos(dc_mensaje) VALUES($1)';
     const values = [message.toString()];
