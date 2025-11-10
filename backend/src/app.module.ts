@@ -7,6 +7,8 @@ import { CommonModule } from './common/common-module';
 import { join } from 'path';
 import { AuthModule } from './modules/auth/auth.module';
 import { ProyectosModule } from './modules/proyectos/proyectos.module';
+import { EmpresasModule } from './modules/empresas/empresas.module';
+import { ConexionesModule } from './modules/conexiones/conexiones.module';
 
 @Module({
   imports: [
@@ -27,7 +29,9 @@ import { ProyectosModule } from './modules/proyectos/proyectos.module';
       }),
     }),
     AuthModule,
+    EmpresasModule,
     ProyectosModule,
+    ConexionesModule,
     CommonModule,
   ],
   controllers: [AppController],

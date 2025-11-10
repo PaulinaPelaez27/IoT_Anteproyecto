@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { ConexionesService } from './conexiones.service';
 import { CreateConexioneDto } from './dto/create-conexione.dto';
@@ -30,7 +31,7 @@ export class ConexionesController {
     return this.conexionesService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id') id: string,
     @Body() updateConexioneDto: UpdateConexioneDto,
@@ -41,5 +42,12 @@ export class ConexionesController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.conexionesService.remove(+id);
+  }
+
+  @Post('test')
+  async testConnection(@Body() dto: CreateConexioneDto) {
+    // Map DTO to plain object to match expected entity structure
+    const conexion = { ...dto };
+    return this.conexionesService.testConnection(conexion);
   }
 }

@@ -1,0 +1,54 @@
+{
+    "idEmpresa":"empre01",
+ 
+    "lstproyecto":[
+        {
+        "idProyecto":"proyec001",
+        "lstNode":[
+        { "node":{
+        "id":"nod01",
+        "strdescripcion":"dddd",
+        "lstsensores":[
+            {"id":"sensor1",
+            "lstparametros":[
+                {"id":"calor","valor":255,"strDescripcion":"ddddd"},
+                 {"id":"humedad","valor":255,"strDescripcion":"ddddd"},
+                  {"id":"movimiento","valor":255,"strDescripcion":"ddddd"}
+            ]
+            
+            },
+               {"id":"sensor2",
+            "lstparametros":[
+                {"id":"calor","valor":255,"strDescripcion":"ddddd"}
+            ]
+            
+            }
+        ]
+    }},
+    { "node":{
+        "id":"nod02",
+        "strdescripcion":"dddd",
+        "lstsensores":[
+            {"id":"sensor2",
+            "lstparametros":[
+                {"id":"calor","valor":255,"strDescripcion":"ddddd"},
+                 {"id":"humedad","valor":255,"strDescripcion":"ddddd"},
+                  {"id":"movimiento","valor":255,"strDescripcion":"ddddd"}
+            ]
+            
+            },
+               {"id":"sensor3",
+            "lstparametros":[
+                {"id":"calor","valor":255,"strDescripcion":"ddddd"}
+            ]
+            
+            }
+        ]
+    }}
+    ]
+    }]
+    
+   
+}
+
+{"id_ext":"Ext-001","ts_ms":41505429,"bat_v":13.26806,"bat_pct":42.0234,"light_pct":95.62881,"hum_pct":32.11233,"temp_c":20,"dist_mm":0.235619,"gps":{"has_fix":1,"lat":"-1.65459","lon":"-78.67753","dt":"2025-10-28 17:41:18","age_s":48},"link":{"net":1,"gprs":1},"dev":{"msg":974,"eew":109,"bot":12}}
