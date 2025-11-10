@@ -1,6 +1,6 @@
 import { IsString, IsOptional, IsInt, IsBoolean, Min, MaxLength } from 'class-validator';
 
-export class CreateConexioneDto {
+export class CreateConexionDto {
   @IsInt()
   @Min(1)
   empresaId: number;

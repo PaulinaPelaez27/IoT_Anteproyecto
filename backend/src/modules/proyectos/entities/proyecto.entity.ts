@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 
 @Entity('tb_proyectos')
@@ -38,6 +39,6 @@ export class Proyecto {
   })
   modificadoEn?: Date;
 
-  @Column({ name: 'p_borrado_en', type: 'timestamptz', nullable: true })
-  borradoEn?: Date;
+  @DeleteDateColumn({ name: 'p_borrado_en', type: 'timestamptz', nullable: true })
+  borradoEn?: Date; 
 }

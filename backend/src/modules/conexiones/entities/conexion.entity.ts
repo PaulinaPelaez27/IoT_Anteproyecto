@@ -21,17 +21,6 @@ export class Conexion {
   @Column({ name: 'c_id_empresa', type: 'int' })
   empresaId: number;
   
-  //cambie esto
-  
-  /*@ManyToOne(
-    () => Empresa,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-    (empresa) => (empresa as any).conexiones,
-    {
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-    },
-  )*/
   @ManyToOne(() => Empresa, (empresa) => empresa.conexiones, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',

@@ -9,16 +9,16 @@ import {
   Put,
 } from '@nestjs/common';
 import { ConexionesService } from './conexiones.service';
-import { CreateConexioneDto } from './dto/create-conexione.dto';
-import { UpdateConexioneDto } from './dto/update-conexione.dto';
+import { CreateConexionDto } from './dto/create-conexion.dto';
+import { UpdateConexionDto } from './dto/update-conexion.dto';
 
 @Controller('conexiones')
 export class ConexionesController {
   constructor(private readonly conexionesService: ConexionesService) {}
 
   @Post()
-  create(@Body() createConexioneDto: CreateConexioneDto) {
-    return this.conexionesService.create(createConexioneDto);
+  create(@Body() createConexionDto: CreateConexionDto) {
+    return this.conexionesService.create(createConexionDto);
   }
 
   @Get()
@@ -31,12 +31,12 @@ export class ConexionesController {
     return this.conexionesService.findOne(+id);
   }
 
-  @Put(':id')
+  @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() updateConexioneDto: UpdateConexioneDto,
+    @Body() updateConexionDto: UpdateConexionDto,
   ) {
-    return this.conexionesService.update(+id, updateConexioneDto);
+    return this.conexionesService.update(+id, updateConexionDto);
   }
 
   @Delete(':id')
@@ -45,7 +45,7 @@ export class ConexionesController {
   }
 
   @Post('test')
-  async testConnection(@Body() dto: CreateConexioneDto) {
+  async testConnection(@Body() dto: CreateConexionDto) {
   return this.conexionesService.testConnection(dto as any);
 }
 }
