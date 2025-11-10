@@ -125,10 +125,34 @@ export class ConexionesService {
     });
   }
 
+  /**
+   * Valida que el nombre de la base de datos contenga solo caracteres seguros.
+   * Permite solo letras (a-z, A-Z), números (0-9) y guiones bajos (_).
+   * @throws Error si el nombre contiene caracteres no permitidos
+   */
+  private validateDatabaseName(dbName: string): void {
+    const validPattern = /^[a-zA-Z0-9_]+$/;
+    if (!validPattern.test(dbName)) {
+      throw new Error(
+        `Nombre de base de datos inválido: "${dbName}". Solo se permiten caracteres alfanuméricos y guiones bajos.`,
+      );
+    }
+  }
+
   async createDefaultForEmpresa(empresaId: number, nombreEmpresa: string) {
-    const dbName = `empresa_${empresaId}_${nombreEmpresa
+    // Sanitize company name: remove all non-alphanumeric characters except underscores
+    const sanitizedName = nombreEmpresa
       .toLowerCase()
-      .replace(/\s+/g, '_')}`;
+      .replace(/[^a-z0-9_]/g, '_')
+      .replace(/_+/g, '_') // Replace multiple consecutive underscores with single underscore
+      .replace(/^_|_$/g, ''); // Remove leading/trailing underscores
+
+    // PostgreSQL has a 63 character limit for identifiers
+    // Reserve space for prefix and empresa ID (e.g., "empresa_123_" = ~13 chars)
+    const maxNameLength = 50;
+    const truncatedName = sanitizedName.slice(0, maxNameLength);
+
+    const dbName = `empresa_${empresaId}_${truncatedName}`;
 
     await this.createDatabaseIfNotExists(dbName);
 
