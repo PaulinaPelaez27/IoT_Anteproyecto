@@ -126,9 +126,19 @@ export class ConexionesService {
   }
 
   async createDefaultForEmpresa(empresaId: number, nombreEmpresa: string) {
-    const dbName = `empresa_${empresaId}_${nombreEmpresa
+    // Sanitize company name: remove all non-alphanumeric characters except underscores
+    const sanitizedName = nombreEmpresa
       .toLowerCase()
-      .replace(/\s+/g, '_')}`;
+      .replace(/[^a-z0-9_]/g, '_')
+      .replace(/_+/g, '_') // Replace multiple consecutive underscores with single underscore
+      .replace(/^_|_$/g, ''); // Remove leading/trailing underscores
+
+    // PostgreSQL has a 63 character limit for identifiers
+    // Reserve space for prefix and empresa ID (e.g., "empresa_123_" = ~13 chars)
+    const maxNameLength = 50;
+    const truncatedName = sanitizedName.slice(0, maxNameLength);
+
+    const dbName = `empresa_${empresaId}_${truncatedName}`;
 
     await this.createDatabaseIfNotExists(dbName);
 
