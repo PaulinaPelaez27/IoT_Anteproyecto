@@ -21,7 +21,7 @@ export class Conexion {
   @Column({ name: 'c_id_empresa', type: 'int' })
   empresaId: number;
   
-  //cambie esto
+  //cambié esto
   
   /*@ManyToOne(
     () => Empresa,
