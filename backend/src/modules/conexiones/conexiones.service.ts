@@ -125,6 +125,20 @@ export class ConexionesService {
     });
   }
 
+  /**
+   * Valida que el nombre de la base de datos contenga solo caracteres seguros.
+   * Permite solo letras (a-z, A-Z), números (0-9) y guiones bajos (_).
+   * @throws Error si el nombre contiene caracteres no permitidos
+   */
+  private validateDatabaseName(dbName: string): void {
+    const validPattern = /^[a-zA-Z0-9_]+$/;
+    if (!validPattern.test(dbName)) {
+      throw new Error(
+        `Nombre de base de datos inválido: "${dbName}". Solo se permiten caracteres alfanuméricos y guiones bajos.`,
+      );
+    }
+  }
+
   async createDefaultForEmpresa(empresaId: number, nombreEmpresa: string) {
     // Sanitize company name: remove all non-alphanumeric characters except underscores
     const sanitizedName = nombreEmpresa
@@ -155,6 +169,9 @@ export class ConexionesService {
   }
 
   async createDatabaseIfNotExists(dbName: string) {
+    // Validar el nombre de la base de datos antes de usarlo en consultas SQL
+    this.validateDatabaseName(dbName);
+
     const adminDs = new DataSource({
       type: 'postgres',
       host: process.env.DB_HOST,

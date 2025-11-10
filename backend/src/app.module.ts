@@ -8,7 +8,6 @@ import { join } from 'path';
 import { AuthModule } from './modules/auth/auth.module';
 import { ProyectosModule } from './modules/proyectos/proyectos.module';
 import { EmpresasModule } from './modules/empresas/empresas.module';
-import { Conexion } from './modules/conexiones/entities/conexion.entity';
 import { ConexionesModule } from './modules/conexiones/conexiones.module';
 
 @Module({
