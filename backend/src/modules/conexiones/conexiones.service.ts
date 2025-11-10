@@ -154,17 +154,20 @@ export class ConexionesService {
       database: 'postgres',
     });
 
-    await adminDs.initialize();
-    const exists = await adminDs.query(
-      `SELECT 1 FROM pg_database WHERE datname = $1`,
-      [dbName],
-    );
+    try {
+      await adminDs.initialize();
+      const exists = await adminDs.query(
+        `SELECT 1 FROM pg_database WHERE datname = $1`,
+        [dbName],
+      );
 
-    if (exists.length === 0) {
-      await adminDs.query(`CREATE DATABASE "${dbName}"`);
-      console.log(`✅ Base de datos ${dbName} creada`);
+      if (exists.length === 0) {
+        await adminDs.query(`CREATE DATABASE "${dbName}"`);
+        console.log(`✅ Base de datos ${dbName} creada`);
+      }
+    } finally {
+      await adminDs.destroy();
     }
-    await adminDs.destroy();
   }
 
   async testConnection(conexion: Conexion) {
