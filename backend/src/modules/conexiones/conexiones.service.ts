@@ -144,7 +144,33 @@ export class ConexionesService {
     return this.conexionRepo.save(conexion);
   }
 
+  /**
+   * Validates that a database name contains only alphanumeric characters and underscores.
+   * This prevents SQL injection attacks in CREATE DATABASE statements.
+   */
+  private validateDatabaseName(dbName: string): void {
+    if (!dbName || typeof dbName !== 'string') {
+      throw new Error('Database name must be a non-empty string');
+    }
+
+    // Allow only alphanumeric characters and underscores
+    const validPattern = /^[a-zA-Z0-9_]+$/;
+    if (!validPattern.test(dbName)) {
+      throw new Error(
+        'Database name can only contain alphanumeric characters and underscores',
+      );
+    }
+
+    // Additional check: database name should not be too long (PostgreSQL limit is 63 chars)
+    if (dbName.length > 63) {
+      throw new Error('Database name exceeds maximum length of 63 characters');
+    }
+  }
+
   async createDatabaseIfNotExists(dbName: string) {
+    // Validate database name to prevent SQL injection
+    this.validateDatabaseName(dbName);
+
     const adminDs = new DataSource({
       type: 'postgres',
       host: process.env.DB_HOST,

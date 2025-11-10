@@ -1,4 +1,11 @@
-import { IsString, IsOptional, IsInt, IsBoolean, Min, MaxLength } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsInt,
+  IsBoolean,
+  Min,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateConexioneDto {
   @IsInt()
