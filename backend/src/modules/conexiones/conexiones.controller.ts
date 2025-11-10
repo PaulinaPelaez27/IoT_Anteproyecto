@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { ConexionesService } from './conexiones.service';
 import { CreateConexioneDto } from './dto/create-conexione.dto';
@@ -30,7 +31,7 @@ export class ConexionesController {
     return this.conexionesService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id') id: string,
     @Body() updateConexioneDto: UpdateConexioneDto,
@@ -42,4 +43,9 @@ export class ConexionesController {
   remove(@Param('id') id: string) {
     return this.conexionesService.remove(+id);
   }
+
+  @Post('test')
+  async testConnection(@Body() dto: CreateConexioneDto) {
+  return this.conexionesService.testConnection(dto as any);
+}
 }
