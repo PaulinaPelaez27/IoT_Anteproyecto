@@ -40,5 +40,5 @@ export class Proyecto {
   modificadoEn?: Date;
 
   @DeleteDateColumn({ name: 'p_borrado_en', type: 'timestamptz', nullable: true })
-  borradoEn?: Date; 
+  borradoEn?: Date;
 }

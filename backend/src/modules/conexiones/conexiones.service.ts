@@ -11,7 +11,7 @@ export class ConexionesService {
   constructor(
     @InjectRepository(Conexion)
     private readonly conexionRepo: Repository<Conexion>,
-  ) {}
+  ) { }
 
   async create(createConexionDto: CreateConexionDto) {
     const ent = this.conexionRepo.create(createConexionDto);
@@ -117,26 +117,6 @@ export class ConexionesService {
       }
     } finally {
       await adminDs.destroy();
-    }
-  }
-
-  async testConnection(conexion: Conexion) {
-    const ds = new DataSource({
-      type: 'postgres',
-      host: conexion.host,
-      port: conexion.puerto,
-      username: conexion.usuario,
-      password: conexion.contrasena,
-      database: conexion.nombreBaseDeDatos,
-    });
-
-    try {
-      await ds.initialize();
-      await ds.query('SELECT 1');
-      await ds.destroy();
-      return { ok: true, message: 'Conexión válida ✅' };
-    } catch (error) {
-      return { ok: false, message: error.message };
     }
   }
 
