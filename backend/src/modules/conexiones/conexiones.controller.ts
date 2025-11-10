@@ -46,6 +46,8 @@ export class ConexionesController {
 
   @Post('test')
   async testConnection(@Body() dto: CreateConexioneDto) {
-  return this.conexionesService.testConnection(dto as any);
-}
+    // Map DTO to plain object to match expected entity structure
+    const conexion = { ...dto };
+    return this.conexionesService.testConnection(conexion);
+  }
 }
