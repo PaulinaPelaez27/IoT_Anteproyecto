@@ -18,27 +18,27 @@ export class EmpresasService {
   constructor(
     @InjectRepository(Empresa)
     private readonly empresaRepository: Repository<Empresa>,
-    private readonly conexionesService: ConexionesService, // 🔹 Importante: integrar servicio de conexiones
+    private readonly conexionesService: ConexionesService, // Importante: integrar servicio de conexiones
   ) {}
 
   async create(createEmpresaDto: CreateEmpresaDto) {
     try {
-      // 1️⃣ Crear empresa
+      //  Crear empresa
       const empresa = this.empresaRepository.create(createEmpresaDto);
       const savedEmpresa = await this.empresaRepository.save(empresa);
 
-      // 2️⃣ Crear conexión automática (y base operativa)
+      //  Crear conexión automática (y base operativa)
       try {
         await this.conexionesService.createDefaultForEmpresa(
           savedEmpresa.id,
           savedEmpresa.nombre,
         );
         this.logger.log(
-          `✅ Conexión creada para empresa ${savedEmpresa.nombre} (ID=${savedEmpresa.id})`,
+          ` Conexión creada para empresa ${savedEmpresa.nombre} (ID=${savedEmpresa.id})`,
         );
       } catch (err) {
         this.logger.error(
-          `⚠️ No se pudo crear la conexión para empresa ${savedEmpresa.nombre}: ${err.message}`,
+          ` No se pudo crear la conexión para empresa ${savedEmpresa.nombre}: ${err.message}`,
         );
       }
 

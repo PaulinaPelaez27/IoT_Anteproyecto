@@ -7,7 +7,7 @@ import {
   MaxLength,
 } from 'class-validator';
 
-export class CreateConexioneDto {
+export class CreateConexionDto {
   @IsInt()
   @Min(1)
   empresaId: number;
