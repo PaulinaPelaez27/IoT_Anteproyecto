@@ -48,10 +48,34 @@ export class ConexionesService {
     });
   }
 
+  /**
+   * Valida que el nombre de la base de datos contenga solo caracteres seguros.
+   * Permite solo letras (a-z, A-Z), números (0-9) y guiones bajos (_).
+   * @throws Error si el nombre contiene caracteres no permitidos
+   */
+  private validateDatabaseName(dbName: string): void {
+    const validPattern = /^[a-zA-Z0-9_]+$/;
+    if (!validPattern.test(dbName)) {
+      throw new Error(
+        `Nombre de base de datos inválido: "${dbName}". Solo se permiten caracteres alfanuméricos y guiones bajos.`,
+      );
+    }
+  }
+
   async createDefaultForEmpresa(empresaId: number, nombreEmpresa: string) {
-    const dbName = `empresa_${empresaId}_${nombreEmpresa
+    // Sanitize company name: remove all non-alphanumeric characters except underscores
+    const sanitizedName = nombreEmpresa
       .toLowerCase()
-      .replace(/\s+/g, '_')}`;
+      .replace(/[^a-z0-9_]/g, '_')
+      .replace(/_+/g, '_') // Replace multiple consecutive underscores with single underscore
+      .replace(/^_|_$/g, ''); // Remove leading/trailing underscores
+
+    // PostgreSQL has a 63 character limit for identifiers
+    // Reserve space for prefix and empresa ID (e.g., "empresa_123_" = ~13 chars)
+    const maxNameLength = 50;
+    const truncatedName = sanitizedName.slice(0, maxNameLength);
+
+    const dbName = `empresa_${empresaId}_${truncatedName}`;
 
     await this.createDatabaseIfNotExists(dbName);
 
@@ -67,7 +91,33 @@ export class ConexionesService {
     return this.conexionRepo.save(conexion);
   }
 
+  /**
+   * Validates that a database name contains only alphanumeric characters and underscores.
+   * This prevents SQL injection attacks in CREATE DATABASE statements.
+   */
+  private validateDatabaseName(dbName: string): void {
+    if (!dbName || typeof dbName !== 'string') {
+      throw new Error('Database name must be a non-empty string');
+    }
+
+    // Allow only alphanumeric characters and underscores
+    const validPattern = /^[a-zA-Z0-9_]+$/;
+    if (!validPattern.test(dbName)) {
+      throw new Error(
+        'Database name can only contain alphanumeric characters and underscores',
+      );
+    }
+
+    // Additional check: database name should not be too long (PostgreSQL limit is 63 chars)
+    if (dbName.length > 63) {
+      throw new Error('Database name exceeds maximum length of 63 characters');
+    }
+  }
+
   async createDatabaseIfNotExists(dbName: string) {
+    // Validate database name to prevent SQL injection
+    this.validateDatabaseName(dbName);
+
     const adminDs = new DataSource({
       type: 'postgres',
       host: process.env.DB_HOST,
@@ -77,17 +127,20 @@ export class ConexionesService {
       database: 'postgres',
     });
 
-    await adminDs.initialize();
-    const exists = await adminDs.query(
-      `SELECT 1 FROM pg_database WHERE datname = $1`,
-      [dbName],
-    );
+    try {
+      await adminDs.initialize();
+      const exists = await adminDs.query(
+        `SELECT 1 FROM pg_database WHERE datname = $1`,
+        [dbName],
+      );
 
-    if (exists.length === 0) {
-      await adminDs.query(`CREATE DATABASE "${dbName}"`);
-      console.log(`✅ Base de datos ${dbName} creada`);
+      if (exists.length === 0) {
+        await adminDs.query(`CREATE DATABASE "${dbName}"`);
+        console.log(`✅ Base de datos ${dbName} creada`);
+      }
+    } finally {
+      await adminDs.destroy();
     }
-    await adminDs.destroy();
   }
 
   async testConnection(conexion: Conexion) {

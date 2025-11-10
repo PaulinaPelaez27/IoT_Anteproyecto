@@ -24,9 +24,7 @@ export class Conexion {
   @ManyToOne(() => Empresa, (empresa) => empresa.conexiones, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
-  }
-  )
-
+  })
   @JoinColumn({ name: 'c_id_empresa' })
   empresa?: Empresa;
 
