@@ -31,12 +31,12 @@ export class TenantConnectionHelper implements OnModuleDestroy {
     DataSourceOptions,
     'host' | 'username' | 'password' | 'database'
   > = {
-    type: 'postgres',
-    synchronize: false,
-    logging: false,
-  };
+      type: 'postgres',
+      synchronize: false,
+      logging: false,
+    };
 
-  constructor(private readonly conexiones: ConexionesService) {}
+  constructor(private readonly conexiones: ConexionesService) { }
 
   async onModuleDestroy() {
     await this.closeAll();
@@ -47,7 +47,7 @@ export class TenantConnectionHelper implements OnModuleDestroy {
     if (!empresaId) throw new Error('empresaId requerido');
 
     const row = await this.conexiones.findByEmpresaId(empresaId);
-    if (!row) {
+    this.logger.debug(`Configuración obtenida para empresaId=${empresaId}`, row); if (!row) {
       throw new NotFoundException(
         `No existe configuración de conexión para empresaId=${empresaId}`,
       );
@@ -89,7 +89,9 @@ export class TenantConnectionHelper implements OnModuleDestroy {
   ): Promise<DataSource> {
     const options = this.buildOptions(cfg, entities);
     const ds = new DataSource(options);
+    this.logger.log(`🟡 Intentando inicializar conexión para empresa: ${empresaId} con config: ${JSON.stringify(cfg)}`);
     await ds.initialize();
+    this.logger.log(`🟢 Conexión inicializada correctamente para empresa: ${empresaId}`);
     this.cache.set(empresaId, ds);
     this.logger.log(`Initialized tenant DataSource for empresaId=${empresaId}`);
     return ds;
@@ -105,6 +107,7 @@ export class TenantConnectionHelper implements OnModuleDestroy {
     empresaId: number,
     entities: any[] = [],
   ): Promise<DataSource> {
+    this.logger.log('getDataSource llamado con empresaId: ' + empresaId);
     if (!empresaId) throw new Error('empresaId requerido');
 
     // 1) cache
@@ -114,11 +117,11 @@ export class TenantConnectionHelper implements OnModuleDestroy {
       return cached;
     }
 
-    // 2) si une init est déjà en cours, on attend la même promesse
+    // 2) si una inicialización ya está en curso, esperamos la misma promesa
     const pending = this.inFlight.get(empresaId);
     if (pending) return pending;
 
-    // 3) sinon, on lance l’init avec verrou
+    // 3) si no, iniciamos la inicialización con bloqueo
     const promise = (async () => {
       try {
         const cfg = await this.fetchTenantConfig(empresaId);
