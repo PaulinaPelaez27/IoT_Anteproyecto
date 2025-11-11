@@ -13,122 +13,115 @@ type PerfilLike = { p_id_empresa?: number; empresa?: { e_id?: number } };
 
 @Injectable()
 export class ProyectosService {
-  private readonly logger: Logger;
+  private readonly logger = new Logger(ProyectosService.name);
 
-  constructor(private readonly tenantConnectionHelper: TenantConnectionHelper) {
-    // Inicializa el logger aquí para evitar que TypeScript emita
-    // un parámetro constructor adicional (metadatos Object) que
-    // causaría un error de inyección en Nest.
-    this.logger = new Logger(ProyectosService.name);
-  }
+  constructor(
+    private readonly tenantConnectionHelper: TenantConnectionHelper,
+  ) { }
 
-  async create(perfil: PerfilLike, createProyectoDto: CreateProyectoDto) {
+  /** Helper reutilizable para obtener el repositorio tenant */
+  private async getRepo(perfil: PerfilLike): Promise<Repository<Proyecto>> {
     const empresaId = perfil.p_id_empresa ?? perfil.empresa?.e_id;
-    if (!empresaId) throw new Error('empresaId requerido');
+    if (!empresaId) {
+      throw new BadRequestException('empresaId requerido');
+    }
 
     const ds = await this.tenantConnectionHelper.getDataSource(empresaId, [
       Proyecto,
     ]);
-    if (!ds) throw new Error(`No tenant datasource for empresa ${empresaId}`);
+    if (!ds) {
+      throw new InternalServerErrorException(
+        `No se pudo obtener la conexión para la empresa ${empresaId}`,
+      );
+    }
 
-    const repo: Repository<Proyecto> = ds.getRepository(Proyecto);
-    const ent = repo.create(createProyectoDto as Partial<Proyecto>);
-    return repo.save(ent);
+    return ds.getRepository(Proyecto);
   }
 
-  async findAll(perfil: PerfilLike): Promise<Proyecto[]> {
-    this.logger.debug(`findAll called with perfil=${JSON.stringify(perfil)}`);
-
-    const empresaId = perfil.p_id_empresa ?? perfil.empresa?.e_id;
-    if (empresaId == null) {
-      throw new BadRequestException('x-empresa-id (empresaId) es requerido');
-    }
-    if (Number.isNaN(Number(empresaId)) || Number(empresaId) <= 0) {
-      throw new BadRequestException('x-empresa-id debe ser un número válido');
-    }
-
+  /** Crear proyecto */
+  async create(perfil: PerfilLike, dto: CreateProyectoDto): Promise<Proyecto> {
+    const repo = await this.getRepo(perfil);
+    const entity = repo.create(dto as Partial<Proyecto>);
     try {
-      const ds = await this.tenantConnectionHelper.getDataSource(
-        Number(empresaId),
-        [Proyecto],
-      );
-      const repo: Repository<Proyecto> = ds.getRepository(Proyecto);
-
-      // Filtro predeterminado (no borrado)
-      const items = await repo.find({
-        where: { borrado: false },
-        order: { id: 'ASC' }, // Adapta si tienes createdAt/updatedAt
-      });
-
-      this.logger.debug(
-        `findAll: returning ${items.length} proyecto(s) for empresaId=${empresaId}`,
-      );
-      return items;
+      const saved = await repo.save(entity);
+      this.logger.debug(`Proyecto creado con ID=${saved.id}`);
+      return saved;
     } catch (err) {
-      this.logger.error(
-        `findAll failed for empresaId=${empresaId}`,
-        err instanceof Error ? err.stack : String(err),
-      );
-      // Lanza un error HTTP controlado
+      this.logger.error('Error creando proyecto', err);
+      throw new InternalServerErrorException('No se pudo crear el proyecto');
+    }
+  }
+
+  /** Listar todos los proyectos activos */
+  async findAll(perfil: PerfilLike): Promise<Proyecto[]> {
+    console.log('findAll llamado con perfil:', perfil);
+    const repo = await this.getRepo(perfil);
+    try {
+      const proyectos = await repo.find({
+        where: { borrado: false },
+        order: { id: 'ASC' },
+      });
+      this.logger.debug(`findAll: ${proyectos.length} proyectos encontrados`);
+      return proyectos;
+    } catch (err) {
+      this.logger.error('Error obteniendo proyectos', err);
       throw new InternalServerErrorException(
         'No se pudieron recuperar los proyectos',
       );
     }
   }
 
-  async createSimple(perfil: PerfilLike, CreateProyectoDto: CreateProyectoDto) {
-    const empresaId = perfil.p_id_empresa ?? perfil.empresa?.e_id;
-    if (!empresaId) throw new Error('empresaId requerido');
-    const ds = await this.tenantConnectionHelper.getDataSource(empresaId, [
-      Proyecto,
-    ]);
-    if (!ds) throw new Error('No tenant datasource for empresa');
-    const repo: Repository<Proyecto> = ds.getRepository(Proyecto);
-    const ent = repo.create(CreateProyectoDto as Partial<Proyecto>);
-    return repo.save(ent);
+  /** Buscar un proyecto por ID */
+  async findOne(perfil: PerfilLike, id: number): Promise<Proyecto> {
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new BadRequestException('ID de proyecto inválido');
+    }
+
+    const repo = await this.getRepo(perfil);
+    const proyecto = await repo.findOne({ where: { id, borrado: false } });
+
+    if (!proyecto) {
+      throw new NotFoundException(`Proyecto con ID ${id} no encontrado`);
+    }
+    return proyecto;
   }
 
-  async findOne(perfil: PerfilLike, id: number) {
-    const empresaId = perfil.p_id_empresa ?? perfil.empresa?.e_id;
-    if (!empresaId) throw new Error('empresaId requerido');
-    const ds = await this.tenantConnectionHelper.getDataSource(empresaId, [
-      Proyecto,
-    ]);
-    if (!ds) throw new Error('No tenant datasource for empresa');
-    const repo: Repository<Proyecto> = ds.getRepository(Proyecto);
-    const p = await repo.findOne({ where: { id } });
-    if (!p) throw new NotFoundException('Proyecto not found');
-    return p;
-  }
-
+  /** Actualizar proyecto */
   async update(
     perfil: PerfilLike,
     id: number,
-    updateProyectoDto: UpdateProyectoDto,
-  ) {
-    const empresaId = perfil.p_id_empresa ?? perfil.empresa?.e_id;
-    if (!empresaId) throw new Error('empresaId requerido');
-    const ds = await this.tenantConnectionHelper.getDataSource(empresaId, [
-      Proyecto,
-    ]);
-    if (!ds) throw new Error('No tenant datasource for empresa');
-    const repo: Repository<Proyecto> = ds.getRepository(Proyecto);
-    const ent = await this.findOne(perfil, id);
-    Object.assign(ent, updateProyectoDto);
-    return repo.save(ent);
+    dto: UpdateProyectoDto,
+  ): Promise<Proyecto> {
+    const repo = await this.getRepo(perfil);
+    const proyecto = await this.findOne(perfil, id);
+
+    Object.assign(proyecto, dto);
+
+    try {
+      const updated = await repo.save(proyecto);
+      this.logger.debug(`Proyecto actualizado ID=${id}`);
+      return updated;
+    } catch (err) {
+      this.logger.error(`Error actualizando proyecto ID=${id}`, err);
+      throw new InternalServerErrorException('Error actualizando proyecto');
+    }
   }
 
-  async remove(perfil: PerfilLike, id: number) {
-    const empresaId = perfil.p_id_empresa ?? perfil.empresa?.e_id;
-    if (!empresaId) throw new Error('empresaId requerido');
-    const ds = await this.tenantConnectionHelper.getDataSource(empresaId, [
-      Proyecto,
-    ]);
-    if (!ds) throw new Error('No tenant datasource for empresa');
-    const repo: Repository<Proyecto> = ds.getRepository(Proyecto);
-    const ent = await this.findOne(perfil, id);
-    ent.borrado = true;
-    ent.borradoEn = new Date();
-    return repo.save(ent);
+  /** Borrado lógico de proyecto */
+  async remove(perfil: PerfilLike, id: number): Promise<Proyecto> {
+    const repo = await this.getRepo(perfil);
+    const proyecto = await this.findOne(perfil, id);
+
+    proyecto.borrado = true;
+    proyecto.borradoEn = new Date();
+
+    try {
+      const removed = await repo.save(proyecto);
+      this.logger.debug(`Proyecto marcado como borrado ID=${id}`);
+      return removed;
+    } catch (err) {
+      this.logger.error(`Error eliminando proyecto ID=${id}`, err);
+      throw new InternalServerErrorException('Error eliminando proyecto');
+    }
   }
 }
