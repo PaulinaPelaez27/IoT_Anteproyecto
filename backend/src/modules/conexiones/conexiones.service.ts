@@ -113,7 +113,6 @@ export class ConexionesService {
 
       if (exists.length === 0) {
         await adminDs.query(`CREATE DATABASE "${dbName}"`);
-        console.log(`✅ Base de datos ${dbName} creada`);
       }
     } finally {
       await adminDs.destroy();

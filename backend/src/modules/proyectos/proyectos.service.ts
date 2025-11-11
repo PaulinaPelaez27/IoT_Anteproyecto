@@ -54,7 +54,6 @@ export class ProyectosService {
 
   /** Listar todos los proyectos activos */
   async findAll(perfil: PerfilLike): Promise<Proyecto[]> {
-    console.log('findAll llamado con perfil:', perfil);
     const repo = await this.getRepo(perfil);
     try {
       const proyectos = await repo.find({

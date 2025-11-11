@@ -19,7 +19,6 @@ export class ProyectosController {
 
   /** Helper privado para generar el perfil */
   private getPerfil(empresaId?: string) {
-    console.log('empresaId recibido en getPerfil:', empresaId);
     if (!empresaId || isNaN(Number(empresaId))) {
       throw new BadRequestException('Header x-empresa-id inválido o ausente');
     }
@@ -37,7 +36,6 @@ export class ProyectosController {
 
   @Get()
   findAll(@Headers('x-empresa-id') empresaId: string) {
-    console.log('empresaId en ProyectosController.findAll:', empresaId);
     const perfil = this.getPerfil(empresaId);
     return this.proyectosService.findAll(perfil);
   }
