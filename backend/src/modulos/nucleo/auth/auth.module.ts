@@ -6,7 +6,7 @@ import { Auth } from './entities/auth.entity';
 import { Conexion } from '../conexiones/entities/conexion.entity';
 import { Empresa } from '../empresas/entities/empresa.entity';
 import { Perfil } from '../perfiles/entities/perfil.entity';
-import { CommonModule } from 'src/common/common-module';
+import { CommonModule } from 'src/infraestructura/base-datos/common-module';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
@@ -32,4 +32,4 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
   providers: [AuthService, JwtStrategy],
   exports: [TypeOrmModule],
 })
-export class AuthModule {}
+export class AuthModule { }

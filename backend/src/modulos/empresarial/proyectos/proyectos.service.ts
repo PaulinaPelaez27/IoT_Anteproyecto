@@ -7,7 +7,7 @@ import { CreateProyectoDto } from './dto/create-proyecto.dto';
 import { UpdateProyectoDto } from './dto/update-proyecto.dto';
 import { Proyecto } from './entities/proyecto.entity';
 import { Repository } from 'typeorm';
-import { TenantConnectionHelper } from 'src/common/tenant-helpers';
+import { TenantConnectionHelper } from 'src/infraestructura/base-datos/tenant-helpers';
 
 type PerfilLike = { p_id_empresa?: number; empresa?: { e_id?: number } };
 

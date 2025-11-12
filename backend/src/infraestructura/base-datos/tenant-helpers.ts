@@ -5,7 +5,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { DataSource, DataSourceOptions } from 'typeorm';
-import { ConexionesService } from 'src/modules/conexiones/conexiones.service';
+import { ConexionesService } from '../../modulos/nucleo/conexiones/conexiones.service';
 
 type TenantCfg = {
   host?: string;

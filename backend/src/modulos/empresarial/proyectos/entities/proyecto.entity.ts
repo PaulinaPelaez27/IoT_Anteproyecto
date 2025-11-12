@@ -5,7 +5,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Nodo } from '../../nodos/entities/nodo.entity';
 
 @Entity('tb_proyectos')
 export class Proyecto {
@@ -41,4 +43,7 @@ export class Proyecto {
 
   @DeleteDateColumn({ name: 'p_borrado_en', type: 'timestamptz', nullable: true })
   borradoEn?: Date;
+
+  @OneToMany(() => Nodo, (nodo) => nodo.proyecto)
+  nodos: Nodo[];
 }
