@@ -2,7 +2,7 @@ import { IsString, IsOptional, IsBoolean, IsInt, IsPositive, MaxLength } from 'c
 
 export class CreateNodoDto {
     @IsString()
-    @MaxLength(100)
+    @MaxLength(45)
     nombre: string;
 
     @IsOptional()
