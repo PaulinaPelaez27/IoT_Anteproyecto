@@ -3,12 +3,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { CommonModule } from './common/common-module';
+import { CommonModule } from './infraestructura/base-datos/common-module';
 import { join } from 'path';
-import { AuthModule } from './modules/auth/auth.module';
-import { ProyectosModule } from './modules/proyectos/proyectos.module';
-import { EmpresasModule } from './modules/empresas/empresas.module';
-import { ConexionesModule } from './modules/conexiones/conexiones.module';
+import { AuthModule } from './modulos/nucleo/auth/auth.module';
+import { ProyectosModule } from './modulos/empresarial/proyectos/proyectos.module';
+import { EmpresasModule } from './modulos/nucleo/empresas/empresas.module';
+import { ConexionesModule } from './modulos/nucleo/conexiones/conexiones.module';
+import { NodosModule } from './modulos/empresarial/nodos/nodos.module';
 
 @Module({
   imports: [
@@ -33,8 +34,9 @@ import { ConexionesModule } from './modules/conexiones/conexiones.module';
     ProyectosModule,
     ConexionesModule,
     CommonModule,
+    NodosModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { TenantConnectionHelper } from 'src/common/tenant-helpers';
+import { TenantConnectionHelper } from 'src/infraestructura/base-datos/tenant-helpers';
 import * as bcrypt from 'bcrypt';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { Auth } from './entities/auth.entity';
@@ -31,7 +31,7 @@ export class AuthService {
     private readonly empresaRepository: Repository<Empresa>,
     private readonly tenantConnectionHelper: TenantConnectionHelper,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async findAll() {
     return this.authRepository.find();

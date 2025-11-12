@@ -12,7 +12,7 @@ import {
 
 import { Auth } from '../../auth/entities/auth.entity';
 import { Empresa } from '../../empresas/entities/empresa.entity';
-import { RolUsuario } from 'src/modules/roles-usuarios/entities/rol-usuario.entity';
+import { RolUsuario } from 'src/modulos/nucleo/roles-usuarios/entities/rol-usuario.entity';
 
 @Entity('tb_perfiles')
 @Unique('uq_perfil', ['usuarioId', 'rolId', 'empresaId'])
