@@ -14,8 +14,7 @@ export class CreateNodoDto {
     @IsBoolean()
     estado?: boolean;
 
-    @IsOptional()
     @IsInt()
     @IsPositive()
-    proyectoId?: number;
+    proyectoId: number;
 }

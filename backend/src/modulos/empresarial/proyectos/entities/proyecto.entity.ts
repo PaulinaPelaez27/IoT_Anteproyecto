@@ -44,6 +44,6 @@ export class Proyecto {
   @DeleteDateColumn({ name: 'p_borrado_en', type: 'timestamptz', nullable: true })
   borradoEn?: Date;
 
-  @OneToMany(() => Nodo, (nodo) => nodo.proyecto)
+  @OneToMany(() => Nodo, nodo => nodo.proyecto)
   nodos: Nodo[];
 }
