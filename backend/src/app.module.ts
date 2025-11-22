@@ -36,7 +36,7 @@ import { SensoresModule } from './modulos/empresarial/sensores/sensores.module';
     ConexionesModule,
     CommonModule,
     NodosModule,
-    SensoresModule
+    SensoresModule,
   ],
   controllers: [AppController],
   providers: [AppService],

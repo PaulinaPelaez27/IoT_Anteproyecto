@@ -16,5 +16,5 @@ export class CreateNodoDto {
 
     @IsInt()
     @IsPositive()
-    proyectoId?: number;
+    proyectoId: number;
 }

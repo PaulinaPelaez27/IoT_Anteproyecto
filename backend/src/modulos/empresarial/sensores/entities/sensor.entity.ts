@@ -18,8 +18,8 @@ export class Sensor {
 @PrimaryGeneratedColumn({ name: 's_id', type: 'int' })
 id: number;
 
-@Column({ name: 's_nombre', type: 'varchar', length: 255, nullable: false })
-nombre: string; 
+@Column({ name: 's_nombre', type: 'varchar', length: 45, nullable: false })
+nombre: string;
 
 @Column({ name: 's_estado', type: 'boolean', nullable: false, default: true })
 estado: boolean;
