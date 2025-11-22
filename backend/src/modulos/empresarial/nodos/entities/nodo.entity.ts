@@ -7,8 +7,10 @@ import {
     UpdateDateColumn,
     DeleteDateColumn,
     JoinColumn,
+    OneToMany,
 } from 'typeorm';
 import { Proyecto } from '../../proyectos/entities/proyecto.entity';
+import { Sensor } from '../../sensores/entities/sensor.entity';
 
 @Entity('tb_nodos')
 export class Nodo {
@@ -36,8 +38,11 @@ export class Nodo {
     @DeleteDateColumn({ name: 'n_borrado_en', type: 'timestamptz', nullable: true })
     borradoEn?: Date;
 
-    @ManyToOne(() => Proyecto, (proyecto) => proyecto.nodos, { nullable: true })
+    @ManyToOne(() => Proyecto, proyecto => proyecto.nodos, { nullable: false })
     @JoinColumn({ name: 'n_id_proyecto' })
-    proyecto?: Proyecto;
+    proyecto: Proyecto;
+
+    @OneToMany(() => Sensor, sensor => sensor.nodo)
+    sensores: Sensor[];
 }
 

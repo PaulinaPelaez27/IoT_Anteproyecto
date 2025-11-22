@@ -25,7 +25,7 @@ export class NodosService {
     const empresaId = perfil.p_id_empresa ?? perfil.empresa?.e_id;
     if (!empresaId) throw new BadRequestException('empresaId requerido');
 
-    const ds = await this.tenantConnectionHelper.getDataSource(empresaId, [Nodo, Proyecto]);
+    const ds = await this.tenantConnectionHelper.getDataSource(empresaId);
     if (!ds) {
       throw new InternalServerErrorException(
         `No se pudo obtener la conexión para la empresa ${empresaId}`,
@@ -42,7 +42,7 @@ export class NodosService {
       throw new BadRequestException('empresaId requerido');
     }
 
-    const ds = await this.tenantConnectionHelper.getDataSource(empresaId, [Proyecto]);
+    const ds = await this.tenantConnectionHelper.getDataSource(empresaId);
     if (!ds) {
       throw new InternalServerErrorException(
         `No se pudo obtener la conexión para la empresa ${empresaId}`,
@@ -135,9 +135,7 @@ export class NodosService {
     Object.assign(nodo, rest);
 
     if (typeof proyectoId !== 'undefined') {
-      nodo.proyecto = proyectoId
-        ? await this.validarProyecto(perfil, proyectoId)
-        : undefined;
+      nodo.proyecto = await this.validarProyecto(perfil, proyectoId);
     }
 
     try {

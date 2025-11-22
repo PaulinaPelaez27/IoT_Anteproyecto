@@ -8,6 +8,7 @@ import { UpdateProyectoDto } from './dto/update-proyecto.dto';
 import { Proyecto } from './entities/proyecto.entity';
 import { Repository } from 'typeorm';
 import { TenantConnectionHelper } from 'src/infraestructura/base-datos/tenant-helpers';
+import { Nodo } from '../nodos/entities/nodo.entity';
 
 type PerfilLike = { p_id_empresa?: number; empresa?: { e_id?: number } };
 
@@ -26,9 +27,7 @@ export class ProyectosService {
       throw new BadRequestException('empresaId requerido');
     }
 
-    const ds = await this.tenantConnectionHelper.getDataSource(empresaId, [
-      Proyecto,
-    ]);
+    const ds = await this.tenantConnectionHelper.getDataSource(empresaId);
     if (!ds) {
       throw new InternalServerErrorException(
         `No se pudo obtener la conexión para la empresa ${empresaId}`,
