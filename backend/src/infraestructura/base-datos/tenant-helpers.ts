@@ -10,12 +10,16 @@ import { ConexionesService } from '../../modulos/nucleo/conexiones/conexiones.se
 import { Proyecto } from '../../modulos/empresarial/proyectos/entities/proyecto.entity';
 import { Nodo } from '../../modulos/empresarial/nodos/entities/nodo.entity';
 import { Sensor } from '../../modulos/empresarial/sensores/entities/sensor.entity';
+import { VariablesSoportaSensor } from '../../modulos/empresarial/variables-soporta-sensores/entities/variables-soporta-sensor.entity';
+import { Variable } from '../../modulos/empresarial/variables/entities/variable.entity';
 
 // 🔥 Lista completa de ENTIDADES obligatorias del dominio IoT
 const ENTIDADES_IOT = [
   Proyecto,
   Nodo,
   Sensor,
+  VariablesSoportaSensor,
+  Variable,
 ];
 
 type TenantCfg = {

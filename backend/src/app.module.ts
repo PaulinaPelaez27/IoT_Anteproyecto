@@ -11,6 +11,8 @@ import { EmpresasModule } from './modulos/nucleo/empresas/empresas.module';
 import { ConexionesModule } from './modulos/nucleo/conexiones/conexiones.module';
 import { NodosModule } from './modulos/empresarial/nodos/nodos.module';
 import { SensoresModule } from './modulos/empresarial/sensores/sensores.module';
+import { VariablesModule } from './modulos/empresarial/variables/variables.module';
+import { VariablesSoportaSensoresModule } from './modulos/empresarial/variables-soporta-sensores/variables-soporta-sensores.module';
 
 @Module({
   imports: [
@@ -37,6 +39,8 @@ import { SensoresModule } from './modulos/empresarial/sensores/sensores.module';
     CommonModule,
     NodosModule,
     SensoresModule,
+    VariablesModule,
+    VariablesSoportaSensoresModule,
   ],
   controllers: [AppController],
   providers: [AppService],
