@@ -45,7 +45,7 @@ export class VariablesService extends BaseTenantService {
       return await repo.save(entity);
     } catch (err) {
       this.logger.error(err);
-      throw new InternalServerErrorException('No se pudo crear el tipo de sensor');
+      throw new InternalServerErrorException('No se pudo crear la variable para el sensor');
     }
   }
 
@@ -59,7 +59,7 @@ export class VariablesService extends BaseTenantService {
 
     const repo = await this.getRepo(perfil);
     const item = await repo.findOne({ where: { id, borrado: false } });
-    if (!item) throw new NotFoundException(`Tipo de sensor ${id} no encontrado`);
+    if (!item) throw new NotFoundException(`Variable del sensor ${id} no encontrado`);
     return item;
   }
 
@@ -78,7 +78,7 @@ export class VariablesService extends BaseTenantService {
       return await repo.save(item);
     } catch (err) {
       this.logger.error(err);
-      throw new InternalServerErrorException('Error actualizando tipo de sensor');
+      throw new InternalServerErrorException('Error actualizando la variable del sensor');
     }
   }
 
