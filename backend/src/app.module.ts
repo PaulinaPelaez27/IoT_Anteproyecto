@@ -13,6 +13,7 @@ import { NodosModule } from './modulos/empresarial/nodos/nodos.module';
 import { SensoresModule } from './modulos/empresarial/sensores/sensores.module';
 import { VariablesModule } from './modulos/empresarial/variables/variables.module';
 import { VariablesSoportaSensoresModule } from './modulos/empresarial/variables-soporta-sensores/variables-soporta-sensores.module';
+import { LecturasSensoresModule } from './modulos/empresarial/lecturas-sensores/lecturas-sensores.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { VariablesSoportaSensoresModule } from './modulos/empresarial/variables-
     SensoresModule,
     VariablesModule,
     VariablesSoportaSensoresModule,
+    LecturasSensoresModule,
   ],
   controllers: [AppController],
   providers: [AppService],
