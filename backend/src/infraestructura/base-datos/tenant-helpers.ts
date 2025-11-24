@@ -13,6 +13,7 @@ import { Sensor } from '../../modulos/empresarial/sensores/entities/sensor.entit
 import { VariablesSoportaSensor } from '../../modulos/empresarial/variables-soporta-sensores/entities/variables-soporta-sensor.entity';
 import { Variable } from '../../modulos/empresarial/variables/entities/variable.entity';
 import { LecturasSensor } from '../../modulos/empresarial/lecturas-sensores/entities/lecturas-sensor.entity';
+import { Umbral } from 'src/modulos/empresarial/umbrales/entities/umbral.entity';
 
 // 🔥 Lista completa de ENTIDADES obligatorias del dominio IoT
 const ENTIDADES_IOT = [
@@ -22,6 +23,7 @@ const ENTIDADES_IOT = [
   VariablesSoportaSensor,
   Variable,
   LecturasSensor,
+  Umbral,
 ];
 
 type TenantCfg = {

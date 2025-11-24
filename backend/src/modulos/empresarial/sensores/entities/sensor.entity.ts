@@ -13,6 +13,7 @@ import {
 import { Nodo } from "../../nodos/entities/nodo.entity";
 import { VariablesSoportaSensor } from "../../variables-soporta-sensores/entities/variables-soporta-sensor.entity";
 import { LecturasSensor } from "../../lecturas-sensores/entities/lecturas-sensor.entity";
+import { Umbral } from "../../umbrales/entities/umbral.entity";
 
 @Entity('tb_sensores')
 
@@ -48,4 +49,7 @@ export class Sensor {
 
     @OneToMany(() => LecturasSensor, lecturasSensor => lecturasSensor.sensor)
     lecturasSensores: LecturasSensor[];
+
+    @OneToMany(() => Umbral, umbral => umbral.sensor)
+    umbrales: Umbral[];
 }

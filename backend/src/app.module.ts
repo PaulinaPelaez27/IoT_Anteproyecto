@@ -14,6 +14,7 @@ import { SensoresModule } from './modulos/empresarial/sensores/sensores.module';
 import { VariablesModule } from './modulos/empresarial/variables/variables.module';
 import { VariablesSoportaSensoresModule } from './modulos/empresarial/variables-soporta-sensores/variables-soporta-sensores.module';
 import { LecturasSensoresModule } from './modulos/empresarial/lecturas-sensores/lecturas-sensores.module';
+import { UmbralesModule } from './modulos/empresarial/umbrales/umbrales.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { LecturasSensoresModule } from './modulos/empresarial/lecturas-sensores/
     VariablesModule,
     VariablesSoportaSensoresModule,
     LecturasSensoresModule,
+    UmbralesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
