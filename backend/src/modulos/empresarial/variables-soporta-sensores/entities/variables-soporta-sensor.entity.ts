@@ -13,14 +13,14 @@ export class VariablesSoportaSensor {
   vssIdVariable: number;
 
   // === RELACIONES ===
-  @ManyToOne(() => Sensor, sensor => sensor.variablesSoportaSensores, {
+  @ManyToOne(() => Sensor,{
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'vss_id_sensor' })
   sensor: Sensor;
 
-  @ManyToOne(() => Variable, variable => variable.variablesSoportaSensores, {
+  @ManyToOne(() => Variable, {
     onUpdate: 'CASCADE',
     onDelete: 'RESTRICT',
   })

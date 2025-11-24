@@ -12,6 +12,7 @@ import {
 
 import { Nodo } from "../../nodos/entities/nodo.entity";
 import { VariablesSoportaSensor } from "../../variables-soporta-sensores/entities/variables-soporta-sensor.entity";
+import { LecturasSensor } from "../../lecturas-sensores/entities/lecturas-sensor.entity";
 
 @Entity('tb_sensores')
 
@@ -38,10 +39,13 @@ export class Sensor {
     @DeleteDateColumn({ name: 's_borrado_en', type: 'timestamptz', nullable: true })
     borradoEn?: Date;
 
-    @ManyToOne(() => Nodo, nodo => nodo.sensores, { nullable: false })
+    @ManyToOne(() => Nodo, { nullable: false })
     @JoinColumn({ name: 's_id_nodo' })
     nodo: Nodo;
 
-    @OneToMany(() => VariablesSoportaSensor, variableSoportaSensor => variableSoportaSensor.sensor)
+    @OneToMany(() => VariablesSoportaSensor, variablesSoportaSensor => variablesSoportaSensor.sensor)
     variablesSoportaSensores: VariablesSoportaSensor[];
+
+    @OneToMany(() => LecturasSensor, lecturasSensor => lecturasSensor.sensor)
+    lecturasSensores: LecturasSensor[];
 }

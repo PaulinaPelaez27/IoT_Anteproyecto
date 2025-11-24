@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 
 import { VariablesSoportaSensor } from '../../variables-soporta-sensores/entities/variables-soporta-sensor.entity';
+import { LecturasSensor } from '../../lecturas-sensores/entities/lecturas-sensor.entity';
 
 @Entity('tb_variables')
 export class Variable {
@@ -44,4 +45,7 @@ export class Variable {
 
     @OneToMany(() => VariablesSoportaSensor, variableSoportaSensor => variableSoportaSensor.variable)
     variablesSoportaSensores: VariablesSoportaSensor[];
+
+    @OneToMany(() => LecturasSensor, lecturasSensor => lecturasSensor.variable)
+    lecturasSensores: LecturasSensor[];
 }
