@@ -10,7 +10,6 @@ import { LecturasSensor } from './entities/lecturas-sensor.entity';
 import { Sensor } from '../sensores/entities/sensor.entity';
 import { Variable } from '../variables/entities/variable.entity';
 import { CreateLecturasSensorDto } from './dto/create-lecturas-sensor.dto';
-import { UpdateLecturasSensorDto } from './dto/update-lecturas-sensor.dto';
 import { TenantConnectionHelper } from 'src/infraestructura/base-datos/tenant-helpers';
 import { BaseTenantService, PerfilLike } from 'src/infraestructura/base-datos/base-tenant.service';
 

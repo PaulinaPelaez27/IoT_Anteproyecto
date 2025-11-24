@@ -36,7 +36,7 @@ export class LecturasSensor {
     @JoinColumn({ name: 'ls_id_sensor' })
     sensor: Sensor;
 
-    @ManyToOne(() => Variable, { nullable: true })
+    @ManyToOne(() => Variable, { nullable: false })
     @JoinColumn({ name: 'ls_id_variable' })
-    variable?: Variable;
+    variable: Variable;
 }

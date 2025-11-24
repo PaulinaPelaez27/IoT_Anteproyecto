@@ -1,7 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Headers, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Headers, BadRequestException } from '@nestjs/common';
 import { LecturasSensoresService } from './lecturas-sensores.service';
 import { CreateLecturasSensorDto } from './dto/create-lecturas-sensor.dto';
-import { UpdateLecturasSensorDto } from './dto/update-lecturas-sensor.dto';
 
 @Controller('lecturas-sensores')
 export class LecturasSensoresController {
