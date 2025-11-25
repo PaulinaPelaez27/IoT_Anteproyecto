@@ -14,6 +14,7 @@ import { VariablesSoportaSensor } from '../../modulos/empresarial/variables-sopo
 import { Variable } from '../../modulos/empresarial/variables/entities/variable.entity';
 import { LecturasSensor } from '../../modulos/empresarial/lecturas-sensores/entities/lecturas-sensor.entity';
 import { Umbral } from '../../modulos/empresarial/umbrales/entities/umbral.entity';
+import { Alerta } from '../../modulos/empresarial/alertas/entities/alerta.entity';
 
 //** Lista completa de ENTIDADES obligatorias del dominio IoT
 const ENTIDADES_IOT = [
@@ -24,6 +25,7 @@ const ENTIDADES_IOT = [
   Variable,
   LecturasSensor,
   Umbral,
+  Alerta,
 ];
 
 type TenantCfg = {
