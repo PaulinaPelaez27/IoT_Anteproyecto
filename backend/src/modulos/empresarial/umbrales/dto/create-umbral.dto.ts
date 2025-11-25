@@ -1,13 +1,17 @@
-import { IsBoolean, IsInt, IsNumber, IsPositive, IsOptional } from 'class-validator';
+import { IsBoolean, IsInt, IsNumber, IsPositive, IsOptional, Validate, ValidateIf } from 'class-validator';
+import { UmbralRangoValidador } from '../validador';
+
 
 export class CreateUmbralDto {
     @IsNumber()
-    @IsOptional()
-    valorMin?: number;
+    valorMin: number;
 
     @IsNumber()
-    @IsOptional()
-    valorMax?: number;
+    valorMax: number;
+
+    @ValidateIf(o => o.valorMin !== undefined && o.valorMax !== undefined)
+    @Validate(UmbralRangoValidador)
+    rangoValido!: boolean;
 
     @IsBoolean()
     @IsOptional()

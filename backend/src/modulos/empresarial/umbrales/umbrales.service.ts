@@ -3,9 +3,10 @@ import {
   NotFoundException,
   BadRequestException,
   InternalServerErrorException,
+  ConflictException,
   Logger,
 } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Repository, QueryFailedError } from 'typeorm';
 import { CreateUmbralDto } from './dto/create-umbral.dto';
 import { UpdateUmbralDto } from './dto/update-umbral.dto';
 import { Umbral } from './entities/umbral.entity';
@@ -86,22 +87,45 @@ export class UmbralesService extends BaseTenantService {
 
   async update(perfil: PerfilLike, id: number, dto: UpdateUmbralDto) {
     const repo = await this.getUmbralRepo(perfil);
-    const umbral = await this.findOne(perfil, id);
-
-    if ((dto as any).sensorId) {
-      umbral.sensor = await this.validarSensor(perfil, (dto as any).sensorId as number);
-    }
-
-    if ((dto as any).variableId) {
-      umbral.variable = await this.validarVariable(perfil, (dto as any).variableId as number);
-    }
-
-    Object.assign(umbral, dto);
 
     try {
-      return await repo.save(umbral);
-    } catch (err) {
-      this.logger.error(err);
+      const umbral = await repo.preload({
+        id,
+        ...(dto.valorMin !== undefined && { valorMin: dto.valorMin }),
+        ...(dto.valorMax !== undefined && { valorMax: dto.valorMax }),
+        ...(dto.estado !== undefined && { estado: dto.estado }),
+      });
+
+      if (!umbral) throw new NotFoundException(`Umbral ${id} no encontrado`);
+
+      // 2. Validación y asignación de relaciones
+      if (dto.sensorId !== undefined) {
+        umbral.sensor = await this.validarSensor(perfil, dto.sensorId);
+      }
+
+      if (dto.variableId !== undefined) {
+        umbral.variable = await this.validarVariable(perfil, dto.variableId);
+      }
+
+      // 3. Guardar
+      await repo.save(umbral);
+
+      // 4. Retornar el registro actualizado
+      return this.findOne(perfil, id);
+
+    } catch (error) {
+      if (error instanceof QueryFailedError) {
+        const d = error.driverError as { code?: string };
+
+        if (d.code === '23505') throw new ConflictException('Ya existe un umbral para ese sensor y variable');
+        if (d.code === '23503') throw new NotFoundException('Sensor o variable no existe');
+      }
+
+      if (error instanceof NotFoundException || error instanceof ConflictException) {
+        throw error;
+      }
+
+      this.logger.error(error);
       throw new InternalServerErrorException('Error actualizando umbral');
     }
   }
