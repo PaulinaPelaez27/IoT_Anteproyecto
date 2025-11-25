@@ -10,5 +10,6 @@ import { Sensor } from '../sensores/entities/sensor.entity';
   imports: [TypeOrmModule.forFeature([Alerta, Sensor]), CommonModule],
   controllers: [AlertasController],
   providers: [AlertasService],
+  exports: [AlertasService],
 })
 export class AlertasModule {}

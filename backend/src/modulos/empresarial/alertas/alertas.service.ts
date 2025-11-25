@@ -80,7 +80,6 @@ export class AlertasService extends BaseTenantService {
       const alerta = await repo.preload({
         id,
         ...(dto.estado !== undefined && { estado: dto.estado }),
-        ...(dto.estado !== undefined && { modificadoEn: new Date() }),
       });
 
       if (!alerta) throw new NotFoundException(`Alerta ${id} no encontrada`);

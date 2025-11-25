@@ -4,7 +4,7 @@ import { UpdateAlertaDto } from './dto/update-alerta.dto';
 
 @Controller('alertas')
 export class AlertasController {
-  constructor(private readonly alertasService: AlertasService) { }
+  constructor(private readonly alertasService: AlertasService) {}
 
   private getPerfil(empresaId?: string) {
     if (!empresaId || isNaN(Number(empresaId))) {
