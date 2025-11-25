@@ -1,35 +1,50 @@
 import { Module } from '@nestjs/common';
+import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ClassSerializerInterceptor } from '@nestjs/common';
+
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { Auth } from './entities/auth.entity';
-import { Conexion } from '../conexiones/entities/conexion.entity';
-import { Empresa } from '../empresas/entities/empresa.entity';
-import { Perfil } from '../perfiles/entities/perfil.entity';
-import { CommonModule } from 'src/infraestructura/base-datos/common-module';
-import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+
+import { Auth } from '../auth/entities/auth.entity';
+import { Perfil } from '../perfiles/entities/perfil.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Auth, Conexion, Empresa, Perfil]),
-    CommonModule,
+    ConfigModule,
+    TypeOrmModule.forFeature([Auth, Perfil]),
+
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: {
-          expiresIn: configService.get<number>('JWT_EXPIRES_IN'),
-        },
-      }),
+      useFactory: (configService: ConfigService): JwtModuleOptions => {
+        const secret = configService.get<string>('JWT_SECRET');
+        if (!secret) throw new Error('JWT_SECRET no está definido');
+
+        return {
+          secret,
+          signOptions: {
+            expiresIn: configService.get<string>('JWT_EXPIRES_IN') || '2h',
+          },
+        } as JwtModuleOptions;
+      },
       inject: [ConfigService],
     }),
-    PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
-  exports: [TypeOrmModule],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ClassSerializerInterceptor,
+    },
+  ],
+  exports: [AuthService, JwtModule, PassportModule],
 })
 export class AuthModule { }

@@ -16,6 +16,11 @@ import { VariablesSoportaSensoresModule } from './modulos/empresarial/variables-
 import { LecturasSensoresModule } from './modulos/empresarial/lecturas-sensores/lecturas-sensores.module';
 import { UmbralesModule } from './modulos/empresarial/umbrales/umbrales.module';
 import { AlertasModule } from './modulos/empresarial/alertas/alertas.module';
+import { UsuariosModule } from './modulos/nucleo/usuarios/usuarios.module';
+import { Roles } from './modulos/nucleo/auth/guards/roles.decorator';
+import { RolesUsuariosModule } from './modulos/nucleo/roles-usuarios/roles-usuarios.module';
+import { Perfil } from './modulos/nucleo/perfiles/entities/perfil.entity';
+import { PerfilesModule } from './modulos/nucleo/perfiles/perfiles.module';
 
 @Module({
   imports: [
@@ -31,7 +36,9 @@ import { AlertasModule } from './modulos/empresarial/alertas/alertas.module';
         password: config.get<string>('DB_PASS', 'postgres'),
         database: config.get<string>('DB_NAME', 'test'),
         entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
-        synchronize: config.get<string>('DB_SYNC', 'false') === 'true',
+        // For safety in production and multi-tenant environments we disable schema sync
+        // and rely on migrations. Explicitly force `synchronize: false` per project rules.
+        synchronize: false,
         logging: config.get<string>('DB_LOGGING', 'false') === 'true',
       }),
     }),
@@ -47,6 +54,9 @@ import { AlertasModule } from './modulos/empresarial/alertas/alertas.module';
     LecturasSensoresModule,
     UmbralesModule,
     AlertasModule,
+    UsuariosModule,
+    RolesUsuariosModule,
+    PerfilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

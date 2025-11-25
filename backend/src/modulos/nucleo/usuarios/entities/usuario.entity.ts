@@ -5,14 +5,11 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
-  Index,
 } from 'typeorm';
-
 import { Perfil } from '../../perfiles/entities/perfil.entity';
 
 @Entity({ name: 'tb_usuarios' })
-@Index('idx_usuario_email', ['email'])
-export class Auth {
+export class Usuario {
   @PrimaryGeneratedColumn({ name: 'u_id' })
   id: number;
 
@@ -26,7 +23,7 @@ export class Auth {
   email: string;
 
   @Column({ name: 'u_contrasena', length: 255 })
-  contrasena: string; // hash
+  contrasena: string;
 
   @Column({ name: 'u_estado', default: true })
   estado: boolean;
@@ -34,25 +31,15 @@ export class Auth {
   @Column({ name: 'u_borrado', default: false })
   borrado: boolean;
 
-  @CreateDateColumn({
-    name: 'u_creado_en',
-    type: 'timestamptz',
-  })
+  @CreateDateColumn({ name: 'u_creado_en', type: 'timestamptz' })
   creadoEn: Date;
 
-  @UpdateDateColumn({
-    name: 'u_modificado_en',
-    type: 'timestamptz',
-    nullable: true,
-  })
+  @UpdateDateColumn({ name: 'u_modificado_en', type: 'timestamptz' })
   modificadoEn?: Date;
 
   @Column({ name: 'u_borrado_en', type: 'timestamptz', nullable: true })
   borradoEn?: Date;
 
-  /*
-   * MULTI–ROL & MULTI–EMPRESA
-   */
   @OneToMany(() => Perfil, (p) => p.usuario)
   perfiles: Perfil[];
 }

@@ -1,8 +1,11 @@
 export class LoginResponseDto {
   id: number;
-  access_token: string;
   nombre: string;
+  apellido?: string;
   email: string;
-  empresa: string;
-  rol: string;
+
+  roles: string[];       // multi-rol
+  empresas: number[];    // multi-empresa (IDs de empresas)
+
+  access_token: string;  // JWT
 }

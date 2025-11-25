@@ -15,6 +15,9 @@ import { Variable } from '../../modulos/empresarial/variables/entities/variable.
 import { LecturasSensor } from '../../modulos/empresarial/lecturas-sensores/entities/lecturas-sensor.entity';
 import { Umbral } from '../../modulos/empresarial/umbrales/entities/umbral.entity';
 import { Alerta } from '../../modulos/empresarial/alertas/entities/alerta.entity';
+import { Perfil } from '../../modulos/nucleo/perfiles/entities/perfil.entity';
+import { Empresa } from '../../modulos/nucleo/empresas/entities/empresa.entity';
+import { Auth } from '../../modulos/nucleo/auth/entities/auth.entity';
 
 //** Lista completa de ENTIDADES obligatorias del dominio IoT
 const ENTIDADES_IOT = [
@@ -26,6 +29,10 @@ const ENTIDADES_IOT = [
   LecturasSensor,
   Umbral,
   Alerta,
+  // Entidades del núcleo que también deben estar disponibles en los DataSources tenant
+  Perfil,
+  Empresa,
+  Auth,
 ];
 
 type TenantCfg = {
@@ -47,12 +54,12 @@ export class TenantConnectionHelper implements OnModuleDestroy {
     DataSourceOptions,
     'host' | 'username' | 'password' | 'database'
   > = {
-    type: 'postgres',
-    synchronize: false,
-    logging: false,
-  };
+      type: 'postgres',
+      synchronize: false,
+      logging: false,
+    };
 
-  constructor(private readonly conexiones: ConexionesService) {}
+  constructor(private readonly conexiones: ConexionesService) { }
 
   async onModuleDestroy() {
     await this.closeAll();

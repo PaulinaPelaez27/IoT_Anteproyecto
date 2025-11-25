@@ -5,50 +5,35 @@ import { Conexion } from '../../conexiones/entities/conexion.entity';
 import { Perfil } from '../../perfiles/entities/perfil.entity';
 
 @Entity('tb_empresas')
+@Entity('tb_empresas')
 export class Empresa {
-  @PrimaryGeneratedColumn({ name: 'e_id', type: 'int' })
+  @PrimaryGeneratedColumn({ name: 'e_id' })
   id: number;
 
-  @Column({ name: 'e_nombre', type: 'varchar', length: 45, nullable: false })
+  @Column({ name: 'e_nombre', length: 45 })
   nombre: string;
 
-  @Column({
-    name: 'e_descripcion',
-    type: 'varchar',
-    length: 250,
-    nullable: true,
-  })
+  @Column({ name: 'e_descripcion', length: 250, nullable: true })
   descripcion?: string;
 
-  @Column({ name: 'e_email', type: 'varchar', length: 100, nullable: true })
+  @Column({ name: 'e_email', length: 100, nullable: true })
   email?: string;
 
-  @Column({ name: 'e_numero_tel', type: 'varchar', length: 20, nullable: true })
+  @Column({ name: 'e_numero_tel', length: 20, nullable: true })
   numeroTel?: string;
 
-  @Column({
-    name: 'e_responsable',
-    type: 'varchar',
-    length: 100,
-    nullable: true,
-  })
+  @Column({ name: 'e_responsable', length: 100, nullable: true })
   responsable?: string;
 
-  @Column({ name: 'e_estado', type: 'boolean', nullable: false, default: true })
+  @Column({ name: 'e_estado', default: true })
   estado: boolean;
 
-  @Column({
-    name: 'e_borrado',
-    type: 'boolean',
-    nullable: false,
-    default: false,
-  })
+  @Column({ name: 'e_borrado', default: false })
   borrado: boolean;
 
   @Column({
     name: 'e_creado_en',
     type: 'timestamptz',
-    nullable: false,
     default: () => 'NOW()',
   })
   creadoEn: Date;
@@ -59,10 +44,9 @@ export class Empresa {
   @Column({ name: 'e_borrado_en', type: 'timestamptz', nullable: true })
   borradoEn?: Date;
 
-  @OneToMany(() => Conexion, (conexion: Conexion) => conexion.empresa)
-  conexiones?: Conexion[];
+  @OneToMany(() => Conexion, (conexion) => conexion.empresa)
+  conexiones: Conexion[];
 
-  // Relación OneToMany hacia Perfil.
-  @OneToMany(() => Perfil, (perfil: Perfil) => perfil.empresa)
-  perfiles?: Perfil[];
+  @OneToMany(() => Perfil, (perfil) => perfil.empresa)
+  perfiles: Perfil[];
 }
