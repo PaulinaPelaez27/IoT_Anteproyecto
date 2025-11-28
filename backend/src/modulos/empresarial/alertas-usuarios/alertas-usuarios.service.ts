@@ -57,15 +57,17 @@ export class AlertasUsuariosService extends BaseTenantService {
     const now = new Date();
 
     if (dto.leido !== undefined) {
-      if (dto.leido && !entity.leido) {
-        entity.leidoEn = now;
+      if (dto.leido !== entity.leido) {
+        if (dto.leido) {
+          entity.leidoEn = now;
+        } else {
+          entity.leidoEn = undefined;
+        }
       }
       entity.leido = dto.leido;
     }
 
     if (dto.estado !== undefined) entity.estado = dto.estado;
-
-    entity.modificadoEn = now;
 
     await repo.save(entity);
     this.logger.log(`Alerta-usuario ${id} actualizada por usuario ${usuarioId}`);
@@ -79,12 +81,9 @@ export class AlertasUsuariosService extends BaseTenantService {
     const entity = await repo.findOne({ where: { id, borrado: false, usuarioId } });
     if (!entity) throw new NotFoundException('Alerta-usuario no encontrada');
 
-    entity.borrado = true;
-    const now = new Date();
-    entity.borradoEn = now;
-    entity.modificadoEn = now;
+    //entity.borrado = true;
 
-    await repo.save(entity);
+    await repo.softDelete({ id , usuarioId });
     this.logger.log(`Alerta-usuario ${id} borrado lógicamente por usuario ${usuarioId}`);
     return { ok: true };
   }
