@@ -63,21 +63,36 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_variables_nombre ON tb_variables (LOWER(v_n
 -- ============================================
 --   5) SENSORES ↔ VARIABLES  (M:N)
 -- ============================================
+-- ============================================
+--   5) SENSORES ↔ VARIABLES  (M:N)
+-- ============================================
 CREATE TABLE IF NOT EXISTS tb_variables_soporta_sensores (
-  vss_id_sensor     INT NOT NULL REFERENCES tb_sensores(s_id)
-                       ON UPDATE CASCADE ON DELETE CASCADE,
-  vss_id_variable   INT NOT NULL REFERENCES tb_variables(v_id)
-                       ON UPDATE CASCADE ON DELETE RESTRICT,
+  vss_id            SERIAL PRIMARY KEY,      -- << NUEVA PK >>
+  
+  vss_id_sensor     INT NOT NULL,
+  vss_id_variable   INT NOT NULL,
+
   vss_estado        BOOLEAN NOT NULL DEFAULT TRUE,
   vss_creado_en     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   vss_modificado_en TIMESTAMPTZ,
   vss_borrado_en    TIMESTAMPTZ,
-  
-  CONSTRAINT pk_vss PRIMARY KEY (vss_id_sensor, vss_id_variable)
+
+  CONSTRAINT fk_vss_sensor   FOREIGN KEY (vss_id_sensor)
+      REFERENCES tb_sensores(s_id)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE,
+
+  CONSTRAINT fk_vss_variable FOREIGN KEY (vss_id_variable)
+      REFERENCES tb_variables(v_id)
+      ON UPDATE CASCADE
+      ON DELETE RESTRICT,
+
+  -- Evita duplicados lógicos
+  CONSTRAINT uq_vss UNIQUE (vss_id_sensor, vss_id_variable)
 );
 
-CREATE INDEX IF NOT EXISTS idx_vss_variable 
-    ON tb_variables_soporta_sensores(vss_id_variable);
+CREATE INDEX IF NOT EXISTS idx_vss_variable
+  ON tb_variables_soporta_sensores(vss_id_variable);
 
 -- ============================================
 --   6) LECTURAS DE SENSORES
