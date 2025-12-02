@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { CreateConexionDto } from './dto/create-conexion.dto';
 import { UpdateConexionDto } from './dto/update-conexion.dto';
 import { Conexion } from './entities/conexion.entity';
@@ -11,71 +11,92 @@ export class ConexionesService {
   constructor(
     @InjectRepository(Conexion)
     private readonly conexionRepo: Repository<Conexion>,
-  ) { }
+  ) {}
 
-  async create(createConexionDto: CreateConexionDto) {
-    const ent = this.conexionRepo.create(createConexionDto);
+  // ==================================================
+  // CREATE
+  // ==================================================
+  async create(dto: CreateConexionDto) {
+    const ent = this.conexionRepo.create(dto);
     return this.conexionRepo.save(ent);
   }
 
+  // ==================================================
+  // FIND ALL
+  // ==================================================
   async findAll() {
-    return this.conexionRepo.find({ where: { borrado: false } });
+    return this.conexionRepo.find({
+      where: { borradoEn: IsNull() },
+      relations: ['empresa'],
+    });
   }
 
+  // ==================================================
+  // FIND ONE
+  // ==================================================
   async findOne(id: number) {
-    const e = await this.conexionRepo.findOne({ where: { id } });
-    if (!e) throw new NotFoundException('Conexión no encontrada');
-    return e;
+    const ent = await this.conexionRepo.findOne({
+      where: { id, borradoEn: IsNull() },
+      relations: ['empresa'],
+    });
+
+    if (!ent) throw new NotFoundException('Conexión no encontrada');
+    return ent;
   }
 
+  // ==================================================
+  // UPDATE
+  // ==================================================
   async update(id: number, dto: UpdateConexionDto) {
     const ent = await this.findOne(id);
     Object.assign(ent, dto);
     return this.conexionRepo.save(ent);
   }
 
+  // ==================================================
+  // SOFT DELETE
+  // ==================================================
   async remove(id: number) {
     const ent = await this.findOne(id);
-    ent.borrado = true;
-    ent.borradoEn = new Date();
-    return this.conexionRepo.save(ent);
+    await this.conexionRepo.softDelete(id);
+    return { message: 'Conexión eliminada correctamente' };
   }
 
+  // ==================================================
+  // FIND BY EMPRESA ID
+  // ==================================================
   async findByEmpresaId(empresaId: number): Promise<Conexion | null> {
-    if (!empresaId) throw new Error('empresaId requerido');
+    if (!empresaId) throw new BadRequestException('empresaId requerido');
+
     return this.conexionRepo.findOne({
-      where: { empresaId, borrado: false },
+      where: { empresaId, borradoEn: IsNull() },
+      relations: ['empresa'],
     });
   }
 
-  /**
-   * Valida que el nombre de la base de datos contenga solo caracteres seguros.
-   * Permite solo letras (a-z, A-Z), números (0-9) y guiones bajos (_).
-   * @throws Error si el nombre contiene caracteres no permitidos
-   */
+  // ==================================================
+  // VALIDACIÓN DB NAME
+  // ==================================================
   private validateDatabaseName(dbName: string): void {
     const validPattern = /^[a-zA-Z0-9_]+$/;
     if (!validPattern.test(dbName)) {
-      throw new Error(
+      throw new BadRequestException(
         `Nombre de base de datos inválido: "${dbName}". Solo se permiten caracteres alfanuméricos y guiones bajos.`,
       );
     }
   }
 
+  // ==================================================
+  // CREAR CONEXIÓN DEFAULT PARA EMPRESA
+  // ==================================================
   async createDefaultForEmpresa(empresaId: number, nombreEmpresa: string) {
-    // Sanitize company name: remove all non-alphanumeric characters except underscores
     const sanitizedName = nombreEmpresa
       .toLowerCase()
-      .replace(/[^a-z0-9_]/g, '_')
-      .replace(/_+/g, '_') // Replace multiple consecutive underscores with single underscore
-      .replace(/^_|_$/g, ''); // Remove leading/trailing underscores
+      .replace(/[^a-z0-9_]/gi, '_')
+      .replace(/_+/g, '_')
+      .replace(/^_|_$/g, '');
 
-    // PostgreSQL has a 63 character limit for identifiers
-    // Reserve space for prefix and empresa ID (e.g., "empresa_123_" = ~13 chars)
-    const maxNameLength = 50;
-    const truncatedName = sanitizedName.slice(0, maxNameLength);
-
-    const dbName = `empresa_${empresaId}_${truncatedName}`;
+    const dbName = `empresa_${empresaId}_${sanitizedName.slice(0, 40)}`;
 
     await this.createDatabaseIfNotExists(dbName);
 
@@ -91,8 +112,10 @@ export class ConexionesService {
     return this.conexionRepo.save(conexion);
   }
 
+  // ==================================================
+  // CREATE DB IF NOT EXISTS (ADMIN MODE)
+  // ==================================================
   async createDatabaseIfNotExists(dbName: string) {
-    // Validate database name to prevent SQL injection
     this.validateDatabaseName(dbName);
 
     const adminDs = new DataSource({
@@ -106,6 +129,7 @@ export class ConexionesService {
 
     try {
       await adminDs.initialize();
+
       const exists = await adminDs.query(
         `SELECT 1 FROM pg_database WHERE datname = $1`,
         [dbName],
@@ -114,11 +138,18 @@ export class ConexionesService {
       if (exists.length === 0) {
         await adminDs.query(`CREATE DATABASE "${dbName}"`);
       }
+    } catch (err) {
+      throw new InternalServerErrorException(
+        'Error al crear base de datos para empresa',
+      );
     } finally {
       await adminDs.destroy();
     }
   }
 
+  // ==================================================
+  // CREAR DATA SOURCE DINÁMICO
+  // ==================================================
   async getTenantDataSourceForEmpresaId(empresaId: number) {
     const conexion = await this.findByEmpresaId(empresaId);
     if (!conexion)
@@ -134,6 +165,7 @@ export class ConexionesService {
     });
 
     await ds.initialize();
+
     return { conexion, dataSource: ds };
   }
 }

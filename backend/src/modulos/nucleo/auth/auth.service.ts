@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 import { Auth } from './entities/auth.entity';
@@ -30,29 +30,34 @@ export class AuthService {
   // LOGIN — MULTIROL + MULTIEMPRESA
   // ============================================
   async login(email: string, password: string): Promise<LoginResponseDto> {
-    const user = await this.authRepository.findOneBy({
-      email,
-      borrado: false,
+    const user = await this.authRepository.findOne({
+      where: { email, borradoEn: IsNull() },
     });
 
     if (!user) throw new UnauthorizedException('Usuario no encontrado');
-    if (!user.estado)
-      throw new UnauthorizedException('Usuario inactivo');
+    if (!user.estado) throw new UnauthorizedException('Usuario inactivo');
 
-    const passwordMatches = await bcrypt.compare(password, user.contrasena);
-    if (!passwordMatches)
-      throw new ConflictException('Credenciales incorrectas');
+    const ok = await bcrypt.compare(password, user.contrasena);
+    if (!ok) throw new ConflictException('Credenciales incorrectas');
 
-    // Cargar roles y empresas
+    // Perfiles activos
     const perfiles = await this.perfilRepository.find({
-      where: { usuarioId: user.id, borrado: false },
+      where: {
+        usuarioId: user.id,
+        borradoEn: IsNull(),
+      },
       relations: ['empresa', 'rol'],
     });
 
-    const roles = perfiles.filter(p => p.rol?.estado).map(p => p.rol.nombre);
-    const empresas = perfiles.filter(p => p.empresa?.estado).map(p => p.empresa.id);
+    const roles = perfiles
+      .filter((p) => p.rol?.estado)
+      .map((p) => p.rol.nombre);
 
-    // JWT
+    const empresas = perfiles
+      .filter((p) => p.empresa?.estado)
+      .map((p) => p.empresa.id);
+
+    // === JWT ===
     const token = this.jwtService.sign({
       sub: user.id,
       email: user.email,
@@ -76,13 +81,16 @@ export class AuthService {
   async findAllByEmpresa(empresaId: number) {
     return this.authRepository
       .createQueryBuilder('u')
-      .innerJoin('u.perfiles', 'p', 'p.empresaId = :emp AND p.borrado = false', {
-        emp: empresaId,
-      })
-      .leftJoinAndSelect('u.perfiles', 'perfiles')
+      .innerJoin(
+        'u.perfiles',
+        'p',
+        'p.empresaId = :emp AND p.borradoEn IS NULL',
+        { emp: empresaId },
+      )
+      .leftJoinAndSelect('u.perfiles', 'perfiles', 'perfiles.borradoEn IS NULL')
       .leftJoinAndSelect('perfiles.rol', 'rol')
       .leftJoinAndSelect('perfiles.empresa', 'empresa')
-      .where('u.borrado = false')
+      .where('u.borradoEn IS NULL')
       .getMany();
   }
 
@@ -91,7 +99,7 @@ export class AuthService {
   // ============================================
   async findOne(id: number) {
     const user = await this.authRepository.findOne({
-      where: { id, borrado: false },
+      where: { id, borradoEn: IsNull() },
       relations: ['perfiles', 'perfiles.rol', 'perfiles.empresa'],
     });
 
@@ -103,7 +111,10 @@ export class AuthService {
   // UPDATE USUARIO
   // ============================================
   async update(id: number, dto: any) {
-    const user = await this.authRepository.findOneBy({ id });
+    const user = await this.authRepository.findOne({
+      where: { id, borradoEn: IsNull() },
+    });
+
     if (!user) throw new NotFoundException('Usuario no encontrado');
 
     if (dto.contrasena) {
@@ -112,25 +123,32 @@ export class AuthService {
     }
 
     Object.assign(user, dto);
+
     return this.authRepository.save(user);
   }
+
+  // ============================================
+  // FIND ALL USERS
+  // ============================================
   async findAll() {
     return this.authRepository.find({
-      where: { borrado: false },
+      where: { borradoEn: IsNull() },
       select: ['id', 'nombre', 'email', 'estado'],
     });
   }
 
   // ============================================
-  // BORRADO LÓGICO
+  // SOFT DELETE
   // ============================================
   async remove(id: number) {
-    const user = await this.authRepository.findOneBy({ id });
+    const user = await this.authRepository.findOne({
+      where: { id, borradoEn: IsNull() },
+    });
+
     if (!user) throw new NotFoundException('Usuario no encontrado');
 
-    user.borrado = true;
-    user.borradoEn = new Date();
+    await this.authRepository.softDelete(id);
 
-    return this.authRepository.save(user);
+    return { message: 'Usuario eliminado correctamente' };
   }
 }

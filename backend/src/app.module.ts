@@ -17,9 +17,7 @@ import { LecturasSensoresModule } from './modulos/empresarial/lecturas-sensores/
 import { UmbralesModule } from './modulos/empresarial/umbrales/umbrales.module';
 import { AlertasModule } from './modulos/empresarial/alertas/alertas.module';
 import { UsuariosModule } from './modulos/nucleo/usuarios/usuarios.module';
-import { Roles } from './modulos/nucleo/auth/guards/roles.decorator';
 import { RolesUsuariosModule } from './modulos/nucleo/roles-usuarios/roles-usuarios.module';
-import { Perfil } from './modulos/nucleo/perfiles/entities/perfil.entity';
 import { PerfilesModule } from './modulos/nucleo/perfiles/perfiles.module';
 
 @Module({
@@ -36,9 +34,9 @@ import { PerfilesModule } from './modulos/nucleo/perfiles/perfiles.module';
         password: config.get<string>('DB_PASS', 'postgres'),
         database: config.get<string>('DB_NAME', 'test'),
         entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
-        // For safety in production and multi-tenant environments we disable schema sync
-        // and rely on migrations. Explicitly force `synchronize: false` per project rules.
-        synchronize: false,
+        // Por seguridad en entornos de producción y multiinquilino deshabilitamos la sincronización del esquema
+        // y confiamos en las migraciones. Forzar explícitamente `synchronize: false` según las reglas del proyecto.
+        synchronize: true,
         logging: config.get<string>('DB_LOGGING', 'false') === 'true',
       }),
     }),

@@ -7,20 +7,20 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
+  DeleteDateColumn,
 } from 'typeorm';
 
-// Ajusta la ruta si la entidad Empresa está en otra ubicación
 import { Empresa } from '../../empresas/entities/empresa.entity';
 
-@Index('idx_conexiones_empresa', ['empresaId'])
 @Entity('tb_conexiones')
+@Index('idx_conexiones_empresa', ['empresaId'])
 export class Conexion {
   @PrimaryGeneratedColumn({ name: 'c_id' })
   id: number;
 
-  @Column({ name: 'c_id_empresa', insert: false, update: false })
+  @Column({ name: 'c_id_empresa' })
   empresaId: number;
-  
+
   @ManyToOne(() => Empresa, (empresa) => empresa.conexiones, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
@@ -46,19 +46,12 @@ export class Conexion {
   @Column({ name: 'c_estado', default: true })
   estado: boolean;
 
-  @Column({ name: 'c_borrado', default: false })
-  borrado: boolean;
-
-  @CreateDateColumn({ name: 'c_creado_en', type: 'timestamptz' })
+  @CreateDateColumn({ name: 'c_creado_en' })
   creadoEn: Date;
 
-  @UpdateDateColumn({
-    name: 'c_modificado_en',
-    type: 'timestamptz',
-    nullable: true,
-  })
-  modificadoEn?: Date;
+  @UpdateDateColumn({ name: 'c_modificado_en' })
+  modificadoEn: Date;
 
-  @Column({ name: 'c_borrado_en', type: 'timestamptz', nullable: true })
-  borradoEn?: Date;
+  @DeleteDateColumn({ name: 'c_borrado_en' })
+  borradoEn: Date;
 }

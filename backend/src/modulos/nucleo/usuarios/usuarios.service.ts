@@ -6,7 +6,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 
 import * as bcrypt from 'bcrypt';
 
@@ -15,6 +15,7 @@ import { Perfil } from '../perfiles/entities/perfil.entity';
 
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
+import { JwtPayload } from '../auth/jwt.strategy';
 
 @Injectable()
 export class UsuariosService {
@@ -26,12 +27,9 @@ export class UsuariosService {
     private readonly perfilRepo: Repository<Perfil>,
   ) {}
 
-  // ============================================================
-  // CREAR USUARIO (solo ADMIN_GLOBAL)
-  // ============================================================
   async create(dto: CreateUsuarioDto): Promise<Auth> {
     const existe = await this.usuarioRepo.findOne({
-      where: { email: dto.email, borrado: false },
+      where: { email: dto.email, borradoEn: IsNull() },
     });
 
     if (existe) throw new ConflictException('El email ya está registrado.');
@@ -39,49 +37,56 @@ export class UsuariosService {
     const hashedPassword = await bcrypt.hash(dto.contrasena, 10);
 
     const user = this.usuarioRepo.create({
-      nombre: dto.nombre,
-      apellido: dto.apellido,
-      email: dto.email,
+      nombre: dto.nombre.trim(),
+      email: dto.email.toLowerCase(),
       contrasena: hashedPassword,
-      estado: true,
-      borrado: false,
+      // añade aquí otros campos si tu entidad Auth los tiene
     });
 
     return this.usuarioRepo.save(user);
   }
 
-  // ============================================================
-  // LISTAR USUARIOS POR EMPRESA
-  // ADMIN_GLOBAL → cualquier empresa
-  // ADMIN → solo sus empresas del JWT
-  // ============================================================
-  async findAllByEmpresa(empresaId: number, usuarioJWT: any) {
-    // Verificar si el usuario es ADMIN_GLOBAL
-    if (!usuarioJWT.roles.includes('ADMIN_GLOBAL')) {
-      // Si es ADMIN normal, validar empresa
-      if (!usuarioJWT.empresas.includes(empresaId)) {
+  async findAllByEmpresa(
+    empresaId: number,
+    usuarioJWT: JwtPayload,
+  ): Promise<Auth[]> {
+    if (!Number.isInteger(empresaId) || empresaId <= 0) {
+      throw new BadRequestException('empresaId inválido');
+    }
+
+    // Solo restringimos si NO es ADMIN
+    if (!usuarioJWT.roles.includes('ADMIN')) {
+      if (
+        !Array.isArray(usuarioJWT.empresas) ||
+        !usuarioJWT.empresas.includes(empresaId)
+      ) {
         throw new ForbiddenException('No puedes acceder a esta empresa.');
       }
     }
 
     return this.usuarioRepo
       .createQueryBuilder('u')
-      .innerJoin('u.perfiles', 'p', 'p.empresaId = :emp AND p.borrado = false', {
-        emp: empresaId,
-      })
+      .innerJoin(
+        'u.perfiles',
+        'p',
+        'p.empresaId = :emp AND p.borradoEn IS NULL',
+        { emp: empresaId },
+      )
       .leftJoinAndSelect('u.perfiles', 'perfiles')
       .leftJoinAndSelect('perfiles.rol', 'rol')
       .leftJoinAndSelect('perfiles.empresa', 'empresa')
-      .where('u.borrado = false')
+      .where('u.borradoEn IS NULL')
+      .orderBy('u.id', 'ASC')
       .getMany();
   }
 
-  // ============================================================
-  // VER USUARIO
-  // ============================================================
   async findOne(id: number): Promise<Auth> {
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new BadRequestException('ID inválido');
+    }
+
     const user = await this.usuarioRepo.findOne({
-      where: { id, borrado: false },
+      where: { id, borradoEn: IsNull() },
       relations: ['perfiles', 'perfiles.empresa', 'perfiles.rol'],
     });
 
@@ -89,11 +94,10 @@ export class UsuariosService {
     return user;
   }
 
-  // ============================================================
-  // UPDATE USUARIO
-  // ============================================================
   async update(id: number, dto: UpdateUsuarioDto): Promise<Auth> {
-    const user = await this.usuarioRepo.findOneBy({ id });
+    const user = await this.usuarioRepo.findOne({
+      where: { id, borradoEn: IsNull() },
+    });
 
     if (!user) throw new NotFoundException('Usuario no encontrado');
 
@@ -102,21 +106,17 @@ export class UsuariosService {
     }
 
     Object.assign(user, dto);
-
     return this.usuarioRepo.save(user);
   }
 
-  // ============================================================
-  // BORRADO LÓGICO
-  // ============================================================
-  async remove(id: number) {
-    const user = await this.usuarioRepo.findOneBy({ id });
+  async remove(id: number): Promise<Auth> {
+    const user = await this.usuarioRepo.findOne({
+      where: { id, borradoEn: IsNull() },
+    });
 
     if (!user) throw new NotFoundException('Usuario no encontrado');
 
-    user.borrado = true;
     user.borradoEn = new Date();
-
     return this.usuarioRepo.save(user);
   }
 }

@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  DeleteDateColumn,
 } from 'typeorm';
 
 import { Perfil } from '../../perfiles/entities/perfil.entity';
@@ -17,16 +18,21 @@ export class RolUsuario {
   @Column({ name: 'ru_nombre', unique: true })
   nombre: string;
 
-  @Column({ name: 'ru_descripcion', nullable: true })
-  descripcion?: string;
+  @Column({ name: 'ru_descripcion', type: 'text', nullable: true })
+  descripcion?: string | null;
 
   @Column({ name: 'ru_estado', default: true })
   estado: boolean;
 
-  @Column({ name: 'ru_borrado', default: false })
-  borrado: boolean;
+  @CreateDateColumn({ name: 'ru_creado_en' })
+  creadoEn: Date;
+
+  @UpdateDateColumn({ name: 'ru_modificado_en' })
+  modificadoEn: Date;
+
+  @DeleteDateColumn({ name: 'ru_borrado_en' })
+  borradoEn: Date;
 
   @OneToMany(() => Perfil, (p) => p.rol)
   perfiles: Perfil[];
 }
-

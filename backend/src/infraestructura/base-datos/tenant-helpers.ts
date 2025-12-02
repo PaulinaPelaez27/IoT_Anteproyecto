@@ -18,6 +18,9 @@ import { Alerta } from '../../modulos/empresarial/alertas/entities/alerta.entity
 import { Perfil } from '../../modulos/nucleo/perfiles/entities/perfil.entity';
 import { Empresa } from '../../modulos/nucleo/empresas/entities/empresa.entity';
 import { Auth } from '../../modulos/nucleo/auth/entities/auth.entity';
+import { RolUsuario } from '../../modulos/nucleo/roles-usuarios/entities/rol-usuario.entity';
+import { Conexion } from 'src/modulos/nucleo/conexiones/entities/conexion.entity';
+import { DatoCrudo } from 'src/modulos/nucleo/datos-crudos/entities/dato-crudo.entity';
 
 //** Lista completa de ENTIDADES obligatorias del dominio IoT
 const ENTIDADES_IOT = [
@@ -29,10 +32,12 @@ const ENTIDADES_IOT = [
   LecturasSensor,
   Umbral,
   Alerta,
-  // Entidades del núcleo que también deben estar disponibles en los DataSources tenant
   Perfil,
   Empresa,
   Auth,
+  RolUsuario,
+  Conexion,
+  DatoCrudo,
 ];
 
 type TenantCfg = {

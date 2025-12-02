@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS tb_proyectos (
   p_nombre        VARCHAR(45) NOT NULL,
   p_descripcion   VARCHAR(250),
   p_estado        BOOLEAN NOT NULL DEFAULT TRUE,
-  p_borrado       BOOLEAN NOT NULL DEFAULT FALSE,
   p_creado_en     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   p_modificado_en TIMESTAMPTZ,
   p_borrado_en    TIMESTAMPTZ
@@ -24,7 +23,6 @@ CREATE TABLE IF NOT EXISTS tb_nodos (
   n_id_proyecto   INT REFERENCES tb_proyectos(p_id)
                      ON UPDATE CASCADE ON DELETE SET NULL,
   n_estado        BOOLEAN NOT NULL DEFAULT TRUE,
-  n_borrado       BOOLEAN NOT NULL DEFAULT FALSE,
   n_creado_en     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   n_modificado_en TIMESTAMPTZ,
   n_borrado_en    TIMESTAMPTZ
@@ -40,7 +38,6 @@ CREATE TABLE IF NOT EXISTS tb_sensores (
   s_id_nodo       INT NOT NULL REFERENCES tb_nodos(n_id)
                      ON UPDATE CASCADE ON DELETE RESTRICT,
   s_estado        BOOLEAN NOT NULL DEFAULT TRUE,
-  s_borrado       BOOLEAN NOT NULL DEFAULT FALSE,
   s_creado_en     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   s_modificado_en TIMESTAMPTZ,
   s_borrado_en    TIMESTAMPTZ
@@ -57,7 +54,6 @@ CREATE TABLE IF NOT EXISTS tb_variables (
   v_descripcion   VARCHAR(250),
   v_var_json      VARCHAR(15) NOT NULL UNIQUE,
   v_estado        BOOLEAN NOT NULL DEFAULT TRUE,
-  v_borrado       BOOLEAN NOT NULL DEFAULT FALSE,
   v_creado_en     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   v_modificado_en TIMESTAMPTZ,
   v_borrado_en    TIMESTAMPTZ
@@ -73,7 +69,6 @@ CREATE TABLE IF NOT EXISTS tb_variables_soporta_sensores (
   vss_id_variable   INT NOT NULL REFERENCES tb_variables(v_id)
                        ON UPDATE CASCADE ON DELETE RESTRICT,
   vss_estado        BOOLEAN NOT NULL DEFAULT TRUE,
-  vss_borrado       BOOLEAN NOT NULL DEFAULT FALSE,
   vss_creado_en     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   vss_modificado_en TIMESTAMPTZ,
   vss_borrado_en    TIMESTAMPTZ,
@@ -96,7 +91,6 @@ CREATE TABLE IF NOT EXISTS tb_lecturas_sensores (
   ls_id_variable   INT NOT NULL REFERENCES tb_variables(v_id)
                       ON UPDATE CASCADE ON DELETE RESTRICT,
   ls_estado        BOOLEAN NOT NULL DEFAULT TRUE,
-  ls_borrado       BOOLEAN NOT NULL DEFAULT FALSE,
   ls_creado_en     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   ls_modificado_en TIMESTAMPTZ,
   ls_borrado_en    TIMESTAMPTZ,
@@ -126,7 +120,6 @@ CREATE TABLE IF NOT EXISTS tb_umbrales (
   um_valor_min     DOUBLE PRECISION,
   um_valor_max     DOUBLE PRECISION,
   um_estado        BOOLEAN NOT NULL DEFAULT TRUE,
-  um_borrado       BOOLEAN NOT NULL DEFAULT FALSE,
   um_creado_en     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   um_modificado_en TIMESTAMPTZ,
   um_borrado_en    TIMESTAMPTZ,
@@ -149,7 +142,6 @@ CREATE TABLE IF NOT EXISTS tb_alertas (
   a_id_sensor     INT NOT NULL REFERENCES tb_sensores(s_id)
                      ON UPDATE CASCADE ON DELETE RESTRICT,
   a_estado        BOOLEAN NOT NULL DEFAULT TRUE,
-  a_borrado       BOOLEAN NOT NULL DEFAULT FALSE,
   a_creado_en     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   a_modificado_en TIMESTAMPTZ,
   a_borrado_en    TIMESTAMPTZ
@@ -166,7 +158,6 @@ CREATE TABLE IF NOT EXISTS tb_alertas_usuarios (
                       ON UPDATE CASCADE ON DELETE CASCADE,
   au_id_usuario    INT NOT NULL,
   au_estado        BOOLEAN NOT NULL DEFAULT TRUE,
-  au_borrado       BOOLEAN NOT NULL DEFAULT FALSE,
   au_creado_en     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   au_leido         BOOLEAN NOT NULL DEFAULT FALSE,
   au_leido_en      TIMESTAMPTZ,

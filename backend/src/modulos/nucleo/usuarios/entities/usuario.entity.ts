@@ -5,6 +5,7 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 import { Perfil } from '../../perfiles/entities/perfil.entity';
 
@@ -25,11 +26,8 @@ export class Usuario {
   @Column({ name: 'u_contrasena', length: 255 })
   contrasena: string;
 
-  @Column({ name: 'u_estado', default: true })
+  @Column({ name: 'u_estado', type: 'boolean', default: true })
   estado: boolean;
-
-  @Column({ name: 'u_borrado', default: false })
-  borrado: boolean;
 
   @CreateDateColumn({ name: 'u_creado_en', type: 'timestamptz' })
   creadoEn: Date;
@@ -37,7 +35,7 @@ export class Usuario {
   @UpdateDateColumn({ name: 'u_modificado_en', type: 'timestamptz' })
   modificadoEn?: Date;
 
-  @Column({ name: 'u_borrado_en', type: 'timestamptz', nullable: true })
+  @DeleteDateColumn({ name: 'u_borrado_en', type: 'timestamptz' })
   borradoEn?: Date;
 
   @OneToMany(() => Perfil, (p) => p.usuario)

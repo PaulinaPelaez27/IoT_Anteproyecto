@@ -8,6 +8,7 @@ export type JwtPayload = {
   email: string;
   roles: string[];      // multi-rol
   empresas: number[];   // multi-empresa
+  
 };
 
 @Injectable()

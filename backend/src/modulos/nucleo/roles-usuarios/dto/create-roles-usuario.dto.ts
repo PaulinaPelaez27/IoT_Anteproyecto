@@ -9,5 +9,5 @@ export class CreateRolUsuarioDto {
   @IsString()
   @IsOptional()
   @MaxLength(250)
-  descripcion?: string;
+  descripcion?: string | null;
 }

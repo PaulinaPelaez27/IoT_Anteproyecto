@@ -6,12 +6,13 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
+  DeleteDateColumn,
 } from 'typeorm';
 
 import { Perfil } from '../../perfiles/entities/perfil.entity';
 
 @Entity({ name: 'tb_usuarios' })
-@Index('idx_usuario_email', ['email'])
+@Index('idx_usuario_email', ['email'], { unique: true })
 export class Auth {
   @PrimaryGeneratedColumn({ name: 'u_id' })
   id: number;
@@ -19,36 +20,23 @@ export class Auth {
   @Column({ name: 'u_nombre', length: 45 })
   nombre: string;
 
-  @Column({ name: 'u_apellido', length: 45, nullable: true })
-  apellido?: string;
-
-  @Column({ name: 'u_email', length: 100, unique: true })
+  @Column({ name: 'u_email', length: 100})
   email: string;
 
   @Column({ name: 'u_contrasena', length: 255 })
-  contrasena: string; // hash
+  contrasena: string;
 
-  @Column({ name: 'u_estado', default: true })
+  @Column({ name: 'u_estado', type: 'boolean', default: true })
   estado: boolean;
 
-  @Column({ name: 'u_borrado', default: false })
-  borrado: boolean;
-
-  @CreateDateColumn({
-    name: 'u_creado_en',
-    type: 'timestamptz',
-  })
+  @CreateDateColumn({ name: 'u_creado_en' })
   creadoEn: Date;
 
-  @UpdateDateColumn({
-    name: 'u_modificado_en',
-    type: 'timestamptz',
-    nullable: true,
-  })
-  modificadoEn?: Date;
+  @UpdateDateColumn({ name: 'u_modificado_en' })
+  modificadoEn: Date;
 
-  @Column({ name: 'u_borrado_en', type: 'timestamptz', nullable: true })
-  borradoEn?: Date;
+  @DeleteDateColumn({ name: 'u_borrado_en' })
+  borradoEn: Date;
 
   /*
    * MULTI–ROL & MULTI–EMPRESA

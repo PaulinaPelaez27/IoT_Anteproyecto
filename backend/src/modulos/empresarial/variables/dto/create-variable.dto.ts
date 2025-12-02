@@ -9,12 +9,12 @@ export class CreateVariableDto {
         @IsString()
         @IsOptional()
         @MaxLength(15)
-        unidad?: string;
+        unidad?: string | null;
 
         @IsString()
         @IsOptional()
         @MaxLength(250)
-        descripcion?: string;
+        descripcion?: string | null;
 
         @IsString()
         @IsNotEmpty()

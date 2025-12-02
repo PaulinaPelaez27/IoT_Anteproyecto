@@ -2,11 +2,14 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 
 import { RolUsuario } from './entities/rol-usuario.entity';
+import { UpdateRolUsuarioDto } from './dto/update-roles-usuario.dto';
+import { CreateRolUsuarioDto } from './dto/create-roles-usuario.dto';
 
 @Injectable()
 export class RolesUsuariosService {
@@ -18,19 +21,27 @@ export class RolesUsuariosService {
   // ============================
   // Crear rol
   // ============================
-  async create(nombre: string, descripcion?: string): Promise<RolUsuario> {
-    const existe = await this.rolRepo.findOneBy({
-      nombre,
-      borrado: false,
+  async create(dto: CreateRolUsuarioDto): Promise<RolUsuario> {
+    const nombreNormalizado = dto.nombre.trim();
+
+    if (!nombreNormalizado) {
+      throw new BadRequestException('El nombre del rol es obligatorio');
+    }
+
+    const existe = await this.rolRepo.findOne({
+      where: {
+        nombre: nombreNormalizado,
+        borradoEn: IsNull(),
+      },
     });
 
-    if (existe) throw new ConflictException('El rol ya existe');
+    if (existe) {
+      throw new ConflictException('Ya existe un rol con ese nombre');
+    }
 
     const rol = this.rolRepo.create({
-      nombre,
-      descripcion: descripcion ?? undefined,
-      estado: true,
-      borrado: false,
+      nombre: nombreNormalizado,
+      descripcion: dto.descripcion?.trim() || null,
     });
 
     return this.rolRepo.save(rol);
@@ -41,7 +52,7 @@ export class RolesUsuariosService {
   // ============================
   async findAll(): Promise<RolUsuario[]> {
     return this.rolRepo.find({
-      where: { borrado: false },
+      where: { borradoEn: IsNull() },
       order: { id: 'ASC' },
     });
   }
@@ -50,12 +61,17 @@ export class RolesUsuariosService {
   // Buscar rol por ID
   // ============================
   async findOne(id: number): Promise<RolUsuario> {
-    const rol = await this.rolRepo.findOneBy({
-      id,
-      borrado: false,
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new BadRequestException('ID inválido');
+    }
+
+    const rol = await this.rolRepo.findOne({
+      where: { id, borradoEn: IsNull() },
     });
 
-    if (!rol) throw new NotFoundException('Rol no encontrado');
+    if (!rol) {
+      throw new NotFoundException('Rol no encontrado');
+    }
 
     return rol;
   }
@@ -63,43 +79,48 @@ export class RolesUsuariosService {
   // ============================
   // Actualizar un rol
   // ============================
-  async update(
-    id: number,
-    payload: { nombre?: string; descripcion?: string; estado?: boolean },
-  ): Promise<RolUsuario> {
+  async update(id: number, dto: UpdateRolUsuarioDto): Promise<RolUsuario> {
     const rol = await this.findOne(id);
 
-    if (payload.nombre) {
-      const existe = await this.rolRepo.findOneBy({
-        nombre: payload.nombre,
-        borrado: false,
+    if (dto.nombre) {
+      const nombreNormalizado = dto.nombre.trim();
+
+      const existe = await this.rolRepo.findOne({
+        where: {
+          nombre: nombreNormalizado,
+          borradoEn: IsNull(),
+        },
       });
 
-      if (existe && existe.id !== id)
+      if (existe && existe.id !== id) {
         throw new ConflictException('Ya existe otro rol con ese nombre');
+      }
 
-      rol.nombre = payload.nombre;
+      rol.nombre = nombreNormalizado;
     }
 
-    if (payload.descripcion !== undefined) {
-      rol.descripcion = payload.descripcion;
+    if (dto.descripcion !== undefined) {
+      rol.descripcion = dto.descripcion?.trim() || null;
     }
 
-    if (payload.estado !== undefined) {
-      rol.estado = payload.estado;
+    if (dto.estado !== undefined) {
+      rol.estado = dto.estado;
     }
 
     return this.rolRepo.save(rol);
   }
 
   // ============================
-  // Borrado lógico
+  // Borrado lógico (soft delete)
   // ============================
-  async remove(id: number): Promise<void> {
+  async remove(id: number) {
     const rol = await this.findOne(id);
 
-    rol.borrado = true;
+    rol.borradoEn = new Date();
+    rol.estado = false; // opcional pero lógico: si está borrado, queda inactivo
 
     await this.rolRepo.save(rol);
+
+    return { message: 'Rol eliminado correctamente' };
   }
 }

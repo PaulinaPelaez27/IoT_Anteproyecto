@@ -23,13 +23,10 @@ export class Proyecto {
     length: 250,
     nullable: true,
   })
-  descripcion?: string;
+  descripcion?: string | null;
 
   @Column({ name: 'p_estado', type: 'boolean', default: true })
   estado: boolean;
-
-  @Column({ name: 'p_borrado', type: 'boolean', default: false })
-  borrado: boolean;
 
   @CreateDateColumn({ name: 'p_creado_en', type: 'timestamptz' })
   creadoEn: Date;

@@ -6,7 +6,7 @@ import {
   ConflictException,
   Logger,
 } from '@nestjs/common';
-import { Repository, QueryFailedError } from 'typeorm';
+import { Repository, QueryFailedError, IsNull } from 'typeorm';
 import { CreateUmbralDto } from './dto/create-umbral.dto';
 import { UpdateUmbralDto } from './dto/update-umbral.dto';
 import { Umbral } from './entities/umbral.entity';
@@ -35,108 +35,140 @@ export class UmbralesService extends BaseTenantService {
     return this.getTenantRepo(perfil, Variable);
   }
 
-  private async validarSensor(perfil: PerfilLike, sensorId: number): Promise<Sensor> {
+  /** Validaciones */
+  private async validarSensor(perfil: PerfilLike, sensorId: number): Promise<void> {
     const repo = await this.getSensorRepo(perfil);
-    const sensor = await repo.findOne({ where: { id: sensorId, borrado: false } });
-    if (!sensor) throw new NotFoundException(`Sensor ${sensorId} no encontrado`);
-    return sensor;
+
+    const existe = await repo.findOne({
+      where: { id: sensorId, borradoEn: IsNull() },
+      select: ['id'],
+    });
+
+    if (!existe) throw new NotFoundException(`Sensor ${sensorId} no encontrado`);
   }
 
-  private async validarVariable(perfil: PerfilLike, variableId: number): Promise<Variable> {
+  private async validarVariable(perfil: PerfilLike, variableId: number): Promise<void> {
     const repo = await this.getVariableRepo(perfil);
-    const variable = await repo.findOne({ where: { id: variableId, borrado: false } });
-    if (!variable) throw new NotFoundException(`Variable ${variableId} no encontrada`);
-    return variable;
+
+    const existe = await repo.findOne({
+      where: { id: variableId, borradoEn: IsNull() },
+      select: ['id'],
+    });
+
+    if (!existe) throw new NotFoundException(`Variable ${variableId} no encontrada`);
   }
 
+  /** Crear umbral */
   async create(perfil: PerfilLike, dto: CreateUmbralDto): Promise<Umbral> {
     const repo = await this.getUmbralRepo(perfil);
 
-    const umbral = repo.create({
-      valorMin: dto.valorMin,
-      valorMax: dto.valorMax,
-      estado: dto.estado ?? true,
-      borrado: false,
-    } as Partial<Umbral>);
+    await this.validarSensor(perfil, dto.sensorId);
+    await this.validarVariable(perfil, dto.variableId);
 
-    if (dto.sensorId) umbral.sensor = await this.validarSensor(perfil, dto.sensorId);
-    if (dto.variableId) umbral.variable = await this.validarVariable(perfil, dto.variableId);
+    const umbral = repo.create({
+      valorMin: dto.valorMin ?? null,
+      valorMax: dto.valorMax ?? null,
+      sensorId: dto.sensorId,
+      variableId: dto.variableId,
+      estado: dto.estado ?? true,
+    });
 
     try {
       return await repo.save(umbral);
     } catch (err) {
       this.logger.error(err);
+
+      if (err instanceof QueryFailedError) {
+        const code = (err.driverError as any).code;
+        if (code === '23505') {
+          throw new ConflictException('Ya existe un umbral para ese sensor y variable');
+        }
+      }
+
       throw new InternalServerErrorException('No se pudo crear el umbral');
     }
   }
 
+  /** Listar */
   async findAll(perfil: PerfilLike): Promise<Umbral[]> {
     const repo = await this.getUmbralRepo(perfil);
-    return repo.find({ where: { borrado: false }, order: { id: 'ASC' }, relations: ['sensor', 'variable'] });
+
+    return repo.find({
+      where: { borradoEn: IsNull() },
+      order: { id: 'ASC' },
+      relations: ['sensor', 'variable'],
+    });
   }
 
+  /** Obtener uno */
   async findOne(perfil: PerfilLike, id: number): Promise<Umbral> {
-    if (!Number.isInteger(id) || id <= 0) throw new BadRequestException('ID inválido');
+    if (!Number.isInteger(id) || id <= 0)
+      throw new BadRequestException('ID inválido');
 
     const repo = await this.getUmbralRepo(perfil);
-    const umbral = await repo.findOne({ where: { id, borrado: false }, relations: ['sensor', 'variable'] });
+
+    const umbral = await repo.findOne({
+      where: { id, borradoEn: IsNull() },
+      relations: ['sensor', 'variable'],
+    });
 
     if (!umbral) throw new NotFoundException(`Umbral ${id} no encontrado`);
+
     return umbral;
   }
 
-  async update(perfil: PerfilLike, id: number, dto: UpdateUmbralDto) {
+  /** Actualizar */
+  async update(perfil: PerfilLike, id: number, dto: UpdateUmbralDto): Promise<Umbral> {
     const repo = await this.getUmbralRepo(perfil);
 
+    const umbral = await this.findOne(perfil, id);
+
+    if (dto.valorMin !== undefined) umbral.valorMin = dto.valorMin;
+    if (dto.valorMax !== undefined) umbral.valorMax = dto.valorMax;
+    if (dto.estado !== undefined) umbral.estado = dto.estado;
+
+    if (dto.sensorId !== undefined) {
+      await this.validarSensor(perfil, dto.sensorId);
+      umbral.sensorId = dto.sensorId;
+    }
+
+    if (dto.variableId !== undefined) {
+      await this.validarVariable(perfil, dto.variableId);
+      umbral.variableId = dto.variableId;
+    }
+
     try {
-      const umbral = await repo.preload({
-        id,
-        ...(dto.valorMin !== undefined && { valorMin: dto.valorMin }),
-        ...(dto.valorMax !== undefined && { valorMax: dto.valorMax }),
-        ...(dto.estado !== undefined && { estado: dto.estado }),
-      });
-
-      if (!umbral) throw new NotFoundException(`Umbral ${id} no encontrado`);
-
-      // 2. Validación y asignación de relaciones
-      if (dto.sensorId !== undefined) {
-        umbral.sensor = await this.validarSensor(perfil, dto.sensorId);
-      }
-
-      if (dto.variableId !== undefined) {
-        umbral.variable = await this.validarVariable(perfil, dto.variableId);
-      }
-
-      // 3. Guardar
       await repo.save(umbral);
-
-      // 4. Retornar el registro actualizado
       return this.findOne(perfil, id);
-
     } catch (error) {
-      if (error instanceof QueryFailedError) {
-        const d = error.driverError as { code?: string };
-
-        if (d.code === '23505') throw new ConflictException('Ya existe un umbral para ese sensor y variable');
-        if (d.code === '23503') throw new NotFoundException('Sensor o variable no existe');
-      }
-
-      if (error instanceof NotFoundException || error instanceof ConflictException) {
-        throw error;
-      }
-
       this.logger.error(error);
+
+      if (error instanceof QueryFailedError) {
+        const code = (error.driverError as any).code;
+
+        if (code === '23505')
+          throw new ConflictException('Ya existe un umbral para ese sensor y variable');
+
+        if (code === '23503')
+          throw new NotFoundException('Sensor o variable no existe');
+      }
+
       throw new InternalServerErrorException('Error actualizando umbral');
     }
   }
 
+  /** Soft delete */
   async remove(perfil: PerfilLike, id: number) {
     const repo = await this.getUmbralRepo(perfil);
-    const umbral = await this.findOne(perfil, id);
 
-    umbral.borrado = true;
-    umbral.borradoEn = new Date();
+    await this.findOne(perfil, id); // validar existencia
 
-    return repo.save(umbral);
+    try {
+      await repo.softDelete(id);
+      return { message: `Umbral ${id} eliminado correctamente` };
+    } catch (error) {
+      this.logger.error(error);
+      throw new InternalServerErrorException('Error borrando umbral');
+    }
   }
-}
+} 

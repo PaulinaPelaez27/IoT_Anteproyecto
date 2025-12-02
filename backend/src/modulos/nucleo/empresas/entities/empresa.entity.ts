@@ -1,10 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-// Importación de tipo para evitar dependencia circular fuerte
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
 import { Conexion } from '../../conexiones/entities/conexion.entity';
-// Nueva relación a Perfiles (asegúrate de que exista Perfil.entit y su ManyToOne hacia Empresa)
 import { Perfil } from '../../perfiles/entities/perfil.entity';
+import { DatoCrudo } from '../../datos-crudos/entities/dato-crudo.entity';
+import { Proyecto } from 'src/modulos/empresarial/proyectos/entities/proyecto.entity';
 
-@Entity('tb_empresas')
 @Entity('tb_empresas')
 export class Empresa {
   @PrimaryGeneratedColumn({ name: 'e_id' })
@@ -28,25 +27,23 @@ export class Empresa {
   @Column({ name: 'e_estado', default: true })
   estado: boolean;
 
-  @Column({ name: 'e_borrado', default: false })
-  borrado: boolean;
-
-  @Column({
-    name: 'e_creado_en',
-    type: 'timestamptz',
-    default: () => 'NOW()',
-  })
+  @CreateDateColumn({ name: 'e_creado_en' })
   creadoEn: Date;
 
-  @Column({ name: 'e_modificado_en', type: 'timestamptz', nullable: true })
-  modificadoEn?: Date;
+  @UpdateDateColumn({ name: 'e_modificado_en' })
+  modificadoEn: Date;
 
-  @Column({ name: 'e_borrado_en', type: 'timestamptz', nullable: true })
-  borradoEn?: Date;
+  @DeleteDateColumn({ name: 'e_borrado_en' })
+  borradoEn: Date;
 
   @OneToMany(() => Conexion, (conexion) => conexion.empresa)
   conexiones: Conexion[];
 
   @OneToMany(() => Perfil, (perfil) => perfil.empresa)
   perfiles: Perfil[];
+
+  @OneToMany(() => DatoCrudo, (dc) => dc.empresa)
+  datosCrudos: DatoCrudo[];
+
+
 }

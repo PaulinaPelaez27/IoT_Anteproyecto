@@ -31,9 +31,6 @@ export class VariablesSoportaSensor {
   @Column({ name: 'vss_estado', type: 'boolean', default: true })
   estado: boolean;
 
-  @Column({ name: 'vss_borrado', type: 'boolean', default: false })
-  borrado: boolean;
-
   @Column({ name: 'vss_creado_en', type: 'timestamptz', default: () => 'NOW()' })
   creadoEn: Date;
 
