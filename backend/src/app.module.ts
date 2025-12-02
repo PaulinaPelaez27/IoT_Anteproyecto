@@ -19,6 +19,7 @@ import { AlertasModule } from './modulos/empresarial/alertas/alertas.module';
 import { UsuariosModule } from './modulos/nucleo/usuarios/usuarios.module';
 import { RolesUsuariosModule } from './modulos/nucleo/roles-usuarios/roles-usuarios.module';
 import { PerfilesModule } from './modulos/nucleo/perfiles/perfiles.module';
+import { AlertasUsuariosModule } from './modulos/empresarial/alertas-usuarios/alertas-usuarios.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { PerfilesModule } from './modulos/nucleo/perfiles/perfiles.module';
     UsuariosModule,
     RolesUsuariosModule,
     PerfilesModule,
+    AlertasUsuariosModule,
   ],
   controllers: [AppController],
   providers: [AppService],

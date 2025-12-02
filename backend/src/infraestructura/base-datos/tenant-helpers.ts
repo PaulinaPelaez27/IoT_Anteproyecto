@@ -21,6 +21,7 @@ import { Auth } from '../../modulos/nucleo/auth/entities/auth.entity';
 import { RolUsuario } from '../../modulos/nucleo/roles-usuarios/entities/rol-usuario.entity';
 import { Conexion } from 'src/modulos/nucleo/conexiones/entities/conexion.entity';
 import { DatoCrudo } from 'src/modulos/nucleo/datos-crudos/entities/dato-crudo.entity';
+import { AlertaUsuario } from '../../modulos/empresarial/alertas-usuarios/entities/alertas-usuario.entity';
 
 //** Lista completa de ENTIDADES obligatorias del dominio IoT
 const ENTIDADES_IOT = [
@@ -38,6 +39,7 @@ const ENTIDADES_IOT = [
   RolUsuario,
   Conexion,
   DatoCrudo,
+  AlertaUsuario,
 ];
 
 type TenantCfg = {
