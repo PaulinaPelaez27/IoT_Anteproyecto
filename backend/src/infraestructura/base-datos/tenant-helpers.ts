@@ -50,7 +50,7 @@ export class TenantConnectionHelper implements OnModuleDestroy {
     'host' | 'username' | 'password' | 'database'
   > = {
     type: 'postgres',
-    synchronize: false,
+    synchronize: true,
     logging: false,
   };
 
