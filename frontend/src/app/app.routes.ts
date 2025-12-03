@@ -1,6 +1,16 @@
 import { Routes } from '@angular/router';
-//import { ListaEmpresas } from './pages/lista-empresas/lista-empresas';
-import { EMPRESAS_ROUTES } from './features/empresas/empresas.routes';
-import { PROYECTOS_ROUTES } from './features/proyectos/proyectos.routes';
 
-export const routes: Routes = [ { path: 'empresas', children: EMPRESAS_ROUTES }, { path: 'proyectos', children: PROYECTOS_ROUTES } ];
+export const routes: Routes = [
+  {
+    path: 'empresas',
+    loadChildren: () =>
+      import('./features/empresas/empresas.routes')
+        .then(r => r.EMPRESAS_ROUTES),
+  },
+  {
+    path: 'proyectos',
+    loadChildren: () =>
+      import('./features/proyectos/proyectos.routes')
+        .then(r => r.PROYECTOS_ROUTES),
+  },
+];

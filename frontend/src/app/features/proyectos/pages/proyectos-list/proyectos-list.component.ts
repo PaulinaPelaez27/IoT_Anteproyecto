@@ -24,6 +24,8 @@ import { FormsModule } from '@angular/forms';
 // Servicios y modelos
 import { ProyectosService } from '../../services/proyectos.service';
 import { Proyecto } from '../../models/proyecto.model';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ProyectoEditDialogComponent } from '../../components/proyecto-edit-dialog/proyecto-edit-dialog.component';
 
 @Component({
   selector: 'app-proyectos-list',
@@ -44,6 +46,7 @@ import { Proyecto } from '../../models/proyecto.model';
     MatInputModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
+    MatDialogModule
   ],
 })
 export class ProyectosListComponent implements OnInit, AfterViewInit {
@@ -64,8 +67,9 @@ export class ProyectosListComponent implements OnInit, AfterViewInit {
 
   constructor(
     private readonly proyectosService: ProyectosService,
-    private readonly router: Router
-  ) {}
+    private readonly router: Router,
+    private readonly dialog: MatDialog
+  ) { }
 
   ngOnInit(): void {
     this.configFilterPredicate();
@@ -116,8 +120,17 @@ export class ProyectosListComponent implements OnInit, AfterViewInit {
     this.router.navigate(['/proyectos/crear']);
   }
 
-  goToEdit(proyecto: Proyecto): void {
-    this.router.navigate(['/proyectos/editar', proyecto.id]);
+  goToEdit(proyecto: Proyecto) {
+    const dialogRef = this.dialog.open(ProyectoEditDialogComponent, {
+      width: '600px',
+      data: proyecto
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadProyectos();  // refrescar tabla
+      }
+    });
   }
 
   onDelete(proyecto: Proyecto): void {
@@ -135,4 +148,17 @@ export class ProyectosListComponent implements OnInit, AfterViewInit {
   trackByProyectoId(index: number, proyecto: Proyecto): number {
     return proyecto.id;
   }
+  openEditDialog(proyecto: Proyecto) {
+  const dialogRef = this.dialog.open(ProyectoEditDialogComponent, {
+    width: '600px',
+    data: proyecto,   // 👈 AQUI SE ENVIA initialData
+  });
+
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      this.loadProyectos();
+    }
+  });
+}
+  
 }
