@@ -1,0 +1,60 @@
+<div class="lista-empresas-container">
+    <div class="toolbar">
+        <div class="title-group">
+            <h2>Lista de empresas</h2>
+            <p class="subtitle">Gestiona tus empresas registradas</p>
+        </div>
+
+        <div class="controls">
+            <div class="search-wrapper">
+                <mat-icon class="search-icon">search</mat-icon>
+                <input type="search" placeholder="Buscar empresa, responsable, email..." aria-label="Buscar" />
+            </div>
+
+            <button mat-button  class="create-btn" (click)="openCreateDialog()">
+                <mat-icon>add</mat-icon>
+                Crear empresa
+            </button>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="empresa-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Email</th>
+                    <th>Número</th>
+                    <th>Responsable</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr *ngFor="let empresa of empresas; trackBy: trackByEmpresaId">
+                    <td class="col-name">{{ empresa.nombre }}</td>
+                    <td class="col-desc">{{ empresa.descripcion }}</td>
+                    <td class="col-email">{{ empresa.email }}</td>
+                    <td class="col-phone">{{ empresa.numeroTel }}</td>
+                    <td class="col-resp">{{ empresa.responsable }}</td>
+                    <td class="col-estado">
+                        <span class="estado"
+                              [ngClass]="{'activo': empresa.estado === true, 'inactivo': empresa.estado !== true}">
+                            {{ empresa.estado }}
+                        </span>
+                    </td>
+                    <td class="col-actions">
+                        <button mat-icon-button color="primary" aria-label="Editar empresa" (click)="openUpdateDialog(empresa)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button color="warn" aria-label="Eliminar empresa" (click)="onDelete(empresa)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
