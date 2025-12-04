@@ -13,4 +13,11 @@ export const routes: Routes = [
       import('./features/proyectos/proyectos.routes')
         .then(r => r.PROYECTOS_ROUTES),
   },
+  {
+  path: 'nodos',
+  loadChildren: () =>
+    import('./features/nodos/nodos.routes')
+      .then(r => r.NODOS_ROUTES),
+},
+
 ];
