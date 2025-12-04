@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 
@@ -23,7 +23,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
   templateUrl: './proyecto-form.component.html',
   styleUrls: ['./proyecto-form.component.scss'],
 })
-export class ProyectoFormComponent {
+export class ProyectoFormComponent implements OnInit {
 
   @Input() initialData: any = null;
   @Output() submitForm = new EventEmitter<any>();
@@ -39,14 +39,14 @@ export class ProyectoFormComponent {
   }
 
   ngOnInit() {
-  if (this.initialData) {
-    this.form.patchValue({
-      nombre: this.initialData.nombre,
-      descripcion: this.initialData.descripcion,
-      estado: this.initialData.estado,
-    });
+    if (this.initialData) {
+      this.form.patchValue({
+        nombre: this.initialData.nombre,
+        descripcion: this.initialData.descripcion,
+        estado: this.initialData.estado,
+      });
+    }
   }
-}
 
   onSubmit() {
     if (this.form.invalid) {
