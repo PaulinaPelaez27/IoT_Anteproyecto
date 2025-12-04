@@ -120,19 +120,6 @@ export class ProyectosListComponent implements OnInit, AfterViewInit {
     this.router.navigate(['/proyectos/crear']);
   }
 
-  goToEdit(proyecto: Proyecto) {
-    const dialogRef = this.dialog.open(ProyectoEditDialogComponent, {
-      width: '600px',
-      data: proyecto
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.loadProyectos();  // refrescar tabla
-      }
-    });
-  }
-
   onDelete(proyecto: Proyecto): void {
     if (!confirm(`¿Eliminar el proyecto "${proyecto.nombre}"?`)) return;
 
