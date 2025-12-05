@@ -15,6 +15,12 @@ import { Variable } from '../../modulos/empresarial/variables/entities/variable.
 import { LecturasSensor } from '../../modulos/empresarial/lecturas-sensores/entities/lecturas-sensor.entity';
 import { Umbral } from '../../modulos/empresarial/umbrales/entities/umbral.entity';
 import { Alerta } from '../../modulos/empresarial/alertas/entities/alerta.entity';
+import { Perfil } from '../../modulos/nucleo/perfiles/entities/perfil.entity';
+import { Empresa } from '../../modulos/nucleo/empresas/entities/empresa.entity';
+import { Auth } from '../../modulos/nucleo/auth/entities/auth.entity';
+import { RolUsuario } from '../../modulos/nucleo/roles-usuarios/entities/rol-usuario.entity';
+import { Conexion } from 'src/modulos/nucleo/conexiones/entities/conexion.entity';
+import { DatoCrudo } from 'src/modulos/nucleo/datos-crudos/entities/dato-crudo.entity';
 import { AlertaUsuario } from '../../modulos/empresarial/alertas-usuarios/entities/alertas-usuario.entity';
 
 //** Lista completa de ENTIDADES obligatorias del dominio IoT
@@ -27,6 +33,12 @@ const ENTIDADES_IOT = [
   LecturasSensor,
   Umbral,
   Alerta,
+  Perfil,
+  Empresa,
+  Auth,
+  RolUsuario,
+  Conexion,
+  DatoCrudo,
   AlertaUsuario,
 ];
 
@@ -54,7 +66,7 @@ export class TenantConnectionHelper implements OnModuleDestroy {
     logging: false,
   };
 
-  constructor(private readonly conexiones: ConexionesService) {}
+  constructor(private readonly conexiones: ConexionesService) { }
 
   async onModuleDestroy() {
     await this.closeAll();

@@ -23,7 +23,6 @@ export class CreateEmpresaDto {
 
   @IsOptional()
   @IsEmail()
-  @Length(0, 100)
   email?: string;
 
   @IsOptional()

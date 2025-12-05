@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { UpdateAlertaDto } from './dto/update-alerta.dto';
 import { Alerta } from './entities/alerta.entity';
 import { Sensor } from '../sensores/entities/sensor.entity';
@@ -28,27 +28,31 @@ export class AlertasService extends BaseTenantService {
     return this.getTenantRepo(perfil, Sensor);
   }
 
-  private async validarSensor(perfil: PerfilLike, sensorId: number): Promise<Sensor> {
+  private async validarSensor(perfil: PerfilLike, sensorId: number): Promise<void> {
     const repo = await this.getSensorRepo(perfil);
-    const sensor = await repo.findOne({ where: { id: sensorId, borrado: false } });
-    if (!sensor) throw new NotFoundException(`Sensor ${sensorId} no encontrado`);
-    return sensor;
+
+    const sensorExiste = await repo.findOne({
+      where: { id: sensorId, borradoEn: IsNull() },
+      select: ['id'],
+    });
+
+    if (!sensorExiste) throw new NotFoundException(`Sensor ${sensorId} no encontrado`);
   }
 
-  /** Método interno: crear alerta desde la lógica automática (no expuesto en el controlador) */
+  /** Crear alerta desde la lógica automática */
   async createAutomaticAlert(
     perfil: PerfilLike,
     data: { mensaje: string; sensorId: number; estado?: boolean },
   ): Promise<Alerta> {
+    await this.validarSensor(perfil, data.sensorId);
+
     const repo = await this.getAlertaRepo(perfil);
-    const sensor = await this.validarSensor(perfil, data.sensorId);
 
     const alerta = repo.create({
       mensaje: data.mensaje,
-      sensor,
+      sensorId: data.sensorId,
       estado: data.estado ?? true,
-      borrado: false,
-    } as Partial<Alerta>);
+    });
 
     try {
       return await repo.save(alerta);
@@ -60,34 +64,40 @@ export class AlertasService extends BaseTenantService {
 
   async findAll(perfil: PerfilLike): Promise<Alerta[]> {
     const repo = await this.getAlertaRepo(perfil);
-    return repo.find({ where: { borrado: false }, order: { creadoEn: 'DESC' }, relations: ['sensor'] });
+
+    return repo.find({
+      where: { borradoEn: IsNull() },
+      order: { creadoEn: 'DESC' },
+      relations: ['sensor'],
+    });
   }
 
   async findOne(perfil: PerfilLike, id: number): Promise<Alerta> {
-    if (!Number.isInteger(id) || id <= 0) throw new BadRequestException('ID inválido');
+    if (!Number.isInteger(id) || id <= 0)
+      throw new BadRequestException('ID inválido');
 
     const repo = await this.getAlertaRepo(perfil);
-    const alerta = await repo.findOne({ where: { id, borrado: false }, relations: ['sensor'] });
+
+    const alerta = await repo.findOne({
+      where: { id, borradoEn: IsNull() },
+      relations: ['sensor'],
+    });
 
     if (!alerta) throw new NotFoundException(`Alerta ${id} no encontrada`);
+
     return alerta;
   }
 
   async update(perfil: PerfilLike, id: number, dto: UpdateAlertaDto) {
     const repo = await this.getAlertaRepo(perfil);
 
+    const alerta = await this.findOne(perfil, id);
+
+    alerta.estado = dto.estado ?? alerta.estado;
+
     try {
-      const alerta = await repo.preload({
-        id,
-        ...(dto.estado !== undefined && { estado: dto.estado }),
-      });
-
-      if (!alerta) throw new NotFoundException(`Alerta ${id} no encontrada`);
-
-      await repo.save(alerta);
-      return this.findOne(perfil, id);
+      return await repo.save(alerta);
     } catch (error) {
-      if (error instanceof NotFoundException) throw error;
       this.logger.error(error);
       throw new InternalServerErrorException('Error actualizando alerta');
     }
@@ -95,13 +105,12 @@ export class AlertasService extends BaseTenantService {
 
   async remove(perfil: PerfilLike, id: number) {
     const repo = await this.getAlertaRepo(perfil);
-    const alerta = await this.findOne(perfil, id);
 
-    alerta.borrado = true;
-    alerta.borradoEn = new Date();
+    await this.findOne(perfil, id); // verifica existencia
 
     try {
-      return repo.save(alerta);
+      await repo.softDelete(id);
+      return { message: `Alerta ${id} eliminada correctamente` };
     } catch (error) {
       this.logger.error(error);
       throw new InternalServerErrorException('Error borrando alerta');

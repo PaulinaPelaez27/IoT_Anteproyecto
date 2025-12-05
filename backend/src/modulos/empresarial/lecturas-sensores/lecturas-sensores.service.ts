@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { LecturasSensor } from './entities/lecturas-sensor.entity';
 import { Sensor } from '../sensores/entities/sensor.entity';
 import { Variable } from '../variables/entities/variable.entity';
@@ -33,39 +33,50 @@ export class LecturasSensoresService extends BaseTenantService {
     return this.getTenantRepo(perfil, Variable);
   }
 
-  private async validarSensor(perfil: PerfilLike, sensorId: number): Promise<Sensor> {
+  /** Valida que el sensor exista */
+  private async validarSensor(perfil: PerfilLike, sensorId: number): Promise<void> {
     const repo = await this.getSensorRepo(perfil);
-    const sensor = await repo.findOne({ where: { id: sensorId, borrado: false } });
 
-    if (!sensor) throw new NotFoundException(`Sensor ${sensorId} no encontrado`);
+    const existe = await repo.findOne({
+      where: { id: sensorId, borradoEn: IsNull() },
+      select: ['id'],
+    });
 
-    return sensor;
+    if (!existe) throw new NotFoundException(`Sensor ${sensorId} no encontrado`);
   }
 
-  private async validarVariable(perfil: PerfilLike, variableId: number): Promise<Variable> {
+  /** Valida que la variable exista (solo si se envía variableId) */
+  private async validarVariable(perfil: PerfilLike, variableId: number): Promise<void> {
     const repo = await this.getVariableRepo(perfil);
-    const variable = await repo.findOne({ where: { id: variableId, borrado: false } });
 
-    if (!variable) throw new NotFoundException(`Variable ${variableId} no encontrada`);
+    const existe = await repo.findOne({
+      where: { id: variableId, borradoEn: IsNull() },
+      select: ['id'],
+    });
 
-    return variable;
+    if (!existe) throw new NotFoundException(`Variable ${variableId} no encontrada`);
   }
 
+  /** Crear lectura */
   async create(perfil: PerfilLike, dto: CreateLecturasSensorDto): Promise<LecturasSensor> {
     const repo = await this.getLecturaRepo(perfil);
 
-    if (!dto.sensorId || dto.sensorId <= 0) throw new BadRequestException('sensorId inválido');
+    if (!dto.sensorId || dto.sensorId <= 0) {
+      throw new BadRequestException('sensorId inválido');
+    }
+
+    await this.validarSensor(perfil, dto.sensorId);
+
+    if (dto.variableId) {
+      await this.validarVariable(perfil, dto.variableId);
+    }
 
     const lectura = repo.create({
       valor: dto.valor,
-      borrado: false,
-    } as Partial<LecturasSensor>);
-
-    lectura.sensor = await this.validarSensor(perfil, dto.sensorId);
-
-    if (dto.variableId) {
-      lectura.variable = await this.validarVariable(perfil, dto.variableId);
-    }
+      sensorId: dto.sensorId,
+      variableId: dto.variableId ?? null,
+      estado: true,
+    });
 
     try {
       return await repo.save(lectura);
@@ -75,29 +86,47 @@ export class LecturasSensoresService extends BaseTenantService {
     }
   }
 
+  /** Listar lecturas */
   async findAll(perfil: PerfilLike): Promise<LecturasSensor[]> {
     const repo = await this.getLecturaRepo(perfil);
-    return repo.find({ where: { borrado: false }, order: { id: 'ASC' }, relations: ['sensor', 'variable'] });
+
+    return repo.find({
+      where: { borradoEn: IsNull() },
+      order: { id: 'ASC' },
+      relations: ['sensor', 'variable'],
+    });
   }
 
+  /** Obtener una lectura por id */
   async findOne(perfil: PerfilLike, id: number): Promise<LecturasSensor> {
-    if (!Number.isInteger(id) || id <= 0) throw new BadRequestException('ID inválido');
+    if (!Number.isInteger(id) || id <= 0)
+      throw new BadRequestException('ID inválido');
 
     const repo = await this.getLecturaRepo(perfil);
-    const lectura = await repo.findOne({ where: { id, borrado: false }, relations: ['sensor', 'variable'] });
+
+    const lectura = await repo.findOne({
+      where: { id, borradoEn: IsNull() },
+      relations: ['sensor', 'variable'],
+    });
 
     if (!lectura) throw new NotFoundException(`Lectura ${id} no encontrada`);
 
     return lectura;
   }
 
+  /** Soft delete */
   async remove(perfil: PerfilLike, id: number) {
     const repo = await this.getLecturaRepo(perfil);
-    const lectura = await this.findOne(perfil, id);
 
-    lectura.borrado = true;
-    lectura.borradoEn = new Date();
+    // Verifica existencia
+    await this.findOne(perfil, id);
 
-    return repo.save(lectura);
+    try {
+      await repo.softDelete(id);
+      return { message: `Lectura ${id} eliminada correctamente` };
+    } catch (err) {
+      this.logger.error(err);
+      throw new InternalServerErrorException('Error borrando lectura');
+    }
   }
 }

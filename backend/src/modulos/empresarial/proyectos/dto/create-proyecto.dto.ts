@@ -9,7 +9,7 @@ export class CreateProyectoDto {
     @IsString()
     @IsOptional()
     @MaxLength(250)
-    descripcion?: string;
+    descripcion?: string | null;
 
     @IsBoolean()
     @IsOptional()

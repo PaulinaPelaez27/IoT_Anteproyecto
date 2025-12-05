@@ -5,22 +5,22 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
-  Index,
   DeleteDateColumn,
 } from 'typeorm';
-
 import { Perfil } from '../../perfiles/entities/perfil.entity';
 
 @Entity({ name: 'tb_usuarios' })
-@Index('idx_usuario_email', ['email'], { unique: true })
-export class Auth {
+export class Usuario {
   @PrimaryGeneratedColumn({ name: 'u_id' })
   id: number;
 
   @Column({ name: 'u_nombre', length: 45 })
   nombre: string;
 
-  @Column({ name: 'u_email', length: 100})
+  @Column({ name: 'u_apellido', length: 45, nullable: true })
+  apellido?: string;
+
+  @Column({ name: 'u_email', length: 100, unique: true })
   email: string;
 
   @Column({ name: 'u_contrasena', length: 255 })
@@ -29,18 +29,15 @@ export class Auth {
   @Column({ name: 'u_estado', type: 'boolean', default: true })
   estado: boolean;
 
-  @CreateDateColumn({ name: 'u_creado_en' })
+  @CreateDateColumn({ name: 'u_creado_en', type: 'timestamptz' })
   creadoEn: Date;
 
-  @UpdateDateColumn({ name: 'u_modificado_en' })
-  modificadoEn: Date;
+  @UpdateDateColumn({ name: 'u_modificado_en', type: 'timestamptz' })
+  modificadoEn?: Date;
 
-  @DeleteDateColumn({ name: 'u_borrado_en' })
-  borradoEn: Date;
+  @DeleteDateColumn({ name: 'u_borrado_en', type: 'timestamptz' })
+  borradoEn?: Date;
 
-  /*
-   * MULTI–ROL & MULTI–EMPRESA
-   */
   @OneToMany(() => Perfil, (p) => p.usuario)
   perfiles: Perfil[];
 }

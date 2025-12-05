@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
   Index,
   Unique,
+  DeleteDateColumn,
 } from 'typeorm';
 
 import { Auth } from '../../auth/entities/auth.entity';
@@ -19,70 +20,57 @@ import { RolUsuario } from 'src/modulos/nucleo/roles-usuarios/entities/rol-usuar
 @Index('idx_perfiles_usuario', ['usuarioId'])
 @Index('idx_perfiles_empresa', ['empresaId'])
 export class Perfil {
-  @PrimaryGeneratedColumn({ name: 'p_id', type: 'int' })
+  @PrimaryGeneratedColumn({ name: 'p_id' })
   id: number;
 
-  @Column({ name: 'p_id_usuario', type: 'int' })
+  /*
+   * FK: USUARIO
+   */
+  @Column({ name: 'p_id_usuario' })
   usuarioId: number;
 
-  @ManyToOne(
-    () => Auth,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-    (u) => (u as any).perfiles,
-    {
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-    },
-  )
+  @ManyToOne(() => Auth, (u) => u.perfiles, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn({ name: 'p_id_usuario' })
-  usuario?: Auth;
+  usuario: Auth;
 
-  @ManyToOne(
-    () => RolUsuario,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-    (r) => (r as any).perfiles,
-    {
-      onDelete: 'RESTRICT',
-      onUpdate: 'CASCADE',
-    },
-  )
-  @JoinColumn({ name: 'p_id_rol' })
-  rol?: RolUsuario;
-
-  @Column({ name: 'p_id_rol', type: 'int' })
+  /*
+   * FK: ROL
+   */
+  @Column({ name: 'p_id_rol' })
   rolId: number;
 
-  @Column({ name: 'p_id_empresa', type: 'int' })
+  @ManyToOne(() => RolUsuario, (r) => r.perfiles, {
+    onDelete: 'RESTRICT',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'p_id_rol' })
+  rol: RolUsuario;
+
+  /*
+   * FK: EMPRESA
+   */
+  @Column({ name: 'p_id_empresa' })
   empresaId: number;
 
-  @ManyToOne(
-    () => Empresa,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-    (e) => (e as any).perfiles,
-    {
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-    },
-  )
+  @ManyToOne(() => Empresa, (e) => e.perfiles, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn({ name: 'p_id_empresa' })
-  empresa?: Empresa;
+  empresa: Empresa;
 
   @Column({ name: 'p_estado', type: 'boolean', default: true })
   estado: boolean;
 
-  @Column({ name: 'p_borrado', type: 'boolean', default: false })
-  borrado: boolean;
-
-  @CreateDateColumn({ name: 'p_creado_en', type: 'timestamptz' })
+  @CreateDateColumn({ name: 'p_creado_en' })
   creadoEn: Date;
 
-  @UpdateDateColumn({
-    name: 'p_modificado_en',
-    type: 'timestamptz',
-    nullable: true,
-  })
-  modificadoEn?: Date;
+  @UpdateDateColumn({ name: 'p_modificado_en' })
+  modificadoEn: Date;
 
-  @Column({ name: 'p_borrado_en', type: 'timestamptz', nullable: true })
-  borradoEn?: Date;
+  @DeleteDateColumn({ name: 'p_borrado_en' })
+  borradoEn: Date;
 }

@@ -1,68 +1,48 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-// Importación de tipo para evitar dependencia circular fuerte
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
 import { Conexion } from '../../conexiones/entities/conexion.entity';
-// Nueva relación a Perfiles (asegúrate de que exista Perfil.entit y su ManyToOne hacia Empresa)
 import { Perfil } from '../../perfiles/entities/perfil.entity';
+import { DatoCrudo } from '../../datos-crudos/entities/dato-crudo.entity';
 
 @Entity('tb_empresas')
 export class Empresa {
-  @PrimaryGeneratedColumn({ name: 'e_id', type: 'int' })
+  @PrimaryGeneratedColumn({ name: 'e_id' })
   id: number;
 
-  @Column({ name: 'e_nombre', type: 'varchar', length: 45, nullable: false })
+  @Column({ name: 'e_nombre', length: 45 })
   nombre: string;
 
-  @Column({
-    name: 'e_descripcion',
-    type: 'varchar',
-    length: 250,
-    nullable: true,
-  })
+  @Column({ name: 'e_descripcion', length: 250, nullable: true })
   descripcion?: string;
 
-  @Column({ name: 'e_email', type: 'varchar', length: 100, nullable: true })
+  @Column({ name: 'e_email', length: 100, nullable: true })
   email?: string;
 
-  @Column({ name: 'e_numero_tel', type: 'varchar', length: 20, nullable: true })
+  @Column({ name: 'e_numero_tel', length: 20, nullable: true })
   numeroTel?: string;
 
-  @Column({
-    name: 'e_responsable',
-    type: 'varchar',
-    length: 100,
-    nullable: true,
-  })
+  @Column({ name: 'e_responsable', length: 100, nullable: true })
   responsable?: string;
 
-  @Column({ name: 'e_estado', type: 'boolean', nullable: false, default: true })
+  @Column({ name: 'e_estado', default: true })
   estado: boolean;
 
-  @Column({
-    name: 'e_borrado',
-    type: 'boolean',
-    nullable: false,
-    default: false,
-  })
-  borrado: boolean;
-
-  @Column({
-    name: 'e_creado_en',
-    type: 'timestamptz',
-    nullable: false,
-    default: () => 'NOW()',
-  })
+  @CreateDateColumn({ name: 'e_creado_en' })
   creadoEn: Date;
 
-  @Column({ name: 'e_modificado_en', type: 'timestamptz', nullable: true })
-  modificadoEn?: Date;
+  @UpdateDateColumn({ name: 'e_modificado_en' })
+  modificadoEn: Date;
 
-  @Column({ name: 'e_borrado_en', type: 'timestamptz', nullable: true })
-  borradoEn?: Date;
+  @DeleteDateColumn({ name: 'e_borrado_en' })
+  borradoEn: Date;
 
-  @OneToMany(() => Conexion, (conexion: Conexion) => conexion.empresa)
-  conexiones?: Conexion[];
+  @OneToMany(() => Conexion, (conexion) => conexion.empresa)
+  conexiones: Conexion[];
 
-  // Relación OneToMany hacia Perfil.
-  @OneToMany(() => Perfil, (perfil: Perfil) => perfil.empresa)
-  perfiles?: Perfil[];
+  @OneToMany(() => Perfil, (perfil) => perfil.empresa)
+  perfiles: Perfil[];
+
+  @OneToMany(() => DatoCrudo, (dc) => dc.empresa)
+  datosCrudos: DatoCrudo[];
+
+
 }

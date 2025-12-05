@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { Sensor } from './entities/sensor.entity';
 import { Nodo } from '../nodos/entities/nodo.entity';
 import { CreateSensorDto } from './dto/create-sensor.dto';
@@ -29,52 +29,63 @@ export class SensoresService extends BaseTenantService {
     return this.getTenantRepo(perfil, Nodo);
   }
 
-  private async validarNodo(perfil: PerfilLike, nodoId: number): Promise<Nodo> {
+  /** Validación del nodo */
+  private async validarNodo(perfil: PerfilLike, nodoId: number): Promise<void> {
     const repo = await this.getNodoRepo(perfil);
-    const nodo = await repo.findOne({ where: { id: nodoId, borrado: false } });
 
-    if (!nodo)
-      throw new NotFoundException(`Nodo ${nodoId} no encontrado`);
+    const existe = await repo.findOne({
+      where: { id: nodoId, borradoEn: IsNull() },
+      select: ['id'],
+    });
 
-    return nodo;
+    if (!existe) throw new NotFoundException(`Nodo ${nodoId} no encontrado`);
   }
 
+  /** Crear sensor */
   async create(perfil: PerfilLike, dto: CreateSensorDto): Promise<Sensor> {
     const repo = await this.getSensorRepo(perfil);
 
-    if (!dto.nodoId || dto.nodoId <= 0)
+    if (!dto.nodoId || dto.nodoId <= 0) {
       throw new BadRequestException('nodoId inválido');
+    }
+
+    await this.validarNodo(perfil, dto.nodoId);
 
     const sensor = repo.create({
-      ...dto,
+      nombre: dto.nombre,
+      nodoId: dto.nodoId,
       estado: dto.estado ?? true,
-      borrado: false,
     });
-
-    sensor.nodo = await this.validarNodo(perfil, dto.nodoId);
 
     try {
       return await repo.save(sensor);
     } catch (err) {
+      this.logger.error(err);
       throw new InternalServerErrorException('No se pudo crear el sensor');
     }
   }
 
+  /** Listar sensores */
   async findAll(perfil: PerfilLike): Promise<Sensor[]> {
     const repo = await this.getSensorRepo(perfil);
+
     return repo.find({
-      where: { borrado: false },
+      where: { borradoEn: IsNull() },
       order: { id: 'ASC' },
+      relations: ['nodo'],
     });
   }
 
+  /** Obtener sensor por ID */
   async findOne(perfil: PerfilLike, id: number): Promise<Sensor> {
-    if (!Number.isInteger(id) || id <= 0)
+    if (!Number.isInteger(id) || id <= 0) {
       throw new BadRequestException('ID inválido');
+    }
 
     const repo = await this.getSensorRepo(perfil);
+
     const sensor = await repo.findOne({
-      where: { id, borrado: false },
+      where: { id, borradoEn: IsNull() },
       relations: ['nodo'],
     });
 
@@ -84,30 +95,39 @@ export class SensoresService extends BaseTenantService {
     return sensor;
   }
 
-  async update(perfil: PerfilLike, id: number, dto: UpdateSensorDto) {
+  /** Actualizar sensor */
+  async update(perfil: PerfilLike, id: number, dto: UpdateSensorDto): Promise<Sensor> {
     const repo = await this.getSensorRepo(perfil);
     const sensor = await this.findOne(perfil, id);
 
     if (dto.nodoId) {
-      sensor.nodo = await this.validarNodo(perfil, dto.nodoId);
+      await this.validarNodo(perfil, dto.nodoId);
+      sensor.nodoId = dto.nodoId;
     }
 
-    Object.assign(sensor, dto);
+    if (dto.nombre !== undefined) sensor.nombre = dto.nombre;
+    if (dto.estado !== undefined) sensor.estado = dto.estado;
 
     try {
       return await repo.save(sensor);
     } catch (err) {
+      this.logger.error(err);
       throw new InternalServerErrorException('Error actualizando sensor');
     }
   }
 
+  /** Soft delete */
   async remove(perfil: PerfilLike, id: number) {
     const repo = await this.getSensorRepo(perfil);
-    const sensor = await this.findOne(perfil, id);
 
-    sensor.borrado = true;
-    sensor.borradoEn = new Date();
+    await this.findOne(perfil, id); // validar existencia
 
-    return repo.save(sensor);
+    try {
+      await repo.softDelete(id);
+      return { message: `Sensor ${id} eliminado correctamente` };
+    } catch (err) {
+      this.logger.error(err);
+      throw new InternalServerErrorException('Error borrando sensor');
+    }
   }
 }

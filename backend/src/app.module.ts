@@ -16,6 +16,9 @@ import { VariablesSoportaSensoresModule } from './modulos/empresarial/variables-
 import { LecturasSensoresModule } from './modulos/empresarial/lecturas-sensores/lecturas-sensores.module';
 import { UmbralesModule } from './modulos/empresarial/umbrales/umbrales.module';
 import { AlertasModule } from './modulos/empresarial/alertas/alertas.module';
+import { UsuariosModule } from './modulos/nucleo/usuarios/usuarios.module';
+import { RolesUsuariosModule } from './modulos/nucleo/roles-usuarios/roles-usuarios.module';
+import { PerfilesModule } from './modulos/nucleo/perfiles/perfiles.module';
 import { AlertasUsuariosModule } from './modulos/empresarial/alertas-usuarios/alertas-usuarios.module';
 
 @Module({
@@ -32,7 +35,9 @@ import { AlertasUsuariosModule } from './modulos/empresarial/alertas-usuarios/al
         password: config.get<string>('DB_PASS', 'postgres'),
         database: config.get<string>('DB_NAME', 'test'),
         entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
-        synchronize: config.get<string>('DB_SYNC', 'false') === 'true',
+        // Por seguridad en entornos de producción y multiinquilino deshabilitamos la sincronización del esquema
+        // y confiamos en las migraciones. Forzar explícitamente `synchronize: false` según las reglas del proyecto.
+        synchronize: true,
         logging: config.get<string>('DB_LOGGING', 'false') === 'true',
       }),
     }),
@@ -48,6 +53,9 @@ import { AlertasUsuariosModule } from './modulos/empresarial/alertas-usuarios/al
     LecturasSensoresModule,
     UmbralesModule,
     AlertasModule,
+    UsuariosModule,
+    RolesUsuariosModule,
+    PerfilesModule,
     AlertasUsuariosModule,
   ],
   controllers: [AppController],

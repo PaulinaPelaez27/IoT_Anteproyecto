@@ -8,7 +8,7 @@ export class CreateNodoDto {
     @IsOptional()
     @IsString()
     @MaxLength(100)
-    ubicacion?: string;
+    ubicacion?: string | null;
 
     @IsOptional()
     @IsBoolean()

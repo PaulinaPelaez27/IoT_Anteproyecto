@@ -13,30 +13,46 @@ import {
 import { Sensor } from '../../sensores/entities/sensor.entity';
 
 @Entity('tb_alertas')
-@Index('idx_alertas_sensor_fecha', ['sensor', 'creadoEn'])
+@Index('idx_alertas_sensor_fecha', ['sensorId', 'creadoEn'])
 export class Alerta {
-    @PrimaryGeneratedColumn({ name: 'a_id', type: 'int' })
-    id: number;
+  @PrimaryGeneratedColumn({ name: 'a_id', type: 'int' })
+  id: number;
 
-    @Column({ name: 'a_mensaje', type: 'varchar', length: 250 })
-    mensaje: string;
+  @Column({ name: 'a_mensaje', type: 'varchar', length: 250 })
+  mensaje: string;
 
-    @ManyToOne(() => Sensor, { nullable: false, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
-    @JoinColumn({ name: 'a_id_sensor' })
-    sensor: Sensor;
+  /*
+   * FK EXPLÍCITA
+   */
+  @Column({ name: 'a_id_sensor' })
+  sensorId: number;
 
-    @Column({ name: 'a_estado', type: 'boolean', default: true })
-    estado: boolean;
+  /*
+   * RELACIÓN COMPLETA
+   */
+  @ManyToOne(() => Sensor, (sensor) => sensor.alertas, {
+    nullable: false,
+    onUpdate: 'CASCADE',
+    onDelete: 'RESTRICT',
+  })
+  @JoinColumn({ name: 'a_id_sensor' })
+  sensor: Sensor;
 
-    @Column({ name: 'a_borrado', type: 'boolean', default: false })
-    borrado: boolean;
+  /*
+   * CONTROL OPERATIVO
+   */
+  @Column({ name: 'a_estado', type: 'boolean', default: true })
+  estado: boolean;
 
-    @CreateDateColumn({ name: 'a_creado_en', type: 'timestamptz', default: () => 'NOW()' })
-    creadoEn: Date;
+  /*
+   * TIMESTAMPS
+   */
+  @CreateDateColumn({ name: 'a_creado_en' })
+  creadoEn: Date;
 
-    @UpdateDateColumn({ name: 'a_modificado_en', type: 'timestamptz', nullable: true })
-    modificadoEn?: Date;
+  @UpdateDateColumn({ name: 'a_modificado_en' })
+  modificadoEn: Date;
 
-    @DeleteDateColumn({ name: 'a_borrado_en', type: 'timestamptz', nullable: true })
-    borradoEn?: Date;
+  @DeleteDateColumn({ name: 'a_borrado_en' })
+  borradoEn: Date;
 }

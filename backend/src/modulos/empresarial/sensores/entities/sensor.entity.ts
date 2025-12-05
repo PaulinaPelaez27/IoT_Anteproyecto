@@ -14,42 +14,50 @@ import { Nodo } from "../../nodos/entities/nodo.entity";
 import { VariablesSoportaSensor } from "../../variables-soporta-sensores/entities/variables-soporta-sensor.entity";
 import { LecturasSensor } from "../../lecturas-sensores/entities/lecturas-sensor.entity";
 import { Umbral } from "../../umbrales/entities/umbral.entity";
+import { Alerta } from "../../alertas/entities/alerta.entity";
 
 @Entity('tb_sensores')
-
 export class Sensor {
 
     @PrimaryGeneratedColumn({ name: 's_id', type: 'int' })
     id: number;
 
-    @Column({ name: 's_nombre', type: 'varchar', length: 45, nullable: false })
+    @Column({ name: 's_nombre', type: 'varchar', length: 45 })
     nombre: string;
 
-    @Column({ name: 's_estado', type: 'boolean', nullable: false, default: true })
+    @Column({ name: 's_estado', type: 'boolean', default: true })
     estado: boolean;
 
-    @Column({ name: 's_borrado', type: 'boolean', nullable: false, default: false })
-    borrado: boolean;
-
-    @CreateDateColumn({ name: 's_creado_en', type: 'timestamptz', nullable: false, default: () => 'NOW()' })
+    @CreateDateColumn({ name: 's_creado_en' })
     creadoEn?: Date;
 
-    @UpdateDateColumn({ name: 's_modificado_en', type: 'timestamptz', nullable: true })
+    @UpdateDateColumn({ name: 's_modificado_en' })
     modificadoEn?: Date;
 
-    @DeleteDateColumn({ name: 's_borrado_en', type: 'timestamptz', nullable: true })
+    @DeleteDateColumn({ name: 's_borrado_en' })
     borradoEn?: Date;
 
-    @ManyToOne(() => Nodo, { nullable: false })
+    @Column({ name: 's_id_nodo', type: 'int' })
+    nodoId: number;
+
+    @ManyToOne(() => Nodo, (nodo) => nodo.sensores, {
+        nullable: false,
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+    })
     @JoinColumn({ name: 's_id_nodo' })
     nodo: Nodo;
 
-    @OneToMany(() => VariablesSoportaSensor, variablesSoportaSensor => variablesSoportaSensor.sensor)
+    @OneToMany(() => VariablesSoportaSensor, (vss) => vss.sensor)
     variablesSoportaSensores: VariablesSoportaSensor[];
 
-    @OneToMany(() => LecturasSensor, lecturasSensor => lecturasSensor.sensor)
+    @OneToMany(() => LecturasSensor, (ls) => ls.sensor)
     lecturasSensores: LecturasSensor[];
 
-    @OneToMany(() => Umbral, umbral => umbral.sensor)
+    @OneToMany(() => Umbral, (u) => u.sensor)
     umbrales: Umbral[];
+
+    @OneToMany(() => Alerta, (alerta) => alerta.sensor)
+    alertas: Alerta[];
+
 }
