@@ -2,7 +2,6 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, Up
 import { Conexion } from '../../conexiones/entities/conexion.entity';
 import { Perfil } from '../../perfiles/entities/perfil.entity';
 import { DatoCrudo } from '../../datos-crudos/entities/dato-crudo.entity';
-import { Proyecto } from 'src/modulos/empresarial/proyectos/entities/proyecto.entity';
 
 @Entity('tb_empresas')
 export class Empresa {

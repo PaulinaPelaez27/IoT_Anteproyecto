@@ -7,7 +7,4 @@ export class UpdatePerfilDto extends PartialType(CreatePerfilDto) {
   @IsOptional()
   estado?: boolean;
 
-  @IsBoolean()
-  @IsOptional()
-  borrado?: boolean;
 }

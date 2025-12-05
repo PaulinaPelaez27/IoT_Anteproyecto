@@ -55,9 +55,7 @@ export class ProyectosService extends BaseTenantService {
   async findOne(perfil: PerfilLike, id: number): Promise<Proyecto> {
     if (!Number.isInteger(id) || id <= 0)
       throw new BadRequestException('ID inválido');
-    console.log('antes repo');
     const repo = await this.getProyectoRepo(perfil);
-    console.log('despues repo');
     const proyecto = await repo.findOne({
       where: { id, borradoEn: IsNull() },
     });

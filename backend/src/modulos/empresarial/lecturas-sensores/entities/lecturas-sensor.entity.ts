@@ -41,7 +41,7 @@ export class LecturasSensor {
   /*
    * FK: VARIABLE
    */
-  @Column({ name: 'ls_id_variable', type: 'int' })
+  @Column({ name: 'ls_id_variable', type: 'int', nullable: false })
   variableId: number;
 
   @ManyToOne(() => Variable, (variable) => variable.lecturasSensores, {

@@ -1,10 +1,19 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from "typeorm";
 import { Sensor } from "../../sensores/entities/sensor.entity";
 import { Variable } from "../../variables/entities/variable.entity";
 
 @Entity('tb_variables_soporta_sensores')
 export class VariablesSoportaSensor {
-@PrimaryGeneratedColumn({ name: 'vss_id' })
+  @PrimaryGeneratedColumn({ name: 'vss_id' })
   id: number; // surrogate primary key
 
   @Column({ name: 'vss_id_sensor', type: 'int' })
@@ -38,6 +47,6 @@ export class VariablesSoportaSensor {
   @UpdateDateColumn({ name: 'vss_modificado_en' })
   modificadoEn: Date;
 
-  @DeleteDateColumn({ name: 'vss_borrado_en'})
+  @DeleteDateColumn({ name: 'vss_borrado_en' })
   borradoEn: Date | null; // borrado lógico real
 }

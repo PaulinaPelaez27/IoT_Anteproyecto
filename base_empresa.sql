@@ -63,9 +63,6 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_variables_nombre ON tb_variables (LOWER(v_n
 -- ============================================
 --   5) SENSORES ↔ VARIABLES  (M:N)
 -- ============================================
--- ============================================
---   5) SENSORES ↔ VARIABLES  (M:N)
--- ============================================
 CREATE TABLE IF NOT EXISTS tb_variables_soporta_sensores (
   vss_id            SERIAL PRIMARY KEY,      -- << NUEVA PK >>
   
