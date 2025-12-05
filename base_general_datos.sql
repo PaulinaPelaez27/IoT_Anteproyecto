@@ -13,13 +13,13 @@ VALUES
 -- =========================
 -- Acme IoT
 INSERT INTO tb_conexiones (c_id_empresa, c_host, c_puerto, c_nombre_base_de_datos, c_usuario, c_contrasena)
-SELECT e_id, 'localhost', 5432, 'acme_iot', 'acme_user', '$argon2id$v=19$m=65536,t=3,p=2$acme$somelonghash'
+SELECT e_id, 'localhost', 5432, 'acme_iot', 'postgres', 'Aragot123'
 FROM tb_empresas
 WHERE e_nombre = 'Acme IoT';
 
 -- GreenFarm
 INSERT INTO tb_conexiones (c_id_empresa, c_host, c_puerto, c_nombre_base_de_datos, c_usuario, c_contrasena)
-SELECT e_id, 'localhost', 5432, 'greenfarm_iot', 'gf_user', '$argon2id$v=19$m=65536,t=3,p=2$greenfarm$somelonghash'
+SELECT e_id, 'localhost', 5432, 'greenfarm_iot', 'postgres', 'Aragot123'
 FROM tb_empresas
 WHERE e_nombre = 'GreenFarm';
 

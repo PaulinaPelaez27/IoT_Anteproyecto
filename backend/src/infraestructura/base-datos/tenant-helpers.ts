@@ -61,10 +61,10 @@ export class TenantConnectionHelper implements OnModuleDestroy {
     DataSourceOptions,
     'host' | 'username' | 'password' | 'database'
   > = {
-      type: 'postgres',
-      synchronize: false,
-      logging: false,
-    };
+    type: 'postgres',
+    synchronize: true,
+    logging: false,
+  };
 
   constructor(private readonly conexiones: ConexionesService) { }
 
