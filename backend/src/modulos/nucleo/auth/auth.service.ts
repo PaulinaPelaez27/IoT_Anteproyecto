@@ -29,7 +29,7 @@ export class AuthService {
   // ============================================
   // LOGIN — MULTIROL + MULTIEMPRESA
   // ============================================
-  async login(email: string, password: string): Promise<LoginResponseDto> {
+  async login(email: string, contrasena: string): Promise<LoginResponseDto> {
     const user = await this.authRepository.findOne({
       where: { email, borradoEn: IsNull() },
     });
@@ -37,7 +37,7 @@ export class AuthService {
     if (!user) throw new UnauthorizedException('Usuario no encontrado');
     if (!user.estado) throw new UnauthorizedException('Usuario inactivo');
 
-    const ok = await bcrypt.compare(password, user.contrasena);
+    const ok = await bcrypt.compare(contrasena, user.contrasena);
     if (!ok) throw new ConflictException('Credenciales incorrectas');
 
     // Perfiles activos

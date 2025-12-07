@@ -201,7 +201,7 @@ SELECT a.a_id, 1
 FROM tb_alertas a
 JOIN tb_sensores s ON a.a_id_sensor = s.s_id
 WHERE s.s_nombre='Pres-B1-01'
-ORDER BY a.a_creADO_en DESC LIMIT 1
+ORDER BY a.a_creado_en DESC LIMIT 1
 ON CONFLICT DO NOTHING;
 
 COMMIT;
