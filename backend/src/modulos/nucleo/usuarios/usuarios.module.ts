@@ -6,13 +6,14 @@ import { UsuariosController } from './usuarios.controller';
 
 import { Auth } from '../auth/entities/auth.entity';
 import { Perfil } from '../perfiles/entities/perfil.entity';
+import { Usuario } from './entities/usuario.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Auth, Perfil]),
+    TypeOrmModule.forFeature([Auth, Perfil, Usuario]),
   ],
   controllers: [UsuariosController],
   providers: [UsuariosService],
   exports: [UsuariosService],
 })
-export class UsuariosModule {}
+export class UsuariosModule { }
