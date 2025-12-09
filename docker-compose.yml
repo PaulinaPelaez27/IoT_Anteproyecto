@@ -1,0 +1,75 @@
+services:
+
+  postgres_iot:
+    image: postgres:18
+    container_name: postgres_iot
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_PORT=${DB_PORT}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${DB_NAME} -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./infra/data/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  redis:
+    image: redis:8-alpine
+    container_name: redis-iot
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    networks:
+      - backend
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: mosquitto-iot
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./infra/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    networks:
+      - backend
+
+  mosquitto-service:
+    build:
+      context: ./mosquitto-server
+      dockerfile: Dockerfile
+    container_name: mosquitto-service-iot
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - DB_PORT=${DB_PORT}
+      - MQTT_USERNAME=${MQTT_USERNAME}
+      - PASSWORD_MQ=${PASSWORD_MQ}
+      - MQTTSERVER=${MQTTSERVER}
+    depends_on:
+      - redis
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  pgdata:

@@ -20,6 +20,9 @@ import { UsuariosModule } from './modulos/nucleo/usuarios/usuarios.module';
 import { RolesUsuariosModule } from './modulos/nucleo/roles-usuarios/roles-usuarios.module';
 import { PerfilesModule } from './modulos/nucleo/perfiles/perfiles.module';
 import { AlertasUsuariosModule } from './modulos/empresarial/alertas-usuarios/alertas-usuarios.module';
+import { BullModule } from '@nestjs/bullmq';
+import { ColaIotModule } from './modulos/iot/cola-iot/cola-iot.module';
+
 
 @Module({
   imports: [
@@ -57,6 +60,7 @@ import { AlertasUsuariosModule } from './modulos/empresarial/alertas-usuarios/al
     RolesUsuariosModule,
     PerfilesModule,
     AlertasUsuariosModule,
+    ColaIotModule,
   ],
   controllers: [AppController],
   providers: [AppService],
