@@ -1,8 +1,8 @@
 services:
 
-  postgres_iot:
+  postgres:
     image: postgres:18
-    container_name: postgres_iot
+    container_name: postgres-iot
     restart: always
     env_file:
       - .env
@@ -29,7 +29,7 @@ services:
     container_name: redis-iot
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "6380:6379"
     command: ["redis-server", "--appendonly", "yes"]
     networks:
       - backend
@@ -62,8 +62,15 @@ services:
       - MQTT_USERNAME=${MQTT_USERNAME}
       - PASSWORD_MQ=${PASSWORD_MQ}
       - MQTTSERVER=${MQTTSERVER}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+    volumes:
+      - ./.env:/app/.env
     depends_on:
-      - redis
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_healthy
     networks:
       - backend
 
