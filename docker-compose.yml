@@ -45,6 +45,25 @@ services:
     networks:
       - backend
 
+  simulador-mqtt:
+    build:
+      context: ./Simulador
+      dockerfile: Dockerfile
+    container_name: simulador-mqtt-iot
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - MQTTSERVER=${MQTTSERVER}
+      - TOPICS=${TOPICS}
+      - SENSORES=${SENSORES}
+      - VARIABLES=${VARIABLES}
+    depends_on:
+      mosquitto:
+        condition: service_started
+    networks:
+      - backend
+      
   mosquitto-service:
     build:
       context: ./mosquitto-server
