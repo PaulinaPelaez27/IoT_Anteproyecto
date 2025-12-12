@@ -8,4 +8,4 @@ import { ConexionesModule } from '../../modulos/nucleo/conexiones/conexiones.mod
   providers: [TenantConnectionHelper],
   exports: [TenantConnectionHelper],
 })
-export class CommonModule { }
+export class CommonModule {}

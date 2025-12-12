@@ -1,5 +1,3 @@
--- Nota: No usar BEGIN/COMMIT aquí para permitir CREATE DATABASE.
-
 -- =========================
 --  NUCLEO / MULTI-TENANT
 -- =========================

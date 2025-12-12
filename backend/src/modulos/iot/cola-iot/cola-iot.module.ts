@@ -1,8 +1,6 @@
-// src/modulos/iot/cola-iot/cola-iot.module.ts
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
 import { ColaIotService } from './cola-iot.service';
-//import { ProcesadorIot } from './procesador-iot.processor';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Nodo } from '../../empresarial/nodos/entities/nodo.entity';
 import { Sensor } from '../../empresarial/sensores/entities/sensor.entity';

@@ -14,10 +14,9 @@ import { Empresa } from '../../empresas/entities/empresa.entity';
 @Index('idx_dc_empresa', ['empresaId'])
 @Index('idx_dc_recibido', ['recibidoEn'])
 @Index('idx_dc_nodo', ['nodoId'])
-
 export class DatoCrudo {
   @PrimaryGeneratedColumn('increment', { type: 'bigint', name: 'dc_id' })
-  id: string;
+  id: number;
 
   @Column({ name: 'dc_id_empresa', type: 'int', nullable: true })
   empresaId: number | null;

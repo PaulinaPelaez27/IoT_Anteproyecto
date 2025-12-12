@@ -1,24 +1,32 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { DatoCrudo } from './entities/dato-crudo.entity';
 
 @Injectable()
 export class DatosCrudosService {
-  create() {
-    return 'This action adds a new datosCrudo';
+  constructor(
+    @InjectRepository(DatoCrudo)
+    private datosCrudosRepository: Repository<DatoCrudo>,
+  ) {}
+
+  create(data: Partial<DatoCrudo>) {
+    return this.datosCrudosRepository.create(data);
   }
 
   findAll() {
-    return `This action returns all datosCrudos`;
+    return this.datosCrudosRepository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} datosCrudo`;
+    return this.datosCrudosRepository.findOne({ where: { id } });
   }
 
-  update(id: number) {
-    return `This action updates a #${id} datosCrudo`;
+  update(id: number, data: Partial<DatoCrudo>) {
+    return this.datosCrudosRepository.update(id, data);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} datosCrudo`;
+    return this.datosCrudosRepository.softDelete(id);
   }
 }

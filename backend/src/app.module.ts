@@ -23,10 +23,20 @@ import { AlertasUsuariosModule } from './modulos/empresarial/alertas-usuarios/al
 import { BullModule } from '@nestjs/bullmq';
 import { ColaIotModule } from './modulos/iot/cola-iot/cola-iot.module';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        connection: {
+          host: config.get<string>('REDIS_HOST', 'localhost'),
+          port: parseInt(config.get<string>('REDIS_PORT', '6379'), 10),
+          password: config.get<string>('REDIS_PASS', ''),
+        },
+      }),
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -65,4 +75,4 @@ import { ColaIotModule } from './modulos/iot/cola-iot/cola-iot.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

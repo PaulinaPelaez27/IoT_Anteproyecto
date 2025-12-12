@@ -1,13 +1,22 @@
-import { Controller, Get, Post, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Param,
+  Delete,
+  Body,
+} from '@nestjs/common';
 import { DatosCrudosService } from './datos-crudos.service';
+import { CreateDatosCrudoDto } from './dto/create-datos-crudo.dto';
 
 @Controller('datos-crudos')
 export class DatosCrudosController {
   constructor(private readonly datosCrudosService: DatosCrudosService) {}
 
   @Post()
-  create() {
-    return this.datosCrudosService.create();
+  create(@Body() createDatosCrudoDto: CreateDatosCrudoDto) {
+    return this.datosCrudosService.create(createDatosCrudoDto);
   }
 
   @Get()
@@ -21,8 +30,11 @@ export class DatosCrudosController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string) {
-    return this.datosCrudosService.update(+id);
+  update(
+    @Param('id') id: string,
+    @Body() updateDatosCrudoDto: CreateDatosCrudoDto,
+  ) {
+    return this.datosCrudosService.update(+id, updateDatosCrudoDto);
   }
 
   @Delete(':id')

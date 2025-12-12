@@ -66,7 +66,7 @@ export class TenantConnectionHelper implements OnModuleDestroy {
     logging: false,
   };
 
-  constructor(private readonly conexiones: ConexionesService) { }
+  constructor(private readonly conexiones: ConexionesService) {}
 
   async onModuleDestroy() {
     await this.closeAll();
@@ -118,9 +118,7 @@ export class TenantConnectionHelper implements OnModuleDestroy {
     const options = this.buildOptions(cfg);
     const ds = new DataSource(options);
 
-    this.logger.log(
-      `🟡 Inicializando DataSource para empresa ${empresaId}...`,
-    );
+    this.logger.log(`🟡 Inicializando DataSource para empresa ${empresaId}...`);
 
     await ds.initialize();
 

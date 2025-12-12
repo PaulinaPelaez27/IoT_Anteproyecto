@@ -1,6 +1,6 @@
 import { connect } from "mqtt";
 import { config } from "dotenv";
-import { Pool } from 'pg';
+import { Pool } from "pg";
 import { Queue } from "bullmq";
 import IORedis from "ioredis";
 
@@ -8,7 +8,10 @@ const dotenvResult = config();
 
 // Check for dotenv errors
 if (dotenvResult.error) {
-  console.error("❌ Error cargando el archivo .env:", dotenvResult.error.message);
+  console.error(
+    "[MQTT SERVICE] Error cargando el archivo .env:",
+    dotenvResult.error.message,
+  );
   process.exit(1);
 }
 
@@ -23,12 +26,15 @@ const requiredEnv = [
   "PASSWORD_MQ",
   "MQTTSERVER",
   "REDIS_HOST",
-  "REDIS_PORT"
+  "REDIS_PORT",
 ];
 
 const missingEnv = requiredEnv.filter((key) => !process.env[key]);
 if (missingEnv.length > 0) {
-  console.error("❌ Faltan las siguientes variables de entorno en el archivo .env:", missingEnv.join(", "));
+  console.error(
+    " [MQTT SERVICE] Faltan las siguientes variables de entorno en el archivo .env:",
+    missingEnv.join(", "),
+  );
   process.exit(1);
 }
 
@@ -52,78 +58,73 @@ const pool = new Pool({
   port: process.env.DB_PORT,
 });
 
-pool.connect()
-  .then(() => console.log("✅ Conectado a la base de datos PostgreSQL"))
-  .catch(err => console.error("❌ Error al conectar a la base de datos PostgreSQL:", err));
+pool
+  .connect()
+  .then(() =>
+    console.log("[MQTT SERVICE] Conectado a la base de datos PostgreSQL"),
+  )
+  .catch((err) =>
+    console.error(
+      "[MQTT SERVICE] Error al conectar a la base de datos PostgreSQL:",
+      err,
+    ),
+  );
 
-// Leer credenciales desde .env y pasarlas como opciones de conexión
+// Configuración de conexión MQTT
 const mqttOptions = {
   username: process.env.MQTT_USERNAME,
   password: process.env.PASSWORD_MQ,
-  // opcional: definir clientId si lo necesitas
-  clientId: process.env.CLIENTID || `client_${Math.random().toString(16).slice(2, 10)}`
 };
 
 if (!mqttOptions.username || !mqttOptions.password) {
-  console.warn("⚠️ MQTT_USERNAME o MQTT_PASSWORD no están definidos en el .env");
+  console.warn(
+    "[MQTT SERVICE] MQTT_USERNAME o MQTT_PASSWORD no están definidos en el .env",
+  );
 }
-
-console.log("para verrificar que cosa? no se xd");
 
 const client = connect(process.env.MQTTSERVER, mqttOptions);
 
-console.log(" pa ver sis es cierto lo de arriba");
-
 // Prueba de conexión
 client.on("connect", () => {
-  console.log("✅ ¡CONEXIÓN OK!");
-  console.log("🎯 Los datos son correctos");
+  console.log(" [MQTT SERVICE] ¡CONEXIÓN MQTT OK!");
+  console.log(" [MQTT SERVICE] Los datos son correctos");
 
   // Prueba de suscripción a un topic simple
   client.subscribe("empresas/#", (err) => {
     if (!err) {
-      console.log("📡 Suscrito al topic empresas/#");
+      console.log("[MQTT SERVICE] Suscrito al topic empresas/#");
     }
   });
 });
 
-//TODO: AUTOMATIZAR PARA QUE SE SUBSCRIBA A TODOS LOS TOPICS DE FORMA DINÁMICA
-
 // Prueba de recepción
 client.on("message", (topic, message) => {
-
-  //console.log(`📨 Mensaje recibido en ${topic}: ${message.toString()}`);
   try {
     guardarMensajeBruto(topic, message);
   } catch (error) {
-    console.error("❌ Error al parsear JSON:", error.message);
+    console.error("[MQTT SERVICE] Error al parsear JSON:", error.message);
   }
 });
 
 // Gestión de errores
 client.on("error", (error) => {
-  console.error("❌ ¡ERROR DE CONEXIÓN!");
-  console.error("Detalles:", error.message);
+  console.error("[MQTT SERVICE] ¡ERROR DE CONEXIÓN MQTT!");
+  console.error("[MQTT SERVICE] Detalles:", error.message);
 
   if (error.code === 4) {
     console.error(
-      "🚫 Credenciales rechazadas (usuario/contraseña incorrectos)",
+      "[MQTT SERVICE] Credenciales rechazadas (usuario/contraseña incorrectos)",
     );
   } else if (error.code === 5) {
-    console.error("🚫 Conexión no autorizada");
+    console.error("[MQTT SERVICE] Conexión no autorizada");
   } else {
-    console.error("🚫 Error de red o servidor inaccesible");
+    console.error("[MQTT SERVICE] Error de red o servidor inaccesible");
   }
 });
 
-/*client.on("offline", () => {
-  console.warn("⚠️ Cliente fuera de línea");
-});*/
-
-console.log("⏳ Intentando conectar...");
+console.log(" [MQTT SERVICE] Intentando conectar...");
 
 // Funciones auxiliares para interactuar con la base de datos
-//TODO: Mejorar manejo de errores y validaciones
 async function guardarMensajeBruto(topic, message) {
   const payload = message.toString();
 
@@ -161,29 +162,35 @@ async function guardarMensajeBruto(topic, message) {
     console.log("result", result);
     const rawId = result.rows[0].dc_id;
 
-    console.log(`Mensaje guardado en RAW con ID ${rawId} (Empresa: ${empresaId}, Nodo: ${nodoId})`);
+    console.log(
+      `Mensaje guardado en RAW con ID ${rawId} (Empresa: ${empresaId}, Nodo: ${nodoId})`,
+    );
 
     // 2. Enviar trabajo a Redis/BullMQ
-    await enviarJobProcesamiento(rawId, empresaId);
-
+    await enviarJobProcesamiento(rawId, empresaId, nodoId);
   } catch (error) {
-    console.error("Error al guardar mensaje en la base de datos:", error.message);
+    console.error(
+      "Error al guardar mensaje en la base de datos:",
+      error.message,
+    );
   }
 }
 
-async function enviarJobProcesamiento(rawId, empresaId) {
+async function enviarJobProcesamiento(rawId, empresaId, nodoId) {
   try {
     await colaProcesamiento.add(
       "procesar-dato-crudo",
-      { rawId, empresaId },
+      { rawId, empresaId, nodoId },
       {
         attempts: 5,
         backoff: { type: "exponential", delay: 2000 },
         removeOnComplete: true,
-      }
+      },
     );
 
-    console.log(`Job enviado a Redis (RAW #${rawId}, Empresa ${empresaId})`);
+    console.log(
+      `Job enviado a Redis (RAW #${rawId}, Empresa ${empresaId}, Nodo ${nodoId})`,
+    );
   } catch (error) {
     console.error("Error al enviar job a Redis:", error.message);
   }
@@ -210,4 +217,3 @@ function obtenerNodoDesdeTopic(topic) {
   }
   return null;
 }
-
