@@ -90,7 +90,7 @@ VALUES (1, 'localhost', 5434, 'iot_empresa_demo_db', 'postgres', 'Aragot123');
 
 -- Inserto datos de prueba para empresa tech solutions
 INSERT INTO tb_conexiones (c_id_empresa, c_host, c_puerto, c_nombre_base_de_datos, c_usuario, c_contrasena)
-VALUES (2, 'localhost', 5434, 'iot_tech_solutions_db', 'postgres', 'Aragot123');
+VALUES (2, 'localhost', 5434, 'iot_empresa_tech_solutions_db', 'postgres', 'Aragot123');
 
 -- PERFILES (usuario-rol-empresa)
 CREATE TABLE IF NOT EXISTS tb_perfiles (
@@ -214,6 +214,57 @@ CREATE TABLE IF NOT EXISTS tb_variables_soporta_sensores (
 	vss_modificado_en TIMESTAMPTZ,
 	vss_borrado_en    TIMESTAMPTZ
 );
+
+-- inserto proyecto de prueba
+INSERT INTO tb_proyectos (p_nombre, p_descripcion)
+VALUES
+('Proyecto A',
+ 'Proyecto de monitoreo ambiental y eléctrico');
+
+-- inserto 2 nodos de prueba en el proyecto
+INSERT INTO tb_nodos (n_nombre, n_ubicacion, n_id_proyecto)
+VALUES ('Nodo 1', 'Techo Edificio A', 1),
+('Nodo 2', 'Jardín Edificio A', 1);
+
+-- inserto 2 sensores de prueba en cada nodo
+-- Nodo 1
+INSERT INTO tb_sensores (s_nombre, s_id_nodo)
+VALUES
+('ENV_01 - Estación Ambiental Exterior', 1),
+('ELEC_01 - Medidor de Voltaje', 1);
+
+
+-- Nodo 2
+INSERT INTO tb_sensores (s_nombre, s_id_nodo)
+VALUES
+('POWER_01 - Analizador de Red', 2),
+('LIGHT_01 - Sensor de Iluminación', 2);
+
+
+-- inserto variables de prueba
+-- VARIABLES DEL SISTEMA
+INSERT INTO tb_variables (v_nombre, v_unidad, v_descripcion, v_var_json)
+VALUES
+('Temperatura', '°C', 'Temperatura ambiente o interna', 'temperatura'),
+('Humedad', '%', 'Humedad relativa del ambiente', 'humedad'),
+('Voltaje', 'V', 'Voltaje eléctrico medido', 'voltaje'),
+('Frecuencia', 'Hz', 'Frecuencia eléctrica de la red', 'frecuencia'),
+('Potencia', 'W', 'Potencia eléctrica activa', 'potencia'),
+('Luminosidad', 'lux', 'Nivel de iluminación ambiental', 'luminosidad');
+
+
+-- SENSOR ↔ VARIABLE
+-- Sensor 1
+INSERT INTO tb_variables_soporta_sensores (vss_id_sensor, vss_id_variable)
+SELECT 1, v_id FROM tb_variables
+WHERE v_var_json IN ('temperatura', 'humedad');
+
+-- Sensor 2
+INSERT INTO tb_variables_soporta_sensores (vss_id_sensor, vss_id_variable)
+SELECT 2, v_id FROM tb_variables
+WHERE v_var_json = 'voltaje';
+
+
 
 -- UMBRALES
 CREATE TABLE IF NOT EXISTS tb_umbrales (
@@ -359,6 +410,53 @@ CREATE TABLE IF NOT EXISTS tb_variables_soporta_sensores (
 	vss_modificado_en TIMESTAMPTZ,
 	vss_borrado_en    TIMESTAMPTZ
 );
+
+-- inserto proyecto de prueba
+INSERT INTO tb_proyectos (p_nombre, p_descripcion)
+VALUES
+('Proyecto Tech', 'Proyecto de monitoreo para Tech Solutions');
+
+-- inserto 2 nodos de prueba en el proyecto
+INSERT INTO tb_nodos (n_nombre, n_ubicacion, n_id_proyecto)
+VALUES ('Nodo 1', 'Centro de Datos', 1),
+('Nodo 2', 'Oficinas', 1);
+
+-- inserto sensores de prueba
+INSERT INTO tb_sensores (s_nombre, s_id_nodo)
+VALUES
+('SENSOR_01 - Ambiental', 1),
+('SENSOR_02 - Energía', 1),
+('SENSOR_03 - Temperatura', 2),
+('SENSOR_04 - Potencia', 2);
+
+INSERT INTO tb_variables (v_nombre, v_unidad, v_descripcion, v_var_json)
+VALUES
+('Temperatura', '°C', 'Temperatura ambiente o técnica', 'temperatura'),
+('Humedad', '%', 'Humedad relativa del aire', 'humedad'),
+('Luminosidad', 'lux', 'Nivel de iluminación', 'luminosidad'),
+('Voltaje', 'V', 'Voltaje eléctrico', 'voltaje'),
+('Potencia', 'W', 'Potencia eléctrica activa', 'potencia');
+
+-- Sensor 1
+INSERT INTO tb_variables_soporta_sensores (vss_id_sensor, vss_id_variable)
+SELECT 1, v_id FROM tb_variables
+WHERE v_var_json IN ('luminosidad', 'voltaje');
+
+-- Sensor 2
+INSERT INTO tb_variables_soporta_sensores (vss_id_sensor, vss_id_variable)
+SELECT 2, v_id FROM tb_variables
+WHERE v_var_json IN ('humedad', 'potencia');
+
+-- Sensor 3
+INSERT INTO tb_variables_soporta_sensores (vss_id_sensor, vss_id_variable)
+SELECT 3, v_id FROM tb_variables
+WHERE v_var_json IN ('temperatura', 'humedad');
+
+-- Sensor 4
+INSERT INTO tb_variables_soporta_sensores (vss_id_sensor, vss_id_variable)
+SELECT 4, v_id FROM tb_variables
+WHERE v_var_json = 'potencia';
+
 
 -- UMBRALES
 CREATE TABLE IF NOT EXISTS tb_umbrales (

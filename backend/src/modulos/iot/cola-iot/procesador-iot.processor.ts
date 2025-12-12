@@ -1,17 +1,9 @@
-// src/modulos/iot/cola-iot/procesador-iot.processor.ts
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { DatosCrudosService } from 'src/modulos/nucleo/datos-crudos/datos-crudos.service';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Nodo } from '../../empresarial/nodos/entities/nodo.entity';
 import { Sensor } from '../../empresarial/sensores/entities/sensor.entity';
-import { Variable } from '../../empresarial/variables/entities/variable.entity';
-import { LecturasSensor } from '../../empresarial/lecturas-sensores/entities/lecturas-sensor.entity';
-import { Umbral } from '../../empresarial/umbrales/entities/umbral.entity';
-import { Alerta } from '../../empresarial/alertas/entities/alerta.entity';
 import { Logger } from '@nestjs/common';
-import { TenantConnectionHelper } from 'src/infraestructura/base-datos/tenant-helpers';
+import { BaseTenantService } from 'src/infraestructura/base-datos/base-tenant.service';
 
 export interface IotJobData {
   rawId: number;
@@ -25,21 +17,10 @@ export class ProcesadorIot extends WorkerHost {
 
   constructor(
     private readonly datosCrudosService: DatosCrudosService,
-    @InjectRepository(Nodo)
-    private readonly nodoRepo: Repository<Nodo>,
-    @InjectRepository(Sensor)
-    private readonly sensorRepo: Repository<Sensor>,
-    @InjectRepository(Variable)
-    private readonly variableRepo: Repository<Variable>,
-    @InjectRepository(LecturasSensor)
-    private readonly lecturaRepo: Repository<LecturasSensor>,
-    @InjectRepository(Umbral)
-    private readonly umbralRepo: Repository<Umbral>,
-    @InjectRepository(Alerta)
-    private readonly alertaRepo: Repository<Alerta>,
-    private readonly tenantConnectionHelper: TenantConnectionHelper,
+    private readonly baseTenantService: BaseTenantService,
   ) {
     super();
+    this.logger.log('ProcesadorIot inicializado');
   }
 
   async process(job: Job<IotJobData>): Promise<any> {
@@ -58,18 +39,14 @@ export class ProcesadorIot extends WorkerHost {
 
       // Procesar datos según nodo y empresa. !!! multi-tenant !!!
 
-      //conectarse a la base de datos de la empresaId si es necesario
-      const dataSource =
-        await this.tenantConnectionHelper.getDataSource(empresaId);
-
-      if (!dataSource) {
-        throw new Error(
-          `No se pudo obtener la conexión para la empresa ${empresaId}`,
-        );
-      }
+      // Usar BaseTenantService para obtener el repositorio
+      const sensorRepo = await this.baseTenantService.getTenantRepo(
+        { p_id_empresa: empresaId },
+        Sensor,
+      );
 
       // recuperar variables necesarias segun el sensor
-      const sensor = await dataSource.getRepository(Sensor).findOne({
+      const sensor = await sensorRepo.findOne({
         where: { nodoId: nodoId },
         relations: ['variables'],
       });

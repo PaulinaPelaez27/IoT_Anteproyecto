@@ -8,5 +8,6 @@ import { DatoCrudo } from './entities/dato-crudo.entity';
   imports: [TypeOrmModule.forFeature([DatoCrudo])],
   controllers: [DatosCrudosController],
   providers: [DatosCrudosService],
+  exports: [DatosCrudosService],
 })
 export class DatosCrudosModule {}

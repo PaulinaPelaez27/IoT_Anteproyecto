@@ -9,6 +9,9 @@ import { LecturasSensor } from '../../empresarial/lecturas-sensores/entities/lec
 import { Umbral } from '../../empresarial/umbrales/entities/umbral.entity';
 import { Alerta } from '../../empresarial/alertas/entities/alerta.entity';
 import { DatosCrudosModule } from 'src/modulos/nucleo/datos-crudos/datos-crudos.module';
+import { ProcesadorIot } from './procesador-iot.processor';
+import { CommonModule } from 'src/infraestructura/base-datos/common-module';
+import { BaseTenantService } from 'src/infraestructura/base-datos/base-tenant.service';
 
 @Module({
   imports: [
@@ -16,6 +19,7 @@ import { DatosCrudosModule } from 'src/modulos/nucleo/datos-crudos/datos-crudos.
       name: 'iot-processing',
     }),
     DatosCrudosModule,
+    CommonModule,
     TypeOrmModule.forFeature([
       Nodo,
       Sensor,
@@ -25,7 +29,7 @@ import { DatosCrudosModule } from 'src/modulos/nucleo/datos-crudos/datos-crudos.
       Alerta,
     ]),
   ],
-  providers: [ColaIotService],
+  providers: [ColaIotService, ProcesadorIot, BaseTenantService],
   exports: [ColaIotService],
 })
 export class ColaIotModule {}
