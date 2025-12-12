@@ -11,9 +11,10 @@ import { LecturasSensor } from '../../empresarial/lecturas-sensores/entities/lec
 import { Umbral } from '../../empresarial/umbrales/entities/umbral.entity';
 import { Alerta } from '../../empresarial/alertas/entities/alerta.entity';
 import { Logger } from '@nestjs/common';
-
-
+ 
+/*
 @Processor('iot-processing')
+ 
 export class ProcesadorIot extends WorkerHost {
   private readonly logger = new Logger(ProcesadorIot.name);
 
@@ -34,6 +35,8 @@ export class ProcesadorIot extends WorkerHost {
   ) {
     super();
   }
+
+
 
   // Método obligatorio para BullMQ
   async process(
@@ -149,4 +152,6 @@ export class ProcesadorIot extends WorkerHost {
 
     await this.alertaRepo.save(alerta);
   }
+   
 }
+*/

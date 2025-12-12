@@ -68,7 +68,11 @@ if (!mqttOptions.username || !mqttOptions.password) {
   console.warn("⚠️ MQTT_USERNAME o MQTT_PASSWORD no están definidos en el .env");
 }
 
+console.log("para verrificar que cosa? no se xd");
+
 const client = connect(process.env.MQTTSERVER, mqttOptions);
+
+console.log(" pa ver sis es cierto lo de arriba");
 
 // Prueba de conexión
 client.on("connect", () => {
@@ -76,9 +80,9 @@ client.on("connect", () => {
   console.log("🎯 Los datos son correctos");
 
   // Prueba de suscripción a un topic simple
-  client.subscribe("Extensometer/get", (err) => {
+  client.subscribe("empresas/#", (err) => {
     if (!err) {
-      console.log("📡 Suscrito al topic Extensometer/get");
+      console.log("📡 Suscrito al topic empresas/#");
     }
   });
 });
@@ -88,7 +92,7 @@ client.on("connect", () => {
 // Prueba de recepción
 client.on("message", (topic, message) => {
 
-  console.log(`📨 Mensaje recibido en ${topic}: ${message.toString()}`);
+  //console.log(`📨 Mensaje recibido en ${topic}: ${message.toString()}`);
   try {
     guardarMensajeBruto(topic, message);
   } catch (error) {
@@ -123,21 +127,41 @@ console.log("⏳ Intentando conectar...");
 async function guardarMensajeBruto(topic, message) {
   const payload = message.toString();
 
+  // Extraer empresaId del topic
+  const empresaId = obtenerEmpresaDesdeTopic(topic);
+
+  // Intentar parsear el mensaje como JSON
+  let mensajeJson;
+  try {
+    mensajeJson = JSON.parse(payload);
+  } catch (error) {
+    // Si no es JSON válido, guardar como objeto con texto plano
+    mensajeJson = { raw: payload };
+  }
+
+  // Extraer nodoId del topic
+  const nodoId = obtenerNodoDesdeTopic(topic);
+
   // 1. Guardar en la base de datos
   const query = `
-        INSERT INTO tb_datos_crudos(dc_topic, dc_mensaje, dc_procesado)
-        VALUES ($1, $2, false) 
+        INSERT INTO tb_datos_crudos(
+          dc_id_empresa, 
+          dc_id_nodo, 
+          dc_mensaje, 
+          dc_recibido_en, 
+          dc_estado
+        )
+        VALUES ($1, $2, $3, $4, true) 
         RETURNING dc_id
     `;
 
-  const values = [topic, payload];
-
+  const values = [empresaId, nodoId, JSON.stringify(mensajeJson), new Date()];
   try {
     const result = await pool.query(query, values);
+    console.log("result", result);
     const rawId = result.rows[0].dc_id;
 
-    console.log(`Mensaje guardado en RAW con ID ${rawId}`);
-    const empresaId = obtenerEmpresaDesdeTopic(topic);
+    console.log(`Mensaje guardado en RAW con ID ${rawId} (Empresa: ${empresaId}, Nodo: ${nodoId})`);
 
     // 2. Enviar trabajo a Redis/BullMQ
     await enviarJobProcesamiento(rawId, empresaId);
@@ -167,12 +191,23 @@ async function enviarJobProcesamiento(rawId, empresaId) {
 
 function obtenerEmpresaDesdeTopic(topic) {
   const parts = topic.split("/");
-  const idx = parts.indexOf("empresa");
+  const idx = parts.indexOf("empresas");
 
   if (idx >= 0 && parts[idx + 1]) {
-    return Number(parts[idx + 1]);
+    const empresaId = Number(parts[idx + 1]);
+    return empresaId;
   }
 
+  return null;
+}
+
+function obtenerNodoDesdeTopic(topic) {
+  const parts = topic.split("/");
+  const idx = parts.indexOf("nodos");
+  if (idx >= 0 && parts[idx + 1]) {
+    const nodoId = Number(parts[idx + 1]);
+    return nodoId;
+  }
   return null;
 }
 

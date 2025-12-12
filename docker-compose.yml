@@ -29,7 +29,7 @@ services:
     container_name: redis-iot
     restart: unless-stopped
     ports:
-      - "6380:6379"
+      - "6379:6379"
     command: ["redis-server", "--appendonly", "yes"]
     networks:
       - backend

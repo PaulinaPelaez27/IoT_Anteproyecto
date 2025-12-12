@@ -2,7 +2,7 @@
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
 import { ColaIotService } from './cola-iot.service';
-import { ProcesadorIot } from './procesador-iot.processor';
+//import { ProcesadorIot } from './procesador-iot.processor';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Nodo } from '../../empresarial/nodos/entities/nodo.entity';
 import { Sensor } from '../../empresarial/sensores/entities/sensor.entity';
@@ -27,7 +27,7 @@ import { DatosCrudosModule } from 'src/modulos/nucleo/datos-crudos/datos-crudos.
       Alerta,
     ]),
   ],
-  providers: [ColaIotService, ProcesadorIot],
+  providers: [ColaIotService],
   exports: [ColaIotService],
 })
 export class ColaIotModule {}
