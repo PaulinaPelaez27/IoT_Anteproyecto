@@ -40,7 +40,7 @@ import { ColaIotModule } from './modulos/iot/cola-iot/cola-iot.module';
         entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
         // Por seguridad en entornos de producción y multiinquilino deshabilitamos la sincronización del esquema
         // y confiamos en las migraciones. Forzar explícitamente `synchronize: false` según las reglas del proyecto.
-        synchronize: true,
+        synchronize: false,
         logging: config.get<string>('DB_LOGGING', 'false') === 'true',
       }),
     }),

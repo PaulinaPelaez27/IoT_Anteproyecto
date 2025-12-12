@@ -40,9 +40,8 @@ CREATE TABLE IF NOT EXISTS tb_roles_usuarios (
 
 -- Inserto roles
 INSERT INTO tb_roles_usuarios (ru_nombre, ru_descripcion)
-VALUES
-('Admin', 'Administrador con todos los permisos'),
-('Usuario', 'Usuario con permisos limitados');
+VALUES ('ADMIN_GLOBAL', 'Administrador del sistema con todos los permisos'),
+('ADMIN', 'Usuario con permisos limitados'); --ToDO: cambiar a usuario
 
 -- USUARIOS (Auth / Usuario comparten la misma tabla)
 CREATE TABLE IF NOT EXISTS tb_usuarios (
@@ -60,7 +59,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_usuario_email ON tb_usuarios(u_email);
 
 -- Inserto usuario admin
 INSERT INTO tb_usuarios (u_nombre, u_apellido, u_email, u_contrasena)
-VALUES ('Admin', 'Principal', 'admin@empresa-demo.com', '$2a$12$DFJL8KOzcl9Z5.dUjKQ/c.Rmut3RUJEKKBpN4XDOgc62xcDwBx0Xy'); --admin1234
+VALUES ('Admin', 'Global', 'admin@global.com', '$2a$12$DFJL8KOzcl9Z5.dUjKQ/c.Rmut3RUJEKKBpN4XDOgc62xcDwBx0Xy'); --admin1234
 
 --Inserto usuario normal de prueba(empresa 1)
 INSERT INTO tb_usuarios (u_nombre, u_apellido, u_email, u_contrasena)
