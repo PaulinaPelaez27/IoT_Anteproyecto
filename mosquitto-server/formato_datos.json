@@ -1,0 +1,14 @@
+{
+    "sensor": "4",
+    "timestamp": "2025-12-11T20:54:46.8382",
+    "temperature": "5.58",
+    "humedad": "89.60",
+    "luminosidad": "261.58",
+    "voltaje": "96.56",
+    "corriente": "2.23",
+    "potencia": "1776.31",
+    "energia": "4783.62",
+    "frecuencia": "26.75",
+    "angulo_desfase": "232.85",
+    "factor_potencia": "0.62"
+}
