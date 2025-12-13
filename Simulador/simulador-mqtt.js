@@ -22,7 +22,7 @@ client.on("error", (error) => {
 
 // Función para generar datos aleatorios y publicarlos
 function publishSensorData() {
-  TOPICS.forEach((topic, index) => {   
+  TOPICS.forEach((topic, index) => {
     SENSORES.forEach((sensor) => {
       if ((index === 0 || index === 2) && (sensor === "3" || sensor === "4")) {
         return; // Verificar si el topic corresponde al sensor
@@ -36,7 +36,7 @@ function publishSensorData() {
       });
       const message = JSON.stringify(data);
       client.publish(topic, message, () => {
-      //console.log(`Publicado en ${topic}: ${message}`);
+        console.log(`Publicado en ${topic}: ${message}`);
       });
     });
   });
@@ -64,7 +64,7 @@ function generateRandomValue(variable) {
     case "angulo_desfase":
       return (Math.random() * 360).toFixed(2);
     case "factor_potencia":
-      return (Math.random()).toFixed(2);
+      return Math.random().toFixed(2);
     default:
       return 0;
   }

@@ -22,7 +22,9 @@ services:
       - backend
     volumes:
       - pgdata:/var/lib/postgresql
-      - ./infra/data/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./infra/data/1-init.sql:/docker-entrypoint-initdb.d/1-init.sql
+      - ./infra/data/2-init.sql:/docker-entrypoint-initdb.d/2-init.sql
+      - ./infra/data/3-init.sql:/docker-entrypoint-initdb.d/3-init.sql
 
   redis:
     image: redis:8-alpine
@@ -31,6 +33,11 @@ services:
     ports:
       - "6379:6379"
     command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - backend
 
@@ -40,6 +47,7 @@ services:
     ports:
       - "${MQTTPORT}:1883"
       - "9001:9001"
+    restart: unless-stopped
     volumes:
       - ./infra/mosquitto.conf:/mosquitto/config/mosquitto.conf
     networks:
@@ -87,7 +95,7 @@ services:
       - ./.env:/app/.env
     depends_on:
       redis:
-        condition: service_started
+        condition: service_healthy
       postgres:
         condition: service_healthy
     networks:
