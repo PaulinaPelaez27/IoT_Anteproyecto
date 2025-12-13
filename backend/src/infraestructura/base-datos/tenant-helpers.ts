@@ -77,10 +77,6 @@ export class TenantConnectionHelper implements OnModuleDestroy {
     if (!empresaId) throw new Error('empresaId requerido');
 
     const row = await this.conexiones.findByEmpresaId(empresaId);
-    this.logger.debug(
-      `Configuración obtenida para empresaId=${empresaId}`,
-      row,
-    );
 
     if (!row) {
       throw new NotFoundException(
@@ -132,7 +128,6 @@ export class TenantConnectionHelper implements OnModuleDestroy {
 
   /** Obtiene (o crea) una conexión del Tenant */
   async getDataSource(empresaId: number): Promise<DataSource> {
-    this.logger.log('getDataSource llamado con empresaId: ' + empresaId);
     if (!empresaId) throw new Error('empresaId requerido');
 
     // 1) Ya existe en caché → usarlo
