@@ -30,10 +30,6 @@ export class ProcesadorIot extends WorkerHost {
     try {
       const { rawId, empresaId, nodoId }: IotJobData = job.data;
 
-      this.logger.log(
-        `Procesando job - RAW #${rawId}, Empresa ${empresaId}, Nodo ${nodoId}`,
-      );
-
       const datosCrudos = await this.datosCrudosService.findOne(rawId);
 
       if (!datosCrudos) {
@@ -63,12 +59,6 @@ export class ProcesadorIot extends WorkerHost {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         timestamp: mensajeRaw.timestamp,
       };
-
-      this.logger.log(
-        `Mensaje recibido para RAW #${rawId}: Sensor ${mensaje.sensor}, Lecturas: ${JSON.stringify(
-          mensaje.lecturas,
-        )}, Timestamp: ${mensaje.timestamp}`,
-      );
 
       // Usar BaseTenantService para obtener el repositorio
       const sensorRepo = await this.baseTenantService.getTenantRepo(
@@ -105,9 +95,6 @@ export class ProcesadorIot extends WorkerHost {
       for (const [nombreVar, valor] of Object.entries(mensaje.lecturas)) {
         const variable = variableMap.get(nombreVar);
         if (variable) {
-          this.logger.log(
-            `Procesando lectura - Sensor ID: ${sensor.id}, Variable: ${nombreVar}, Valor: ${valor}`,
-          );
           // Aquí se implementaría la lógica para almacenar la lectura
           // 1. recuperar la repo de lecturas sensores
           const lecturaRepo = await this.baseTenantService.getTenantRepo(
@@ -121,17 +108,9 @@ export class ProcesadorIot extends WorkerHost {
             valor: valor.toString(),
           });
           await lecturaRepo.save(nuevaLectura);
-          this.logger.log(
-            `Lectura guardada - Sensor ID: ${sensor.id}, Variable ID: ${variable.id}, Valor: ${valor}`,
-          );
-        } else {
-          this.logger.warn(
-            `Variable no soportada o inactiva para el sensor ID ${sensor.id}: ${nombreVar}`,
-          );
         }
       }
 
-      this.logger.log(`Job completado para RAW #${rawId}`);
       return { success: true, rawId, empresaId, nodoId };
     } catch (error: unknown) {
       this.logger.error(`Error procesando job: ${(error as Error).message}`);
