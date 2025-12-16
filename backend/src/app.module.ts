@@ -29,13 +29,26 @@ import { ColaIotModule } from './modulos/iot/cola-iot/cola-iot.module';
     BullModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        connection: {
-          host: config.get<string>('REDIS_HOST', 'localhost'),
-          port: parseInt(config.get<string>('REDIS_PORT', '6379'), 10),
-          password: config.get<string>('REDIS_PASS', ''),
-        },
-      }),
+      useFactory: (config: ConfigService) => {
+        const redisPassword = config.get<string>('REDIS_PASS', '');
+        if (!redisPassword) {
+          const nodeEnv = config.get<string>('NODE_ENV', 'development');
+          const warningMsg = '[WARNING] REDIS_PASS environment variable is not set. Redis should always be password-protected, especially in production environments.';
+          if (nodeEnv === 'production') {
+            throw new Error('REDIS_PASS environment variable is required in production.');
+          } else {
+            // eslint-disable-next-line no-console
+            console.warn(warningMsg);
+          }
+        }
+        return {
+          connection: {
+            host: config.get<string>('REDIS_HOST', 'localhost'),
+            port: parseInt(config.get<string>('REDIS_PORT', '6379'), 10),
+            password: redisPassword,
+          },
+        };
+      },
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

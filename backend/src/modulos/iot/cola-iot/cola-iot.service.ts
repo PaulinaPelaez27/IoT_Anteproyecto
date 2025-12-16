@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
+import { IotJobData } from './procesador-iot.processor';
 
 @Injectable()
 export class ColaIotService {
@@ -9,7 +10,7 @@ export class ColaIotService {
     private cola: Queue,
   ) {}
 
-  async encolarProcesamiento(data: any) {
+  async encolarProcesamiento(data: IotJobData) {
     await this.cola.add('procesar-datos-iot', data);
   }
 }

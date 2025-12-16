@@ -36,8 +36,6 @@ export class ProcesadorIot extends WorkerHost {
         throw new Error(`Datos crudos no encontrados: ${rawId}`);
       }
 
-      // datosCrudos.mensaje tiene la estructura esperada : "{""sensor"": ""1"", ""energia"": ""2094.52"", ""humedad"": ""33.95"", ""voltaje"": ""12.68"", ""potencia"": ""705.13"", ""corriente"": ""0.47"", ""timestamp"": ""2025-12-13T21:23:35.064Z"", ""frecuencia"": ""14.91"", ""luminosidad"": ""982.38"", ""temperatura"": ""10.04"", ""angulo_desfase"": ""359.47"", ""factor_potencia"": ""0.31""}"
-
       // gestion mensaje para recuperar idSensor y variables
       // 1. convertir mensaje a objeto
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -92,16 +90,13 @@ export class ProcesadorIot extends WorkerHost {
       });
 
       // Procesar lecturas
+       const lecturaRepo = await this.baseTenantService.getTenantRepo(
+        { p_id_empresa: empresaId },
+        LecturasSensor,
+      );
       for (const [nombreVar, valor] of Object.entries(mensaje.lecturas)) {
         const variable = variableMap.get(nombreVar);
         if (variable) {
-          // Aquí se implementaría la lógica para almacenar la lectura
-          // 1. recuperar la repo de lecturas sensores
-          const lecturaRepo = await this.baseTenantService.getTenantRepo(
-            { p_id_empresa: empresaId },
-            LecturasSensor,
-          );
-
           const nuevaLectura = lecturaRepo.create({
             sensorId: sensor.id,
             variableId: variable.id,
