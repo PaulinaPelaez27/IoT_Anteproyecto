@@ -66,7 +66,7 @@ export class TenantConnectionHelper implements OnModuleDestroy {
     logging: false,
   };
 
-  constructor(private readonly conexiones: ConexionesService) { }
+  constructor(private readonly conexiones: ConexionesService) {}
 
   async onModuleDestroy() {
     await this.closeAll();
@@ -77,10 +77,6 @@ export class TenantConnectionHelper implements OnModuleDestroy {
     if (!empresaId) throw new Error('empresaId requerido');
 
     const row = await this.conexiones.findByEmpresaId(empresaId);
-    this.logger.debug(
-      `Configuración obtenida para empresaId=${empresaId}`,
-      row,
-    );
 
     if (!row) {
       throw new NotFoundException(
@@ -118,9 +114,7 @@ export class TenantConnectionHelper implements OnModuleDestroy {
     const options = this.buildOptions(cfg);
     const ds = new DataSource(options);
 
-    this.logger.log(
-      `🟡 Inicializando DataSource para empresa ${empresaId}...`,
-    );
+    this.logger.log(`🟡 Inicializando DataSource para empresa ${empresaId}...`);
 
     await ds.initialize();
 
@@ -134,7 +128,6 @@ export class TenantConnectionHelper implements OnModuleDestroy {
 
   /** Obtiene (o crea) una conexión del Tenant */
   async getDataSource(empresaId: number): Promise<DataSource> {
-    this.logger.log('getDataSource llamado con empresaId: ' + empresaId);
     if (!empresaId) throw new Error('empresaId requerido');
 
     // 1) Ya existe en caché → usarlo

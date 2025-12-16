@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   InternalServerErrorException,
+  Injectable,
 } from '@nestjs/common';
 import { Repository, EntityTarget, ObjectLiteral } from 'typeorm';
 import { TenantConnectionHelper } from './tenant-helpers';
@@ -10,12 +11,13 @@ export type PerfilLike = {
   empresa?: { e_id?: number };
 };
 
-export abstract class BaseTenantService {
+@Injectable()
+export class BaseTenantService {
   constructor(
-    protected readonly tenantConnectionHelper: TenantConnectionHelper,
+    private readonly tenantConnectionHelper: TenantConnectionHelper,
   ) {}
 
-  protected async getTenantRepo<T extends ObjectLiteral>(
+  async getTenantRepo<T extends ObjectLiteral>(
     perfil: PerfilLike,
     entity: EntityTarget<T>,
   ): Promise<Repository<T>> {

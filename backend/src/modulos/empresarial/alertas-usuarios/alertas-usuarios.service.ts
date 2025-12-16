@@ -1,22 +1,32 @@
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { AlertaUsuario } from './entities/alertas-usuario.entity';
 import { UpdateAlertasUsuarioDto } from './dto/update-alertas-usuario.dto';
-import { TenantConnectionHelper } from '../../../infraestructura/base-datos/tenant-helpers';
-import { BaseTenantService, PerfilLike } from '../../../infraestructura/base-datos/base-tenant.service';
+import {
+  BaseTenantService,
+  PerfilLike,
+} from '../../../infraestructura/base-datos/base-tenant.service';
 
 type FindOptions = { soloNoLeidas?: boolean; alertaId?: number };
 
 @Injectable()
-export class AlertasUsuariosService extends BaseTenantService {
+export class AlertasUsuariosService {
   private readonly logger = new Logger(AlertasUsuariosService.name);
 
-  constructor(protected readonly tenantConnectionHelper: TenantConnectionHelper) {
-    super(tenantConnectionHelper);
-  }
+  constructor(private readonly baseTenantService: BaseTenantService) {}
 
-  private async getRepo(perfil: PerfilLike): Promise<Repository<AlertaUsuario>> {
-    return this.getTenantRepo<AlertaUsuario>(perfil, AlertaUsuario);
+  private async getRepo(
+    perfil: PerfilLike,
+  ): Promise<Repository<AlertaUsuario>> {
+    return this.baseTenantService.getTenantRepo<AlertaUsuario>(
+      perfil,
+      AlertaUsuario,
+    );
   }
 
   async findAll(perfil: PerfilLike, usuarioId: number, opts: FindOptions = {}) {
@@ -24,11 +34,16 @@ export class AlertasUsuariosService extends BaseTenantService {
 
     const repo = await this.getRepo(perfil);
 
-    const qb = repo.createQueryBuilder('au').leftJoinAndSelect('au.alerta', 'alerta');
-    qb.where('au.borrado = false').andWhere('au.usuarioId = :usuarioId', { usuarioId });
+    const qb = repo
+      .createQueryBuilder('au')
+      .leftJoinAndSelect('au.alerta', 'alerta');
+    qb.where('au.borrado = false').andWhere('au.usuarioId = :usuarioId', {
+      usuarioId,
+    });
 
     if (opts.soloNoLeidas) qb.andWhere('au.leido = false');
-    if (opts.alertaId) qb.andWhere('alerta.id = :alertaId', { alertaId: opts.alertaId });
+    if (opts.alertaId)
+      qb.andWhere('alerta.id = :alertaId', { alertaId: opts.alertaId });
 
     qb.orderBy('au.creadoEn', 'DESC');
 
@@ -47,11 +62,18 @@ export class AlertasUsuariosService extends BaseTenantService {
     return entity;
   }
 
-  async update(perfil: PerfilLike, id: number, usuarioId: number, dto: UpdateAlertasUsuarioDto) {
+  async update(
+    perfil: PerfilLike,
+    id: number,
+    usuarioId: number,
+    dto: UpdateAlertasUsuarioDto,
+  ) {
     if (!usuarioId) throw new BadRequestException('usuarioId requerido');
 
     const repo = await this.getRepo(perfil);
-    const entity = await repo.findOne({ where: { id, borrado: false, usuarioId } });
+    const entity = await repo.findOne({
+      where: { id, borrado: false, usuarioId },
+    });
     if (!entity) throw new NotFoundException('Alerta-usuario no encontrada');
 
     const now = new Date();
@@ -70,7 +92,9 @@ export class AlertasUsuariosService extends BaseTenantService {
     if (dto.estado !== undefined) entity.estado = dto.estado;
 
     await repo.save(entity);
-    this.logger.log(`Alerta-usuario ${id} actualizada por usuario ${usuarioId}`);
+    this.logger.log(
+      `Alerta-usuario ${id} actualizada por usuario ${usuarioId}`,
+    );
     return entity;
   }
 
@@ -78,13 +102,17 @@ export class AlertasUsuariosService extends BaseTenantService {
     if (!usuarioId) throw new BadRequestException('usuarioId requerido');
 
     const repo = await this.getRepo(perfil);
-    const entity = await repo.findOne({ where: { id, borrado: false, usuarioId } });
+    const entity = await repo.findOne({
+      where: { id, borrado: false, usuarioId },
+    });
     if (!entity) throw new NotFoundException('Alerta-usuario no encontrada');
 
     //entity.borrado = true;
 
-    await repo.softDelete({ id , usuarioId });
-    this.logger.log(`Alerta-usuario ${id} borrado lógicamente por usuario ${usuarioId}`);
+    await repo.softDelete({ id, usuarioId });
+    this.logger.log(
+      `Alerta-usuario ${id} borrado lógicamente por usuario ${usuarioId}`,
+    );
     return { ok: true };
   }
 }

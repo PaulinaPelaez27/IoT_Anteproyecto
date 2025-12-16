@@ -20,10 +20,36 @@ import { UsuariosModule } from './modulos/nucleo/usuarios/usuarios.module';
 import { RolesUsuariosModule } from './modulos/nucleo/roles-usuarios/roles-usuarios.module';
 import { PerfilesModule } from './modulos/nucleo/perfiles/perfiles.module';
 import { AlertasUsuariosModule } from './modulos/empresarial/alertas-usuarios/alertas-usuarios.module';
+import { BullModule } from '@nestjs/bullmq';
+import { ColaIotModule } from './modulos/iot/cola-iot/cola-iot.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        const redisPassword = config.get<string>('REDIS_PASS', '');
+        if (!redisPassword) {
+          const nodeEnv = config.get<string>('NODE_ENV', 'development');
+          const warningMsg = '[WARNING] REDIS_PASS environment variable is not set. Redis should always be password-protected, especially in production environments.';
+          if (nodeEnv === 'production') {
+            throw new Error('REDIS_PASS environment variable is required in production.');
+          } else {
+            // eslint-disable-next-line no-console
+            console.warn(warningMsg);
+          }
+        }
+        return {
+          connection: {
+            host: config.get<string>('REDIS_HOST', 'localhost'),
+            port: parseInt(config.get<string>('REDIS_PORT', '6379'), 10),
+            password: redisPassword,
+          },
+        };
+      },
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -37,7 +63,7 @@ import { AlertasUsuariosModule } from './modulos/empresarial/alertas-usuarios/al
         entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
         // Por seguridad en entornos de producción y multiinquilino deshabilitamos la sincronización del esquema
         // y confiamos en las migraciones. Forzar explícitamente `synchronize: false` según las reglas del proyecto.
-        synchronize: true,
+        synchronize: false,
         logging: config.get<string>('DB_LOGGING', 'false') === 'true',
       }),
     }),
@@ -57,8 +83,9 @@ import { AlertasUsuariosModule } from './modulos/empresarial/alertas-usuarios/al
     RolesUsuariosModule,
     PerfilesModule,
     AlertasUsuariosModule,
+    ColaIotModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

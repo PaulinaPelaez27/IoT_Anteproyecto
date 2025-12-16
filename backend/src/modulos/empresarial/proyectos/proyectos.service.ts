@@ -1,5 +1,6 @@
-import { Injectable, 
-  NotFoundException, 
+import {
+  Injectable,
+  NotFoundException,
   Logger,
   BadRequestException,
   InternalServerErrorException,
@@ -9,7 +10,10 @@ import { UpdateProyectoDto } from './dto/update-proyecto.dto';
 import { Proyecto } from './entities/proyecto.entity';
 import { IsNull, Repository } from 'typeorm';
 import { TenantConnectionHelper } from 'src/infraestructura/base-datos/tenant-helpers';
-import { BaseTenantService, PerfilLike } from 'src/infraestructura/base-datos/base-tenant.service';
+import {
+  BaseTenantService,
+  PerfilLike,
+} from 'src/infraestructura/base-datos/base-tenant.service';
 
 @Injectable()
 export class ProyectosService extends BaseTenantService {
@@ -60,14 +64,17 @@ export class ProyectosService extends BaseTenantService {
       where: { id, borradoEn: IsNull() },
     });
 
-    if (!proyecto)
-      throw new NotFoundException(`Proyecto ${id} no encontrado`);
+    if (!proyecto) throw new NotFoundException(`Proyecto ${id} no encontrado`);
 
     return proyecto;
   }
 
   /** Actualizar proyecto */
-  async update(perfil: PerfilLike, id: number, dto: UpdateProyectoDto): Promise<Proyecto> {
+  async update(
+    perfil: PerfilLike,
+    id: number,
+    dto: UpdateProyectoDto,
+  ): Promise<Proyecto> {
     const repo = await this.getProyectoRepo(perfil);
     const proyecto = await this.findOne(perfil, id);
 
