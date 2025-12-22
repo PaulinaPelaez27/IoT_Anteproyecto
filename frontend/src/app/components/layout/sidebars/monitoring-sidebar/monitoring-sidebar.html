@@ -1,5 +1,8 @@
-@if (authService.canSwitchCompany()) {
+@if (isAdmin) {
   <app-company-switcher />
 }
 
-<app-project-list />
+<app-project-list 
+  [loading]="loading()"
+  [projects]="projects()"
+/>
