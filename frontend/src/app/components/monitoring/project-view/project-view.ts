@@ -1,20 +1,25 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ProjectService } from '../../../services/project.service';
 import { NodeService } from '../../../services/node.service';
 import { SensorService } from '../../../services/sensor.service';
-import { ButtonComponent } from '../../../shared/ui';
+import { Button } from '../../../shared/ui';
 import { LucideAngularModule, Pencil, Trash } from 'lucide-angular';
 
 @Component({
   selector: 'app-project-view',
-  imports: [CommonModule, RouterModule, ButtonComponent, LucideAngularModule],
+  imports: [CommonModule, RouterModule, Button, LucideAngularModule],
   templateUrl: './project-view.html',
   styleUrls: ['./project-view.css'],
 })
 export class ProjectView {
-  projectId = signal<string>('');
+  projectService = inject(ProjectService);
+  nodeService = inject(NodeService);
+  sensorService = inject(SensorService);
+  route = inject(ActivatedRoute);
+
+  projectId = this.projectService.selectedProjectId;
   selectedNodeId = signal<string | null>(null);
 
   // icons
@@ -40,27 +45,6 @@ export class ProjectView {
     const node = this.selectedNode();
     return node ? this.sensorService.getByNodeId(node.id) : [];
   });
-
-  constructor(
-    private route: ActivatedRoute,
-    private projectService: ProjectService,
-    private nodeService: NodeService,
-    private sensorService: SensorService
-  ) {
-    this.route.params.subscribe((params) => {
-      if (params['projectId']) {
-        this.projectId.set(params['projectId']);
-        // Auto-select first node
-        const nodes = this.nodeService.getByProjectId(params['projectId']);
-        if (nodes.length > 0 && !this.selectedNodeId()) {
-          this.selectedNodeId.set(nodes[0].id);
-        }
-      }
-      if (params['nodeId']) {
-        this.selectedNodeId.set(params['nodeId']);
-      }
-    });
-  }
 
   selectNode(nodeId: string): void {
     this.selectedNodeId.set(nodeId);

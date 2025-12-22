@@ -30,7 +30,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
     </span>
   `,
 })
-export class ButtonComponent {
+export class Button {
   @Input() variant: 'primary' | 'secondary' | 'danger' | 'ghost' = 'primary';
   @Input() size: 'small' | 'medium' | 'large' = 'medium';
   @Input() disabled = false;

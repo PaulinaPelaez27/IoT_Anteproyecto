@@ -4,12 +4,12 @@ import { CompanySwitcher } from '../../company-switcher/company-switcher';
 import { ProjectService } from '../../../../services/project.service';
 import { CompanyService } from '../../../../services/company.service';
 import { Project } from '../../../../models/project.model';
-import { ButtonComponent } from '../../../../shared/ui';
+import { Button } from '../../../../shared/ui';
 
 @Component({
   selector: 'app-monitoring-sidebar',
   standalone: true,
-  imports: [CompanySwitcher, ButtonComponent],
+  imports: [CompanySwitcher, Button],
   templateUrl: './monitoring-sidebar.html',
 })
 export class MonitoringSidebar {
