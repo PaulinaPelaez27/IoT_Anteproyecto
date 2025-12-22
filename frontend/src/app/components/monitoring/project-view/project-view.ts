@@ -5,16 +5,21 @@ import { ProjectService } from '../../../services/project.service';
 import { NodeService } from '../../../services/node.service';
 import { SensorService } from '../../../services/sensor.service';
 import { ButtonComponent } from '../../../shared/ui';
+import { LucideAngularModule, Pencil, Trash } from 'lucide-angular';
 
 @Component({
   selector: 'app-project-view',
-  imports: [CommonModule, RouterModule, ButtonComponent],
+  imports: [CommonModule, RouterModule, ButtonComponent, LucideAngularModule],
   templateUrl: './project-view.html',
-  styleUrl: './project-view.css',
+  styleUrls: ['./project-view.css'],
 })
 export class ProjectView {
   projectId = signal<string>('');
   selectedNodeId = signal<string | null>(null);
+
+  // icons
+  readonly pencilIcon = Pencil;
+  readonly trashIcon = Trash;
 
   project = computed(() => {
     const id = this.projectId();

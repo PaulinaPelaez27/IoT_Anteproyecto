@@ -12,11 +12,11 @@ import { filter } from 'rxjs/operators';
   selector: 'app-root',
   imports: [CommonModule, RouterOutlet, RouterModule, GlobalRail],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
 })
 export class App {
   protected readonly title = signal('Sensor Management System');
-  
+
   projects = computed(() => {
     const companyId = this.companyService.selectedCompanyId();
     return this.projectService.getByCompanyId(companyId);
@@ -30,10 +30,10 @@ export class App {
     private router: Router
   ) {
     // Update active section when route changes
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: NavigationEnd) => {
-      this.navService.updateSectionFromRoute(event.urlAfterRedirects);
-    });
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        this.navService.updateSectionFromRoute(event.urlAfterRedirects);
+      });
   }
 }

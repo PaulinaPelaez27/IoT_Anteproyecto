@@ -3,31 +3,63 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 @Component({
   selector: 'ui-button',
   standalone: true,
+  styles: [
+    `
+      :host ::ng-deep svg {
+        width: 100%;
+        height: 100%;
+      }
+    `,
+  ],
   template: `
-    <button [type]="type" [class]="classes" [disabled]="disabled" (click)="handleClick($event)">
-      <ng-content></ng-content>
-    </button>
+    <span [attr.title]="tooltip" class="inline-flex">
+      <button
+        [type]="type"
+        [class]="classes"
+        [disabled]="disabled"
+        [attr.aria-label]="ariaLabelComputed"
+        (click)="handleClick($event)"
+      >
+        <span
+          class="inline-flex items-center justify-center"
+          [class]="iconOnly ? iconSizeClass : ''"
+        >
+          <ng-content></ng-content>
+        </span>
+      </button>
+    </span>
   `,
 })
 export class ButtonComponent {
-  @Input() variant: 'primary' | 'secondary' | 'danger' = 'primary';
+  @Input() variant: 'primary' | 'secondary' | 'danger' | 'ghost' = 'primary';
   @Input() size: 'small' | 'medium' | 'large' = 'medium';
   @Input() disabled = false;
   @Input() type: 'button' | 'submit' | 'reset' = 'button';
+
+  @Input() iconOnly = false;
+  @Input() ariaLabel?: string;
+  @Input() tooltip?: string;
 
   @Output() clicked = new EventEmitter<MouseEvent>();
 
   get classes(): string {
     return [
-      'rounded-lg transition-colors inline-flex items-center justify-center gap-2',
+      'inline-flex items-center justify-center transition-colors rounded-lg',
+      this.baseSizeClass,
       this.variantClass,
-      this.sizeClass,
+      this.iconOnly ? 'p-2' : this.sizeClass,
       this.disabled ? 'opacity-50 cursor-not-allowed' : '',
     ].join(' ');
   }
 
+  private get baseSizeClass(): string {
+    return 'gap-2';
+  }
+
   private get variantClass(): string {
     switch (this.variant) {
+      case 'ghost':
+        return 'bg-transparent hover:bg-gray-100 text-gray-600';
       case 'secondary':
         return 'bg-gray-200 text-gray-900 hover:bg-gray-300';
       case 'danger':
@@ -54,5 +86,20 @@ export class ButtonComponent {
       return;
     }
     this.clicked.emit(event);
+  }
+
+  get ariaLabelComputed(): string | null {
+    return this.ariaLabel || this.tooltip || null;
+  }
+
+  get iconSizeClass(): string {
+    switch (this.size) {
+      case 'small':
+        return 'w-4 h-4';
+      case 'large':
+        return 'w-6 h-6';
+      default:
+        return 'w-5 h-5';
+    }
   }
 }
