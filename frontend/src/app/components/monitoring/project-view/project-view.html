@@ -9,6 +9,9 @@
       </div>
       <h1 class="text-2xl font-bold text-gray-900">{{ proj.name }}</h1>
       <p class="text-gray-600 mt-1">{{ proj.description }}</p>
+      <ui-button type="button" variant="primary" size="medium">
+        + Agregar Nodo
+      </ui-button>
     </div>
 
     <!-- Node Tabs (Folder Style) -->
@@ -55,10 +58,9 @@
 
         <!-- Sensors Grid -->
         <div class="mb-6 flex items-center justify-between">
-          <h3 class="text-lg font-semibold text-gray-900">Sensors</h3>
-          <button class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-700 transition-colors">
-            + Add Sensor
-          </button>
+          <ui-button type="button" variant="primary" size="medium" >
+            + Agregar Sensor
+          </ui-button>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
