@@ -1,0 +1,11 @@
+<div class="p-4 border-b border-gray-200">
+  <select
+    [value]="companyService.selectedCompanyId()"
+    (change)="companyService.selectCompany($any($event.target).value)"
+    class="w-full px-3 py-2 border border-gray-300 rounded-lg
+           focus:ring-2 focus:ring-primary focus:border-transparent">
+    @for (company of companyService.companies(); track company.id) {
+      <option [value]="company.id">{{ company.name }}</option>
+    }
+  </select>
+</div>

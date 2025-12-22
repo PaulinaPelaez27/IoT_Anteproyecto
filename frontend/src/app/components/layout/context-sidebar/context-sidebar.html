@@ -1,1 +1,17 @@
-<p>context-sidebar works!</p>
+<div class="w-sidebar bg-gray-50 border-r border-gray-200 flex flex-col">
+  @switch (navService.activeSection()) {
+
+    @case ('monitoring') {
+      <app-monitoring-sidebar />
+    }
+
+    @case ('admin') {
+      <app-admin-sidebar />
+    }
+
+    @case ('settings') {
+      <app-settings-sidebar />
+    }
+
+  }
+</div>

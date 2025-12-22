@@ -10,9 +10,7 @@
           [class.text-gray-400]="navService.activeSection() !== item.id"
           class="flex flex-col items-center justify-center h-16 hover:bg-dark-700 transition-colors group relative"
           [title]="item.label">
-          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-            <path [attr.d]="item.icon" />
-          </svg>
+          <lucide-icon [img]="item.icon" class="w-6 h-6 mb-1" [ngClass]="{'text-white': navService.activeSection() === item.id, 'text-gray-400 group-hover:text-white': navService.activeSection() !== item.id}"></lucide-icon>
           <span class="text-xs mt-1">{{ item.label }}</span>
         </button>
       }

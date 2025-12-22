@@ -1,0 +1,58 @@
+<div class="flex-1 overflow-y-auto p-4">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-lg font-semibold text-gray-900">
+      Proyectos
+    </h2>
+
+    @if (canCreateProject) {
+      <button
+        type="button"
+        (click)="createProject()"
+        class="px-3 py-1.5 bg-primary text-white rounded-lg text-sm
+               hover:bg-primary-700 transition-colors"
+      >
+        + Nuevo
+      </button>
+    }
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+    <p class="text-sm text-gray-400 text-center mt-6">
+      Cargando proyectos...
+    </p>
+  }
+
+  <!-- List -->
+  @if (!loading && projects.length) {
+    <div class="space-y-2">
+      @for (project of projects; track project.id) {
+        <a
+          [routerLink]="['/project', project.id]"
+          routerLinkActive="border-l-4 border-primary bg-white"
+          class="block p-3 rounded-lg hover:bg-white transition-colors cursor-pointer"
+        >
+          <h3 class="font-medium text-gray-900">
+            {{ project.name }}
+          </h3>
+
+          @if (project.description) {
+            <p class="text-sm text-gray-500 mt-1">
+              {{ project.description }}
+            </p>
+          }
+        </a>
+      }
+    </div>
+  }
+
+  <!-- Empty state -->
+  @if (!loading && !projects.length) {
+    <p class="text-sm text-gray-400 text-center mt-6">
+      No hay proyectos disponibles
+    </p>
+  }
+
+</div>

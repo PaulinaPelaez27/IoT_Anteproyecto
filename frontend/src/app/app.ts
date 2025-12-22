@@ -1,16 +1,16 @@
 import { Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterOutlet, RouterModule, NavigationEnd } from '@angular/router';
-import { GlobalRail } from './components/layout/global-rail/global-rail';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { CompanyService } from './services/company.service';
 import { ProjectService } from './services/project.service';
 import { AuthService } from './services/auth.service';
 import { NavigationService } from './services/navigation.service';
 import { filter } from 'rxjs/operators';
+import { AppLayout } from './components/layout/app-layout/app-layout';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, RouterOutlet, RouterModule, GlobalRail],
+  imports: [CommonModule, RouterModule, AppLayout],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
