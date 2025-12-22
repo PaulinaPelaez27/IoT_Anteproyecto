@@ -1,3 +1,15 @@
+<!-- Modal global -->
+<ui-modal
+  [open]="modal.open()"
+  [title]="modal.title()"
+  [width]="modal.width()"
+  (close)="modal.hide()"
+>
+  <!-- Contenido del modal -->
+  <router-outlet name="modal"></router-outlet>
+</ui-modal>
+
+<!-- Layout principal -->
 <div class="flex h-screen overflow-hidden">
   <app-global-rail class="flex-shrink-0"></app-global-rail>
 
