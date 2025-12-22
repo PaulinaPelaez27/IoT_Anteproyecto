@@ -5,9 +5,9 @@
       @if (canShowItem(item)) {
         <button
           (click)="setActiveSection(item.id)"
-          [class.bg-primary]="activeSection() === item.id"
-          [class.text-white]="activeSection() === item.id"
-          [class.text-gray-400]="activeSection() !== item.id"
+          [class.bg-primary]="navService.activeSection() === item.id"
+          [class.text-white]="navService.activeSection() === item.id"
+          [class.text-gray-400]="navService.activeSection() !== item.id"
           class="flex flex-col items-center justify-center h-16 hover:bg-dark-700 transition-colors group relative"
           [title]="item.label">
           <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
