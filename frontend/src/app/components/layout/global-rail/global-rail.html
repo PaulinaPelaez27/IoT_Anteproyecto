@@ -1,0 +1,28 @@
+<div class="flex flex-col h-full w-rail bg-dark-800 text-white">
+  <!-- Navigation Items -->
+  <nav class="flex-1 flex flex-col py-4">
+    @for (item of navItems; track item.id) {
+      @if (canShowItem(item)) {
+        <button
+          (click)="setActiveSection(item.id)"
+          [class.bg-primary]="activeSection() === item.id"
+          [class.text-white]="activeSection() === item.id"
+          [class.text-gray-400]="activeSection() !== item.id"
+          class="flex flex-col items-center justify-center h-16 hover:bg-dark-700 transition-colors group relative"
+          [title]="item.label">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <path [attr.d]="item.icon" />
+          </svg>
+          <span class="text-xs mt-1">{{ item.label }}</span>
+        </button>
+      }
+    }
+  </nav>
+
+  <!-- User Avatar -->
+  <div class="h-16 flex items-center justify-center border-t border-dark-700">
+    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold">
+      {{ authService.currentUser()?.firstName?.charAt(0) || '' }}{{ authService.currentUser()?.lastName?.charAt(0) || '' }}
+    </div>
+  </div>
+</div>
