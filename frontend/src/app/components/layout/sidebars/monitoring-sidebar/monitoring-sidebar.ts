@@ -1,45 +1,59 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { AuthService } from '../../../../services/auth.service';
 import { CompanySwitcher } from '../../company-switcher/company-switcher';
-import { ProjectList } from '../../../../shared/components/project-list/project-list';
 import { ProjectService } from '../../../../services/project.service';
 import { CompanyService } from '../../../../services/company.service';
 import { Project } from '../../../../models/project.model';
+import { ButtonComponent } from '../../../../shared/ui';
 
 @Component({
   selector: 'app-monitoring-sidebar',
   standalone: true,
-  imports: [CompanySwitcher, ProjectList],
+  imports: [CompanySwitcher, ButtonComponent],
   templateUrl: './monitoring-sidebar.html',
 })
 export class MonitoringSidebar {
-  private authService = inject(AuthService);
   private projectService = inject(ProjectService);
   private companyService = inject(CompanyService);
 
-  isAdmin = this.authService.isAdmin();
-
-  loading = signal(false);
   projects = signal<Project[]>([]);
+  loading = signal(false);
+  isAdmin = inject(AuthService).isAdmin();
+
+  selectedProjectId = this.projectService.selectedProjectId;
+
+  private lastCompanyId: string | null = null;
 
   constructor() {
     effect(() => {
       const companyId = this.companyService.selectedCompanyId();
 
-      if (!companyId) return;
+      if (!companyId || companyId === this.lastCompanyId) return;
 
+      this.lastCompanyId = companyId;
       this.loadProjects(companyId);
     });
   }
 
-  private async loadProjects(companyId: string) {
+  private loadProjects(companyId: string) {
     this.loading.set(true);
 
-    try {
-      const projects = await this.projectService.getByCompanyId(companyId);
-      this.projects.set(projects);
-    } finally {
-      this.loading.set(false);
-    }
+    const projects = this.projectService.getByCompanyId(companyId);
+    this.projects.set(projects);
+
+    const current = this.projectService.selectedProjectId();
+    const stillExists = projects.find((p) => p.id === current);
+
+    this.projectService.selectProject(stillExists ? stillExists.id : projects[0]?.id ?? null);
+
+    this.loading.set(false);
+  }
+
+  selectProject(projectId: string) {
+    this.projectService.selectProject(projectId);
+  }
+
+  createProject() {
+    // modal / navigation
   }
 }
