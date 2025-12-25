@@ -1,5 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { Project } from '../models/project.model';
+import { CreateProjectDto } from '../components/monitoring/dtos/create-project.dto';
+import { UpdateProjectDto } from '../components/monitoring/dtos/update-project.dto';
 
 const MOCK_PROJECTS: Project[] = [
   {
@@ -52,12 +54,16 @@ export class ProjectService {
     return this.projects().find((p) => p.id === id);
   }
 
-  create(project: Omit<Project, 'id'>): Project {
+  create(project: CreateProjectDto): Project {
+    console.log('ProjectService: Creating project', project);
+    //TODO: replace with true call to backend
+    // for now, we mock the creation
     const newProject: Project = {
       ...project,
-      id: `project-${Date.now()}`,
+      id: `project-${Math.random().toString(36).substr(2, 9)}`,
+      createdAt: new Date(),
+      companyId: 'company-1', // hardcoded for mock
     };
-    console.log('ProjectService: Creating project', newProject);
     this.projectsSignal.update((projects) => [...projects, newProject]);
     return newProject;
   }
