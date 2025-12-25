@@ -1,55 +1,39 @@
 import { Routes } from '@angular/router';
-import { ProjectView } from './components/monitoring/project-view/project-view';
+import { AppLayout } from './components/layout/app-layout/app-layout';
 import { roleGuard } from './guards/role.guard';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'project/project-1',
-    pathMatch: 'full'
-  },
-  {
-    path: 'project/:projectId',
-    component: ProjectView
-  },
-  {
-    path: 'project/:projectId/node/:nodeId',
-    component: ProjectView
-  },
-  {
-    path: 'admin',
-    canActivate: [roleGuard(['admin'])],
+    component: AppLayout,
     children: [
       {
-        path: 'users',
-        loadComponent: () => import('./components/admin/users-view/users-view').then(m => m.UsersView)
+        path: 'monitoring',
+        loadChildren: () =>
+          import('./components/monitoring/routes/monitoring-routes').then(
+            (m) => m.MONITORING_ROUTES
+          ),
       },
       {
-        path: 'companies',
-        loadComponent: () => import('./components/admin/companies-view/companies-view').then(m => m.CompaniesView)
+        path: 'admin',
+        canActivate: [roleGuard(['admin'])],
+        loadChildren: () =>
+          import('./components/admin/routes/admin.routes').then((m) => m.ADMIN_ROUTES),
       },
       {
-        path: 'roles',
-        loadComponent: () => import('./components/admin/roles-view/roles-view').then(m => m.RolesView)
-      }
-    ]
+        path: 'settings',
+        loadChildren: () =>
+          import('./components/settings/routes/settings.routes').then((m) => m.SETTINGS_ROUTES),
+      },
+      {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'monitoring',
+      },
+      {
+        path: '**',
+        redirectTo: '',
+      },
+    ],
   },
-  {
-    path: 'settings',
-    children: [
-      {
-        path: 'profile',
-        loadComponent: () => import('./components/settings/profile-view/profile-view').then(m => m.ProfileView)
-      },
-      {
-        path: 'security',
-        loadComponent: () => import('./components/settings/security-view/security-view').then(m => m.SecurityView)
-      },
-      {
-        path: 'notifications',
-        loadComponent: () => import('./components/settings/notifications-view/notifications-view').then(m => m.NotificationsView)
-      }
-    ]
-  }
 ];
-

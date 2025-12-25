@@ -16,24 +16,4 @@ import { AppLayout } from './components/layout/app-layout/app-layout';
 })
 export class App {
   protected readonly title = signal('Sensor Management System');
-
-  projects = computed(() => {
-    const companyId = this.companyService.selectedCompanyId();
-    return this.projectService.getByCompanyId(companyId);
-  });
-
-  constructor(
-    public authService: AuthService,
-    public companyService: CompanyService,
-    public projectService: ProjectService,
-    public navService: NavigationService,
-    private router: Router
-  ) {
-    // Update active section when route changes
-    this.router.events
-      .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe((event: NavigationEnd) => {
-        this.navService.updateSectionFromRoute(event.urlAfterRedirects);
-      });
-  }
 }

@@ -6,6 +6,9 @@ import { NodeService } from '../../../services/node.service';
 import { SensorService } from '../../../services/sensor.service';
 import { Button } from '../../../shared/ui';
 import { LucideAngularModule, Pencil, Trash } from 'lucide-angular';
+// para usar modal
+import { ModalService } from '../../../shared/ui/modal/modal.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-project-view',
@@ -18,6 +21,8 @@ export class ProjectView {
   nodeService = inject(NodeService);
   sensorService = inject(SensorService);
   route = inject(ActivatedRoute);
+  router = inject(Router);
+  modal = inject(ModalService);
 
   projectId = this.projectService.selectedProjectId;
   selectedNodeId = signal<string | null>(null);
@@ -78,5 +83,14 @@ export class ProjectView {
       default:
         return 'border-gray-500 bg-gray-50';
     }
+  }
+
+  openEditProject(): void {
+    const project = this.project();
+    if (!project) return;
+
+    this.modal.show('Edit Project', 'medium');
+
+    this.router.navigate([{ outlets: { modal: ['edit'] } }], { relativeTo: this.route });
   }
 }
