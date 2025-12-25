@@ -51,6 +51,10 @@ export class ProjectView {
     return node ? this.sensorService.getByNodeId(node.id) : [];
   });
 
+  constructor() {
+    this.projectService.selectProject();
+  }
+
   selectNode(nodeId: string): void {
     this.selectedNodeId.set(nodeId);
   }

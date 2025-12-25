@@ -31,6 +31,8 @@ const MOCK_PROJECTS: Project[] = [
   providedIn: 'root',
 })
 export class ProjectService {
+  // TODO: for now we use mock data; replace with real backend calls later
+  // when real data, no data with differents companies will be loaded together
   private projectsSignal = signal<Project[]>(MOCK_PROJECTS);
   private selectedProjectIdSignal = signal<string | null>(null);
 
@@ -41,9 +43,18 @@ export class ProjectService {
     return this.projects();
   }
 
-  selectProject(projectId: string): void {
-    console.log('ProjectService: Selecting project', projectId);
-    this.selectedProjectIdSignal.set(projectId);
+  selectProject(projectId?: string): void {
+    let id = projectId;
+    if (!id) {
+      const all = this.getAll();
+      if (all.length > 0) {
+        id = all[0].id;
+      }
+    }
+    if (id) {
+      console.log('ProjectService: Selecting project', id);
+      this.selectedProjectIdSignal.set(id);
+    }
   }
 
   getByCompanyId(companyId: string): Project[] {
