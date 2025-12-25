@@ -1,20 +1,20 @@
 import { Routes } from '@angular/router';
+import { MONITORING_ROUTES } from './components/monitoring/routes/monitoring.routes';
+import { ADMIN_ROUTES } from './components/admin/routes/admin.routes';
+import { SETTINGS_ROUTES } from './components/settings/routes/settings.routes';
 
 export const routes: Routes = [
   {
     path: 'monitoring',
-    loadChildren: () =>
-      import('./components/monitoring/routes/monitoring.routes').then((m) => m.MONITORING_ROUTES),
+    children: MONITORING_ROUTES,
   },
   {
     path: 'admin',
-    loadChildren: () =>
-      import('./components/admin/routes/admin.routes').then((m) => m.ADMIN_ROUTES),
+    children: ADMIN_ROUTES,
   },
   {
     path: 'settings',
-    loadChildren: () =>
-      import('./components/settings/routes/settings.routes').then((m) => m.SETTINGS_ROUTES),
+    children: SETTINGS_ROUTES,
   },
   {
     path: '',
