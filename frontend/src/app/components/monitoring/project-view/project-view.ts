@@ -95,6 +95,6 @@ export class ProjectView {
 
     this.modal.show('Edit Project', 'medium');
 
-    this.router.navigate([{ outlets: { modal: ['edit'] } }], { relativeTo: this.route });
+    this.router.navigate([{ outlets: { modal: ['project', 'edit', project.id] } }]);
   }
 }

@@ -1,22 +1,22 @@
 import { Routes } from '@angular/router';
 import { ProjectView } from '../project-view/project-view';
+import { ProjectFormModal } from '../project-form-modal/project-form-modal';
 
 export const MONITORING_ROUTES: Routes = [
   {
     path: '',
     component: ProjectView,
   },
+];
+
+// Modal routes for monitoring (at root level with named outlet)
+export const MONITORING_MODAL_ROUTES: Routes = [
   {
-    path: 'project/:projectId',
-    component: ProjectView,
-    children: [
-      {
-        // ruta para update project
-        path: 'edit',
-        outlet: 'modal',
-        loadComponent: () =>
-          import('../project-form-modal/project-form-modal').then((m) => m.ProjectFormModal),
-      },
-    ],
+    path: 'project/edit/:id',
+    outlet: 'modal',
+    component: ProjectFormModal,
   },
+  // Future modal routes:
+  // { path: 'node/edit/:id', outlet: 'modal', component: NodeFormModal },
+  // { path: 'sensor/edit/:id', outlet: 'modal', component: SensorFormModal },
 ];
