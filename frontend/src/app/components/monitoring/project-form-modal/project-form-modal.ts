@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Button } from '../../../shared/ui/';
 import { ModalService } from '../../../shared/ui/modal/modal.service';
@@ -18,24 +18,24 @@ export class ProjectFormModal {
   mode: 'create' | 'edit' = 'create';
 
   form = this.fb.nonNullable.group({
-    name: ['', [Validators.required, Validators.minLength(3)]],
-    description: ['', [Validators.maxLength(255)]],
+    nombre: ['', [Validators.required, Validators.minLength(3)]],
+    descripcion: ['', [Validators.maxLength(255)]],
+    estado: [true, [Validators.required]],
   });
 
   readonly isEdit = computed(() => this.mode === 'edit');
+  readonly route = inject(ActivatedRoute);
+  readonly id = this.route.snapshot.paramMap.get('id');
 
   constructor() {
-    // if id is passed, set mode to edit and load data
-    const route = inject(ActivatedRoute);
-    const id = route.snapshot.paramMap.get('id');
-
-    if (id) {
+    if (this.id) {
       this.mode = 'edit';
-      const project = this.proyectoService.getById(id);
+      const project = this.proyectoService.getById(this.id);
       if (project) {
         this.form.setValue({
-          name: project.nombre,
-          description: project.descripcion || '',
+          nombre: project.nombre,
+          descripcion: project.descripcion || '',
+          estado: project.estado || true,
         });
       }
     }
@@ -48,15 +48,13 @@ export class ProjectFormModal {
     const dto = this.form.getRawValue();
     // create or update via service
     if (this.isEdit()) {
-      const route = inject(ActivatedRoute);
-      const id = route.snapshot.paramMap.get('id');
-      if (id) {
-        console.log('Updating project', id, dto);
-        //this.projectService.updateProject(id, dto);
+      if (this.id) {
+        console.log('Updating project', this.id, dto);
+        //this.projectService.updateProject(this.id, dto);
       }
     } else {
       console.log('Creating project', dto);
-      //this.projectService.createProject(dto);
+      this.proyectoService.create(dto);
     }
 
     this.close();

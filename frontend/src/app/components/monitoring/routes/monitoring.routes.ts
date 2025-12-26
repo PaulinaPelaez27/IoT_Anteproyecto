@@ -16,6 +16,11 @@ export const MONITORING_MODAL_ROUTES: Routes = [
     outlet: 'modal',
     component: ProjectFormModal,
   },
+  {
+    path: 'project/create',
+    outlet: 'modal',
+    component: ProjectFormModal,
+  },
   // Future modal routes:
   // { path: 'node/edit/:id', outlet: 'modal', component: NodeFormModal },
   // { path: 'sensor/edit/:id', outlet: 'modal', component: SensorFormModal },

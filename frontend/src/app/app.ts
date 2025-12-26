@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AppLayout } from './components/layout/app-layout/app-layout';

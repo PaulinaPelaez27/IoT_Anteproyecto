@@ -42,18 +42,9 @@ export class ProyectoService {
     return this.projects();
   }
 
-  selectProyecto(proyectoId?: string): void {
-    let id = proyectoId;
-    if (!id) {
-      const all = this.getAll();
-      if (all.length > 0) {
-        id = all[0].id;
-      }
-    }
-    if (id) {
-      console.log('ProjectService: Selecting project', id);
-      this.selectedProjectIdSignal.set(id);
-    }
+  selectProyecto(proyectoId: string): void {
+    console.log('ProjectService: Selecting project', proyectoId);
+    this.selectedProjectIdSignal.set(proyectoId);
   }
 
   getByEmpresaId(empresaId: string): Proyecto[] {

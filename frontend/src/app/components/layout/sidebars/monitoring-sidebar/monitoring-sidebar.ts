@@ -5,6 +5,8 @@ import { ProyectoService } from '../../../../services/proyecto.service';
 import { CompanyService } from '../../../../services/company.service';
 import { Proyecto } from '../../../../models/project.model';
 import { Button } from '../../../../shared/ui';
+import { ModalService } from '../../../../shared/ui/modal/modal.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-monitoring-sidebar',
@@ -15,6 +17,9 @@ import { Button } from '../../../../shared/ui';
 export class MonitoringSidebar {
   private proyectoService = inject(ProyectoService);
   private companyService = inject(CompanyService);
+  private modalService = inject(ModalService);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
 
   projects = signal<Proyecto[]>([]);
   loading = signal(false);
@@ -54,6 +59,7 @@ export class MonitoringSidebar {
   }
 
   createProject() {
-    // modal / navigation
+    this.modalService.show('Crear Proyecto', 'medium');
+    this.router.navigate([{ outlets: { modal: ['project', 'create'] } }]);
   }
 }

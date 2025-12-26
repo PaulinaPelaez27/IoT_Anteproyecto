@@ -5,6 +5,7 @@ import { Directive, ElementRef, EventEmitter, HostListener, Output } from '@angu
   standalone: true,
 })
 export class ClickOutsideDirective {
+  // TODO: usarlo en un compoenent toggleable
   @Output() appClickOutside = new EventEmitter<MouseEvent>();
 
   constructor(private elementRef: ElementRef<HTMLElement>) {}

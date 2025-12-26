@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { ProyectoService } from '../../../services/proyecto.service';
 import { NodeService } from '../../../services/node.service';
 import { SensorService } from '../../../services/sensor.service';
@@ -8,7 +8,6 @@ import { Button } from '../../../shared/ui';
 import { LucideAngularModule, Pencil, Trash } from 'lucide-angular';
 // para usar modal
 import { ModalService } from '../../../shared/ui/modal/modal.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-project-view',
@@ -51,10 +50,6 @@ export class ProjectView {
     return node ? this.sensorService.getByNodeId(node.id) : [];
   });
 
-  constructor() {
-    this.proyectoService.selectProyecto();
-  }
-
   selectNode(nodeId: string): void {
     this.selectedNodeId.set(nodeId);
   }
@@ -93,7 +88,7 @@ export class ProjectView {
     const project = this.project();
     if (!project) return;
 
-    this.modal.show('Edit Project', 'medium');
+    this.modal.show('Cambios en el proyecto', 'medium');
 
     this.router.navigate([{ outlets: { modal: ['project', 'edit', project.id] } }]);
   }
