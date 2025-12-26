@@ -3,7 +3,7 @@ import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Button } from '../../../shared/ui/';
 import { ModalService } from '../../../shared/ui/modal/modal.service';
 import { ActivatedRoute } from '@angular/router';
-import { ProjectService } from '../../../services/project.service';
+import { ProyectoService } from '../../../services/proyecto.service';
 
 @Component({
   standalone: true,
@@ -13,7 +13,7 @@ import { ProjectService } from '../../../services/project.service';
 export class ProjectFormModal {
   private fb = inject(FormBuilder);
   private modal = inject(ModalService);
-  private projectService = inject(ProjectService);
+  private proyectoService = inject(ProyectoService);
 
   mode: 'create' | 'edit' = 'create';
 
@@ -31,11 +31,11 @@ export class ProjectFormModal {
 
     if (id) {
       this.mode = 'edit';
-      const project = this.projectService.getById(id);
+      const project = this.proyectoService.getById(id);
       if (project) {
         this.form.setValue({
-          name: project.name,
-          description: project.description,
+          name: project.nombre,
+          description: project.descripcion || '',
         });
       }
     }

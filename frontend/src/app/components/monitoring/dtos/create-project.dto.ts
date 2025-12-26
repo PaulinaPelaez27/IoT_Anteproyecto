@@ -1,5 +1,5 @@
-export interface CreateProjectDto {
-  name: string;
-  description: string;
+export interface CreateProyectoDto {
+  nombre: string;
+  descripcion: string;
   estado?: boolean;
 }

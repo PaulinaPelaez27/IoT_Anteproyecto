@@ -36,12 +36,12 @@
             [class.hover:bg-white]="project.id !== selectedProjectId()"
           >
             <h3 class="font-medium text-gray-900">
-              {{ project.name }}
+              {{ project.nombre }}
             </h3>
 
-            @if (project.description) {
+            @if (project.descripcion) {
               <p class="text-sm text-gray-500 mt-1">
-                {{ project.description }}
+                {{ project.descripcion }}
               </p>
             }
           </div>

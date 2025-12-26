@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { ProjectService } from '../../../services/project.service';
+import { ProyectoService } from '../../../services/proyecto.service';
 import { NodeService } from '../../../services/node.service';
 import { SensorService } from '../../../services/sensor.service';
 import { Button } from '../../../shared/ui';
@@ -17,14 +17,14 @@ import { Router } from '@angular/router';
   styleUrls: ['./project-view.css'],
 })
 export class ProjectView {
-  projectService = inject(ProjectService);
+  proyectoService = inject(ProyectoService);
   nodeService = inject(NodeService);
   sensorService = inject(SensorService);
   route = inject(ActivatedRoute);
   router = inject(Router);
   modal = inject(ModalService);
 
-  projectId = this.projectService.selectedProjectId;
+  projectId = this.proyectoService.selectedProjectId;
   selectedNodeId = signal<string | null>(null);
 
   // icons
@@ -33,7 +33,7 @@ export class ProjectView {
 
   project = computed(() => {
     const id = this.projectId();
-    return id ? this.projectService.getById(id) : undefined;
+    return id ? this.proyectoService.getById(id) : undefined;
   });
 
   nodes = computed(() => {
@@ -52,7 +52,7 @@ export class ProjectView {
   });
 
   constructor() {
-    this.projectService.selectProject();
+    this.proyectoService.selectProyecto();
   }
 
   selectNode(nodeId: string): void {

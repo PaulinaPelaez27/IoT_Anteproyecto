@@ -1,9 +1,9 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { AuthService } from '../../../../services/auth.service';
 import { CompanySwitcher } from '../../company-switcher/company-switcher';
-import { ProjectService } from '../../../../services/project.service';
+import { ProyectoService } from '../../../../services/proyecto.service';
 import { CompanyService } from '../../../../services/company.service';
-import { Project } from '../../../../models/project.model';
+import { Proyecto } from '../../../../models/project.model';
 import { Button } from '../../../../shared/ui';
 
 @Component({
@@ -13,14 +13,14 @@ import { Button } from '../../../../shared/ui';
   templateUrl: './monitoring-sidebar.html',
 })
 export class MonitoringSidebar {
-  private projectService = inject(ProjectService);
+  private proyectoService = inject(ProyectoService);
   private companyService = inject(CompanyService);
 
-  projects = signal<Project[]>([]);
+  projects = signal<Proyecto[]>([]);
   loading = signal(false);
   isAdmin = inject(AuthService).isAdmin();
 
-  selectedProjectId = this.projectService.selectedProjectId;
+  selectedProjectId = this.proyectoService.selectedProjectId;
 
   private lastCompanyId: string | null = null;
 
@@ -38,19 +38,19 @@ export class MonitoringSidebar {
   private loadProjects(companyId: string) {
     this.loading.set(true);
 
-    const projects = this.projectService.getByCompanyId(companyId);
+    const projects = this.proyectoService.getByEmpresaId(companyId);
     this.projects.set(projects);
 
-    const current = this.projectService.selectedProjectId();
+    const current = this.proyectoService.selectedProjectId();
     const stillExists = projects.find((p) => p.id === current);
 
-    this.projectService.selectProject(stillExists ? stillExists.id : projects[0]?.id ?? null);
+    this.proyectoService.selectProyecto(stillExists ? stillExists.id : projects[0]?.id ?? null);
 
     this.loading.set(false);
   }
 
   selectProject(projectId: string) {
-    this.projectService.selectProject(projectId);
+    this.proyectoService.selectProyecto(projectId);
   }
 
   createProject() {

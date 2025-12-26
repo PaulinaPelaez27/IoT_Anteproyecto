@@ -1,7 +1,7 @@
-export interface Project {
+export interface Proyecto {
   id: string;
-  name: string;
-  description: string;
-  createdAt: Date;
-  companyId: string;
+  nombre: string;
+  descripcion: string;
+  creadoEn: Date;
+  empresaId: string;
 }

@@ -5,11 +5,11 @@
       <div class="text-sm text-gray-500 mb-2 flex items-center">
         <span>Projects</span>
         <span class="mx-2">&gt;</span>
-        <span class="text-gray-900 font-medium">{{ proj.name }}</span>
+        <span class="text-gray-900 font-medium">{{ proj.nombre }}</span>
       </div>
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-2">
-          <h1 class="text-2xl font-bold text-gray-900">{{ proj.name }}</h1>
+          <h1 class="text-2xl font-bold text-gray-900">{{ proj.nombre }}</h1>
           <ui-button
             variant="ghost"
             [iconOnly]="true"
@@ -25,7 +25,7 @@
           + Agregar Nodo
         </ui-button>
       </div>
-      <p class="text-gray-600 mt-1">{{ proj.description }}</p>
+      <p class="text-gray-600 mt-1">{{ proj.descripcion }}</p>
     </div>
 
     <!-- Node Tabs (Folder Style) -->

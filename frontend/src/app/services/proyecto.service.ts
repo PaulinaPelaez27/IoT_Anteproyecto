@@ -1,50 +1,49 @@
 import { Injectable, signal } from '@angular/core';
-import { Project } from '../models/project.model';
-import { CreateProjectDto } from '../components/monitoring/dtos/create-project.dto';
-import { UpdateProjectDto } from '../components/monitoring/dtos/update-project.dto';
+import { Proyecto } from '../models/project.model';
+import { CreateProyectoDto } from '../components/monitoring/dtos/create-project.dto';
 
-const MOCK_PROJECTS: Project[] = [
+const MOCK_PROJECTS: Proyecto[] = [
   {
     id: 'project-1',
-    name: 'Factory Floor Monitoring',
-    description: 'Real-time monitoring of factory floor sensors',
-    createdAt: new Date('2024-01-15'),
-    companyId: 'company-1',
+    nombre: 'Factory Floor Monitoring',
+    descripcion: 'Real-time monitoring of factory floor sensors',
+    creadoEn: new Date('2024-01-15'),
+    empresaId: 'company-1',
   },
   {
     id: 'project-2',
-    name: 'Warehouse Temperature Control',
-    description: 'Temperature and humidity monitoring for warehouse',
-    createdAt: new Date('2024-02-20'),
-    companyId: 'company-1',
+    nombre: 'Warehouse Temperature Control',
+    descripcion: 'Temperature and humidity monitoring for warehouse',
+    creadoEn: new Date('2024-02-20'),
+    empresaId: 'company-1',
   },
   {
     id: 'project-3',
-    name: 'Energy Management System',
-    description: 'Smart energy monitoring and optimization',
-    createdAt: new Date('2024-03-10'),
-    companyId: 'company-2',
+    nombre: 'Energy Management System',
+    descripcion: 'Smart energy monitoring and optimization',
+    creadoEn: new Date('2024-03-10'),
+    empresaId: 'company-2',
   },
 ];
 
 @Injectable({
   providedIn: 'root',
 })
-export class ProjectService {
+export class ProyectoService {
   // TODO: for now we use mock data; replace with real backend calls later
   // when real data, no data with differents companies will be loaded together
-  private projectsSignal = signal<Project[]>(MOCK_PROJECTS);
+  private projectsSignal = signal<Proyecto[]>(MOCK_PROJECTS);
   private selectedProjectIdSignal = signal<string | null>(null);
 
   projects = this.projectsSignal.asReadonly();
   selectedProjectId = this.selectedProjectIdSignal.asReadonly();
 
-  getAll(): Project[] {
+  getAll(): Proyecto[] {
     return this.projects();
   }
 
-  selectProject(projectId?: string): void {
-    let id = projectId;
+  selectProyecto(proyectoId?: string): void {
+    let id = proyectoId;
     if (!id) {
       const all = this.getAll();
       if (all.length > 0) {
@@ -57,29 +56,29 @@ export class ProjectService {
     }
   }
 
-  getByCompanyId(companyId: string): Project[] {
-    return this.projects().filter((p) => p.companyId === companyId);
+  getByEmpresaId(empresaId: string): Proyecto[] {
+    return this.projects().filter((p) => p.empresaId === empresaId);
   }
 
-  getById(id: string): Project | undefined {
+  getById(id: string): Proyecto | undefined {
     return this.projects().find((p) => p.id === id);
   }
 
-  create(project: CreateProjectDto): Project {
+  create(project: CreateProyectoDto): Proyecto {
     console.log('ProjectService: Creating project', project);
     //TODO: replace with true call to backend
     // for now, we mock the creation
-    const newProject: Project = {
+    const newProject: Proyecto = {
       ...project,
       id: `project-${Math.random().toString(36).substr(2, 9)}`,
-      createdAt: new Date(),
-      companyId: 'company-1', // hardcoded for mock
+      creadoEn: new Date(),
+      empresaId: 'company-1', // hardcoded for mock
     };
     this.projectsSignal.update((projects) => [...projects, newProject]);
     return newProject;
   }
 
-  update(id: string, updates: Partial<Project>): Project | undefined {
+  update(id: string, updates: Partial<Proyecto>): Proyecto | undefined {
     console.log('ProjectService: Updating project', id, updates);
     const project = this.getById(id);
     if (!project) return undefined;
