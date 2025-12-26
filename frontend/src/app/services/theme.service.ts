@@ -53,7 +53,13 @@ export class ThemeService {
 
   toggleTheme() {
     const currentMode = this.themeMode();
-    const newMode = currentMode === 'dark' ? 'light' : 'dark';
+    if (currentMode === 'system') {
+      const isCurrentlyDark = this.darkMode();
+      const newMode: ThemeMode = isCurrentlyDark ? 'light' : 'dark';
+      this.setTheme(newMode);
+      return;
+    }
+    const newMode: ThemeMode = currentMode === 'dark' ? 'light' : 'dark';
     this.setTheme(newMode);
   }
 

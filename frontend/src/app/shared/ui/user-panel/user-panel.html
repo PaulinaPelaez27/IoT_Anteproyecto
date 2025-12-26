@@ -1,6 +1,6 @@
 @if (panel.open()) {
     <!-- Background overlay -->
-    <div class="fixed inset-0 bg-black/20 z-40" (click)="panel.close()"></div>
+    <div class="fixed inset-0 bg-black/20 z-40"></div>
 
     <div appClickOutside (appClickOutside)="panel.close()">
         <div class="fixed bottom-5 left-16 z-50 w-96 max-w-full bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 flex flex-col">
