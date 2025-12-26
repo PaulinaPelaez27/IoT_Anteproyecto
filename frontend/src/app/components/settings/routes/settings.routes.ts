@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { ProfileView } from '../profile-view/profile-view';
+import { SecurityView } from '../security-view/security-view';
 import { NotificationsView } from '../notifications-view/notifications-view';
 
 // Regular settings routes (nested under /settings)
@@ -9,8 +10,17 @@ export const SETTINGS_ROUTES: Routes = [
     component: ProfileView,
   },
   {
+    path: 'security',
+    component: SecurityView,
+  },
+  {
     path: 'notifications',
     component: NotificationsView,
+  },
+  {
+    path: '',
+    pathMatch: 'full',
+    redirectTo: 'profile',
   },
 ];
 
