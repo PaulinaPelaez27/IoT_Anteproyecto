@@ -1,37 +1,63 @@
 import { Injectable, signal, effect } from '@angular/core';
 
+export type ThemeMode = 'light' | 'dark' | 'system';
+
 @Injectable({
   providedIn: 'root',
 })
 export class ThemeService {
   darkMode = signal<boolean>(false);
+  themeMode = signal<ThemeMode>('system');
+  private mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
   constructor() {
-    // Load saved theme preference or detect system preference
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Load saved theme preference
+    const savedTheme = (localStorage.getItem('theme') as ThemeMode) || 'system';
+    this.themeMode.set(savedTheme);
 
-    const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
-    this.darkMode.set(isDark);
+    // Listen to system theme changes
+    this.mediaQuery.addEventListener('change', (e) => {
+      if (this.themeMode() === 'system') {
+        this.darkMode.set(e.matches);
+      }
+    });
+
+    // Apply initial theme
+    this.applyTheme(savedTheme);
 
     // Apply theme changes to document
     effect(() => {
       const isDarkMode = this.darkMode();
       if (isDarkMode) {
         document.documentElement.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
       } else {
         document.documentElement.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
       }
     });
   }
 
+  setTheme(mode: ThemeMode) {
+    this.themeMode.set(mode);
+    localStorage.setItem('theme', mode);
+    this.applyTheme(mode);
+  }
+
+  private applyTheme(mode: ThemeMode) {
+    if (mode === 'system') {
+      const prefersDark = this.mediaQuery.matches;
+      this.darkMode.set(prefersDark);
+    } else {
+      this.darkMode.set(mode === 'dark');
+    }
+  }
+
   toggleTheme() {
-    this.darkMode.update((value) => !value);
+    const currentMode = this.themeMode();
+    const newMode = currentMode === 'dark' ? 'light' : 'dark';
+    this.setTheme(newMode);
   }
 
   setDarkMode(isDark: boolean) {
-    this.darkMode.set(isDark);
+    this.setTheme(isDark ? 'dark' : 'light');
   }
 }

@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { ProfileView } from '../profile-view/profile-view';
 import { SecurityView } from '../security-view/security-view';
 import { NotificationsView } from '../notifications-view/notifications-view';
+import { AppearanceView } from '../appearance-view/appearance-view';
 
 // Regular settings routes (nested under /settings)
 export const SETTINGS_ROUTES: Routes = [
@@ -16,6 +17,10 @@ export const SETTINGS_ROUTES: Routes = [
   {
     path: 'notifications',
     component: NotificationsView,
+  },
+  {
+    path: 'appearance',
+    component: AppearanceView,
   },
   {
     path: '',

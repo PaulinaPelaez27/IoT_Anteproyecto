@@ -1,0 +1,54 @@
+<div class="max-w-xl mx-auto mt-10 p-6 bg-white dark:bg-gray-900 rounded-xl shadow">
+    <h2 class="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Apariencia</h2>
+    <p class="text-gray-600 dark:text-gray-300 mb-6">Personaliza la apariencia de la interfaz</p>
+    <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
+        <h3 class="font-semibold text-lg mb-4 text-gray-900 dark:text-white">Tema</h3>
+        <div class="flex gap-4">
+            <button
+                (click)="setTheme('light')"
+                [class.border-blue-500]="isActive('light')"
+                [class.dark:border-blue-400]="isActive('light')"
+                [class.bg-blue-50]="isActive('light')"
+                [class.dark:bg-blue-900]="isActive('light')"
+                [class.border-gray-200]="!isActive('light')"
+                [class.dark:border-gray-700]="!isActive('light')"
+                [class.bg-white]="!isActive('light')"
+                [class.dark:bg-gray-900]="!isActive('light')"
+                class="flex-1 border-2 rounded-lg p-4 transition hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                [attr.aria-pressed]="isActive('light')">
+                <span class="block font-bold text-gray-900 dark:text-white">Claro</span>
+                <span class="block text-gray-500 dark:text-gray-300 text-sm">Claro</span>
+            </button>
+            <button
+                (click)="setTheme('dark')"
+                [class.border-blue-500]="isActive('dark')"
+                [class.dark:border-blue-400]="isActive('dark')"
+                [class.bg-blue-50]="isActive('dark')"
+                [class.dark:bg-blue-900]="isActive('dark')"
+                [class.border-gray-200]="!isActive('dark')"
+                [class.dark:border-gray-700]="!isActive('dark')"
+                [class.bg-white]="!isActive('dark')"
+                [class.dark:bg-gray-900]="!isActive('dark')"
+                class="flex-1 border-2 rounded-lg p-4 transition hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                [attr.aria-pressed]="isActive('dark')">
+                <span class="block font-bold text-gray-900 dark:text-white">Oscuro</span>
+                <span class="block text-gray-500 dark:text-gray-300 text-sm">Oscuro</span>
+            </button>
+            <button
+                (click)="setTheme('system')"
+                [class.border-blue-500]="isActive('system')"
+                [class.dark:border-blue-400]="isActive('system')"
+                [class.bg-blue-50]="isActive('system')"
+                [class.dark:bg-blue-900]="isActive('system')"
+                [class.border-gray-200]="!isActive('system')"
+                [class.dark:border-gray-700]="!isActive('system')"
+                [class.bg-white]="!isActive('system')"
+                [class.dark:bg-gray-900]="!isActive('system')"
+                class="flex-1 border-2 rounded-lg p-4 transition hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                [attr.aria-pressed]="isActive('system')">
+                <span class="block font-bold text-gray-900 dark:text-white">Sistema</span>
+                <span class="block text-gray-500 dark:text-gray-300 text-sm">Auto</span>
+            </button>
+        </div>
+    </div>
+</div>
