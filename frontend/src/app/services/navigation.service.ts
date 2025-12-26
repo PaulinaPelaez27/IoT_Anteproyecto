@@ -4,11 +4,11 @@ import { Router } from '@angular/router';
 export type NavSection = 'monitoring' | 'admin' | 'settings';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NavigationService {
   private activeSectionSignal = signal<NavSection>('monitoring');
-  
+
   activeSection = this.activeSectionSignal.asReadonly();
 
   constructor(private router: Router) {}
@@ -16,14 +16,11 @@ export class NavigationService {
   setActiveSection(section: NavSection): void {
     console.log('NavigationService: Setting active section to', section);
     this.activeSectionSignal.set(section);
-    
+
     // Navigate to the appropriate route based on section
     switch (section) {
       case 'monitoring':
-        // Stay on current project route or go to default
-        if (!this.router.url.startsWith('/project')) {
-          this.router.navigate(['/project/project-1']);
-        }
+        this.router.navigate(['/monitoring']);
         break;
       case 'admin':
         this.router.navigate(['/admin/users']);

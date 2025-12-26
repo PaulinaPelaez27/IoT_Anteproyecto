@@ -1,0 +1,63 @@
+<form [formGroup]="form" class="space-y-4" (ngSubmit)="save()">
+
+  <!-- Name -->
+  <div>
+    <label class="block text-sm font-medium text-gray-700">
+      Nombre del proyecto
+    </label>
+
+    <input
+      type="text"
+      formControlName="name"
+      class="w-full mt-1 px-3 py-2 border rounded-lg
+             focus:outline-none focus:ring-2 focus:ring-red-500"
+      autofocus
+    />
+
+    @if (form.controls.name.touched && form.controls.name.invalid) {
+      <p class="text-sm text-red-600 mt-1">
+        El nombre es obligatorio (mín. 3 caracteres)
+      </p>
+    }
+  </div>
+
+  <!-- Description -->
+  <div>
+    <label class="block text-sm font-medium text-gray-700">
+      Descripción
+    </label>
+
+    <textarea
+      formControlName="description"
+      rows="3"
+      class="w-full mt-1 px-3 py-2 border rounded-lg
+             focus:outline-none focus:ring-2 focus:ring-red-500"
+    ></textarea>
+
+    @if (form.controls.description.touched && form.controls.description.invalid) {
+      <p class="text-sm text-red-600 mt-1">
+        Máximo 255 caracteres
+      </p>
+    }
+  </div>
+
+  <!-- Actions -->
+  <div class="flex justify-end gap-2 pt-4">
+    <ui-button
+      variant="secondary"
+      type="button"
+      (clicked)="close()"
+    >
+      Cancelar
+    </ui-button>
+
+    <ui-button
+      variant="primary"
+      type="submit"
+      [disabled]="form.invalid"
+    >
+      {{ isEdit() ? 'Guardar cambios' : 'Crear' }}
+    </ui-button>
+  </div>
+
+</form>

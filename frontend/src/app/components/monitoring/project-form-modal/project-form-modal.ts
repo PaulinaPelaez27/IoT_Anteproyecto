@@ -1,69 +1,68 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { Component, computed, inject, signal } from '@angular/core';
+import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Button } from '../../../shared/ui/';
 import { ModalService } from '../../../shared/ui/modal/modal.service';
+import { ActivatedRoute } from '@angular/router';
 import { ProjectService } from '../../../services/project.service';
-import { CreateProjectDto } from '../dtos/create-project.dto';
-import { UpdateProjectDto } from '../dtos/update-project.dto';
 
 @Component({
   standalone: true,
-  imports: [ReactiveFormsModule],
-  template: `
-    <form (ngSubmit)="submit()">
-      <input data-testid="name" [formControl]="name" />
-      <input data-testid="description" [formControl]="description" />
-
-      <button type="submit">
-        {{ mode === 'create' ? 'Create' : 'Update' }}
-      </button>
-    </form>
-  `,
+  imports: [ReactiveFormsModule, Button],
+  templateUrl: './project-form-modal.html',
 })
-export class ProjectFormModal implements OnInit {
-  mode: 'create' | 'update' = 'create';
-  projectId?: string;
-
-  name = new FormControl('');
-  description = new FormControl('');
-
+export class ProjectFormModal {
+  private fb = inject(FormBuilder);
   private modal = inject(ModalService);
-  private projects = inject(ProjectService);
-  private route = inject(ActivatedRoute);
+  private projectService = inject(ProjectService);
 
-  ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
+  mode: 'create' | 'edit' = 'create';
+
+  form = this.fb.nonNullable.group({
+    name: ['', [Validators.required, Validators.minLength(3)]],
+    description: ['', [Validators.maxLength(255)]],
+  });
+
+  readonly isEdit = computed(() => this.mode === 'edit');
+
+  constructor() {
+    // if id is passed, set mode to edit and load data
+    const route = inject(ActivatedRoute);
+    const id = route.snapshot.paramMap.get('id');
 
     if (id) {
-      this.mode = 'update';
-      this.projectId = id;
-      const project = this.projects.getById(id);
-
+      this.mode = 'edit';
+      const project = this.projectService.getById(id);
       if (project) {
-        this.name.setValue(project.name);
-        this.description.setValue(project.description);
+        this.form.setValue({
+          name: project.name,
+          description: project.description,
+        });
       }
-    } else {
-      this.mode = 'create';
     }
   }
 
-  submit() {
-    if (this.mode === 'create') {
-      const newProject: CreateProjectDto = {
-        name: this.name.value!,
-        description: this.description.value!,
-      };
-      this.projects.create(newProject);
-    } else if (this.projectId) {
-      const updatedProject: UpdateProjectDto = {
-        id: this.projectId,
-        name: this.name.value!,
-        description: this.description.value!,
-      };
-      this.projects.update(this.projectId, updatedProject);
+  save() {
+    console.log(this.form.value);
+    if (this.form.invalid) return;
+
+    const dto = this.form.getRawValue();
+    // create or update via service
+    if (this.isEdit()) {
+      const route = inject(ActivatedRoute);
+      const id = route.snapshot.paramMap.get('id');
+      if (id) {
+        console.log('Updating project', id, dto);
+        //this.projectService.updateProject(id, dto);
+      }
+    } else {
+      console.log('Creating project', dto);
+      //this.projectService.createProject(dto);
     }
 
+    this.close();
+  }
+
+  close() {
     this.modal.hide();
   }
 }
