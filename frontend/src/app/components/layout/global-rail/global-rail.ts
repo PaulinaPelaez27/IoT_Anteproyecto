@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
@@ -6,6 +6,8 @@ import { NavigationService, NavSection } from '../../../services/navigation.serv
 import { LucideAngularModule, Settings, ShieldUser, SquareKanban } from 'lucide-angular';
 
 import type { LucideIconData } from 'lucide-angular';
+import { UserPanelService } from '../../../shared/ui/user-panel/user-panel.service';
+import { UserPanel } from '../../../shared/ui/user-panel/user-panel';
 
 interface NavItem {
   id: NavSection;
@@ -16,14 +18,15 @@ interface NavItem {
 
 @Component({
   selector: 'app-global-rail',
-  imports: [CommonModule, RouterModule, LucideAngularModule],
+  imports: [CommonModule, RouterModule, LucideAngularModule, UserPanel],
   templateUrl: './global-rail.html',
-  styleUrl: './global-rail.css',
 })
 export class GlobalRail {
   readonly monitoringIcon = SquareKanban;
   readonly adminIcon = ShieldUser;
   readonly settingsIcon = Settings;
+
+  userPanel = inject(UserPanelService);
 
   navItems: NavItem[] = [
     {

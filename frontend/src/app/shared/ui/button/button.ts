@@ -59,13 +59,13 @@ export class Button {
   private get variantClass(): string {
     switch (this.variant) {
       case 'ghost':
-        return 'bg-transparent hover:bg-gray-100 text-gray-600';
+        return 'bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400';
       case 'secondary':
-        return 'bg-gray-200 text-gray-900 hover:bg-gray-300';
+        return 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600';
       case 'danger':
-        return 'bg-red-600 text-white hover:bg-red-700';
+        return 'bg-red-600 dark:bg-red-700 text-white hover:bg-red-700 dark:hover:bg-red-600';
       default:
-        return 'bg-red-600 text-white hover:bg-red-700';
+        return 'bg-red-600 dark:bg-red-700 text-white hover:bg-red-700 dark:hover:bg-red-600';
     }
   }
 

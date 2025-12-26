@@ -7,7 +7,7 @@
 
     <!-- Header -->
     <div class="flex items-center justify-between mb-4">
-      <h2 class="text-lg font-semibold text-gray-900">
+      <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
         Proyectos
       </h2>
 
@@ -18,7 +18,7 @@
 
     <!-- Loading -->
     @if (loading()) {
-      <p class="text-sm text-gray-400 text-center mt-6">
+      <p class="text-sm text-gray-400 dark:text-gray-500 text-center mt-6">
         Cargando proyectos...
       </p>
     }
@@ -31,16 +31,18 @@
             (click)="selectProject(project.id)"
             class="block p-3 rounded-lg cursor-pointer transition-colors"
             [class.bg-white]="project.id === selectedProjectId()"
+            [class.dark:bg-gray-800]="project.id === selectedProjectId()"
             [class.border-l-4]="project.id === selectedProjectId()"
             [class.border-primary]="project.id === selectedProjectId()"
             [class.hover:bg-white]="project.id !== selectedProjectId()"
+            [class.dark:hover:bg-gray-800]="project.id !== selectedProjectId()"
           >
-            <h3 class="font-medium text-gray-900">
+            <h3 class="font-medium text-gray-900 dark:text-gray-100">
               {{ project.nombre }}
             </h3>
 
             @if (project.descripcion) {
-              <p class="text-sm text-gray-500 mt-1">
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 {{ project.descripcion }}
               </p>
             }
@@ -51,7 +53,7 @@
 
     <!-- Empty -->
     @if (!loading() && !projects().length) {
-      <p class="text-sm text-gray-400 text-center mt-6">
+      <p class="text-sm text-gray-400 dark:text-gray-500 text-center mt-6">
         No hay proyectos disponibles
       </p>
     }
