@@ -30,7 +30,7 @@ export class Modal implements AfterViewInit, OnDestroy, OnChanges {
   private previouslyFocusedElement: HTMLElement | null = null;
   private boundKeydownHandler = this.handleKeydown.bind(this);
 
-  closeIcon = X;
+  readonly closeIcon = X;
 
   ngAfterViewInit() {
     if (this.open) {
