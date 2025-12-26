@@ -1,55 +1,34 @@
 import { Routes } from '@angular/router';
-import { ProjectView } from './components/monitoring/project-view/project-view';
-import { roleGuard } from './guards/role.guard';
+import {
+  MONITORING_ROUTES,
+  MONITORING_MODAL_ROUTES,
+} from './components/monitoring/routes/monitoring.routes';
+import { ADMIN_ROUTES, ADMIN_MODAL_ROUTES } from './components/admin/routes/admin.routes';
+import {
+  SETTINGS_ROUTES,
+  SETTINGS_MODAL_ROUTES,
+} from './components/settings/routes/settings.routes';
 
 export const routes: Routes = [
   {
-    path: '',
-    redirectTo: 'project/project-1',
-    pathMatch: 'full'
-  },
-  {
-    path: 'project/:projectId',
-    component: ProjectView
-  },
-  {
-    path: 'project/:projectId/node/:nodeId',
-    component: ProjectView
+    path: 'monitoring',
+    children: MONITORING_ROUTES,
   },
   {
     path: 'admin',
-    canActivate: [roleGuard(['admin'])],
-    children: [
-      {
-        path: 'users',
-        loadComponent: () => import('./components/admin/users-view/users-view').then(m => m.UsersView)
-      },
-      {
-        path: 'companies',
-        loadComponent: () => import('./components/admin/companies-view/companies-view').then(m => m.CompaniesView)
-      },
-      {
-        path: 'roles',
-        loadComponent: () => import('./components/admin/roles-view/roles-view').then(m => m.RolesView)
-      }
-    ]
+    children: ADMIN_ROUTES,
   },
   {
     path: 'settings',
-    children: [
-      {
-        path: 'profile',
-        loadComponent: () => import('./components/settings/profile-view/profile-view').then(m => m.ProfileView)
-      },
-      {
-        path: 'security',
-        loadComponent: () => import('./components/settings/security-view/security-view').then(m => m.SecurityView)
-      },
-      {
-        path: 'notifications',
-        loadComponent: () => import('./components/settings/notifications-view/notifications-view').then(m => m.NotificationsView)
-      }
-    ]
-  }
+    children: SETTINGS_ROUTES,
+  },
+  // Modal routes (at root level for named outlet)
+  ...MONITORING_MODAL_ROUTES,
+  ...ADMIN_MODAL_ROUTES,
+  ...SETTINGS_MODAL_ROUTES,
+  {
+    path: '',
+    redirectTo: 'monitoring',
+    pathMatch: 'full',
+  },
 ];
-

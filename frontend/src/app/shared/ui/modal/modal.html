@@ -1,0 +1,39 @@
+@if (open) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center">
+
+    <!-- Overlay -->
+    <div
+      class="absolute inset-0 bg-black/40"
+      (click)="close.emit()"
+    ></div>
+
+    <!-- Modal -->
+    <div
+      class="relative bg-white rounded-xl shadow-xl w-full max-h-[90vh]
+             overflow-hidden"
+      [class.max-w-sm]="width === 'small'"
+      [class.max-w-md]="width === 'medium'"
+      [class.max-w-lg]="width === 'large'"
+    >
+      <!-- Header -->
+      <div class="flex items-center justify-between px-4 py-3 border-b">
+        <h3 class="font-semibold text-gray-900">
+          {{ title }}
+        </h3>
+
+        <button
+          class="text-gray-400 hover:text-gray-600"
+          (click)="close.emit()"
+        >
+          <lucide-icon [img]="closeIcon" class="w-5 h-5" />
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-4 overflow-y-auto">
+        <ng-content />
+      </div>
+    </div>
+
+  </div>
+}
