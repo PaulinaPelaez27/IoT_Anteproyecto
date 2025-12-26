@@ -1,4 +1,4 @@
-<div class="flex flex-col h-full w-rail bg-dark-800 text-white">
+<div class="flex flex-col h-full w-rail bg-dark-800 dark:bg-gray-950 text-white border-r border-dark-700 dark:border-gray-800">
   <!-- Navigation Items -->
   <nav class="flex-1 flex flex-col py-4">
     @for (item of navItems; track item.id) {
@@ -8,7 +8,7 @@
           [class.bg-primary]="navService.activeSection() === item.id"
           [class.text-white]="navService.activeSection() === item.id"
           [class.text-gray-400]="navService.activeSection() !== item.id"
-          class="flex flex-col items-center justify-center h-16 hover:bg-dark-700 transition-colors group relative"
+          class="flex flex-col items-center justify-center h-16 hover:bg-dark-700 dark:hover:bg-gray-800 transition-colors group relative"
           [title]="item.label">
           <lucide-icon
             [img]="item.icon"
@@ -22,7 +22,7 @@
   </nav>
 
   <!-- User Avatar -->
-  <div class="h-16 flex items-center justify-center border-t border-dark-700">
+  <div class="h-16 flex items-center justify-center border-t border-dark-700 dark:border-gray-800">
     <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold" (click)="userPanel.toggle()">
       {{ authService.currentUser()?.firstName?.charAt(0) || '' }}{{ authService.currentUser()?.lastName?.charAt(0) || '' }}
       <ui-user-panel />

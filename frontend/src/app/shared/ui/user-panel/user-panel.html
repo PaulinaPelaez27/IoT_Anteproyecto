@@ -3,9 +3,9 @@
     <div class="fixed inset-0 bg-black/20 z-40" (click)="panel.close()"></div>
 
     <div appClickOutside (appClickOutside)="panel.close()">
-        <div class="fixed bottom-5 left-16 z-50 w-96 max-w-full bg-white rounded-xl shadow-xl border flex flex-col">
+        <div class="fixed bottom-5 left-16 z-50 w-96 max-w-full bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 flex flex-col">
             <!-- Header -->
-            <div class="flex items-center justify-between p-5 border-b relative">
+            <div class="flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700 relative">
             <div class="flex items-center gap-4 w-full">
                 <!-- Initials round -->
                 <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg">
@@ -13,13 +13,13 @@
                 </div>
                 <!-- User info -->
                 <div class="flex flex-col">
-                <span class="font-semibold text-gray-900 text-base">
+                <span class="font-semibold text-gray-900 dark:text-gray-100 text-base">
                     {{ user()?.lastName || '' }} {{ user()?.firstName || '' }}
                 </span>
-                <span class="text-sm text-gray-500">
+                <span class="text-sm text-gray-500 dark:text-gray-400">
                     {{ user()?.email || '' }}
                 </span>
-                <span class="inline-block text-xs px-2 py-1 rounded-full bg-red-100 text-red-700 mt-1 w-fit">
+                <span class="inline-block text-xs px-2 py-1 rounded-full bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 mt-1 w-fit">
                     {{ user()?.role }}
                 </span>
                 </div>
@@ -31,16 +31,16 @@
                 aria-label="Close panel"
                 class="absolute top-3 right-3"
             >
-                <lucide-icon [img]="closeIcon" class="w-5 h-5 text-gray-500 hover:text-gray-700"></lucide-icon>
+                <lucide-icon [img]="closeIcon" class="w-5 h-5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"></lucide-icon>
             </button>
             </div>
 
             <!-- Company Info -->
-            <div class="px-5 py-4 border-b">
-                <div class="text-gray-500 uppercase text-xs mb-1 tracking-wide">
+            <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="text-gray-500 dark:text-gray-400 uppercase text-xs mb-1 tracking-wide">
                     Company
                 </div>
-                <div class="font-medium text-gray-900">
+                <div class="font-medium text-gray-900 dark:text-gray-100">
                     {{ user()?.companyId }}
                 </div>
             </div>
@@ -49,7 +49,7 @@
             <div class="flex-1 flex flex-col justify-end">
                 <button
                     type="button"
-                    class="w-full text-left px-5 py-4 text-red-600 hover:bg-red-50 flex items-center font-medium border-t"
+                    class="w-full text-left px-5 py-4 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center font-medium border-t border-gray-200 dark:border-gray-700"
                     (click)="logout(); $event.stopPropagation()"
                 >
                     <lucide-icon [img]="logoutIcon" class="w-5 h-5 mr-3 align-middle"></lucide-icon>
