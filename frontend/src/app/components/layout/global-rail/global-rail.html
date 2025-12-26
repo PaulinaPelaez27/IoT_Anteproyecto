@@ -23,8 +23,9 @@
 
   <!-- User Avatar -->
   <div class="h-16 flex items-center justify-center border-t border-dark-700">
-    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold">
+    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold" (click)="userPanel.toggle()">
       {{ authService.currentUser()?.firstName?.charAt(0) || '' }}{{ authService.currentUser()?.lastName?.charAt(0) || '' }}
+      <ui-user-panel />
     </div>
   </div>
 </div>
