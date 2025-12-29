@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { ProyectoService } from '../../../services/proyecto.service';
@@ -24,6 +24,28 @@ export class ProyectoView {
 
   projectId = this.proyectoService.selectedProyectoId;
   selectedNodeId = this.nodoService.selectedNodoId;
+
+  constructor() {
+    // Al cargar nodes/sensors, selectiona el primer node disponible
+    effect(() => {
+      const nodes = this.nodes();
+      const currentSelectedId = this.selectedNodeId();
+
+      // Si no hay nodos, deseleccionar
+      if (nodes.length === 0) {
+        if (currentSelectedId !== null) {
+          this.nodoService.selectNodo(null);
+        }
+        return;
+      }
+
+      // Si el nodo seleccionado no existe, seleccionar el primero
+      const nodeExists = currentSelectedId && nodes.some((n) => n.id === currentSelectedId);
+      if (!nodeExists) {
+        this.nodoService.selectNodo(nodes[0].id);
+      }
+    });
+  }
 
   // icons
   readonly pencilIcon = Pencil;
