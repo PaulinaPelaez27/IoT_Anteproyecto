@@ -16,6 +16,19 @@ export class SensorDetailsView {
   sensorId = this.sensorService.selectedSensorId;
   activeTab = signal<'live-data' | 'threshold' | 'resume'>('live-data');
 
+  // readings
+  readings = computed(() => {
+    const id = this.sensorId();
+    const sensor = this.sensorDetails();
+    if (id && sensor) {
+      const tipoId = sensor.tiposDeLectura[0]?.id;
+      if (tipoId) {
+        return this.sensorService.getReadings(id, tipoId, 24);
+      }
+    }
+    return [];
+  });
+
   sensorDetails = computed(() => {
     const id = this.sensorId();
     return id ? this.sensorService.getById(id) : undefined;

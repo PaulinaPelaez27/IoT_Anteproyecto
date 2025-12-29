@@ -3,7 +3,7 @@ export interface Nodo {
   nombre: string;
   descripcion: string;
   proyectoId: string;
-  estado: string;
+  estado: boolean;
   bateria: number;
   ultimaConexion: Date;
 }

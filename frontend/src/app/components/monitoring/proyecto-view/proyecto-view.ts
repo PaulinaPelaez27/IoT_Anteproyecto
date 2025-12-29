@@ -73,34 +73,8 @@ export class ProyectoView {
     return node ? this.sensorService.getByNodeId(node.id) : [];
   });
 
-  getStatusColor(status: string): string {
-    switch (status) {
-      case 'online':
-      case 'active':
-        return 'bg-green-500';
-      case 'warning':
-        return 'bg-yellow-500';
-      case 'error':
-      case 'offline':
-        return 'bg-red-500';
-      case 'degraded':
-        return 'bg-orange-500';
-      default:
-        return 'bg-gray-500';
-    }
-  }
-
-  getSensorStatusColor(status: string): string {
-    switch (status) {
-      case 'active':
-        return 'border-green-500 bg-green-50';
-      case 'warning':
-        return 'border-yellow-500 bg-yellow-50';
-      case 'error':
-        return 'border-red-500 bg-red-50';
-      default:
-        return 'border-gray-500 bg-gray-50';
-    }
+  getStatusColor(status: boolean): string {
+    return status ? 'bg-green-500' : 'bg-red-500';
   }
 
   openEditProject(): void {

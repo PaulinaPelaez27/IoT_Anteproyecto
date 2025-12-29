@@ -11,10 +11,10 @@
     <div class="sticky top-0 px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center justify-between">
         <div>
             <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                {{ sensorDetails()?.name || 'Sensor Details' }}
+                {{ sensorDetails()?.nombre || 'Sensor Details' }}
             </h2>
             <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                {{ sensorDetails()?.type || 'Loading...' }}
+                {{ sensorDetails()?.tipo || 'Loading...' }}
             </p>
         </div>
         <button
@@ -67,11 +67,11 @@
       <!-- Live Data Tab -->
       @if (activeTab() === 'live-data') {
         @if (sensorDetails(); as sensor) {
-          @for (readingType of sensor.readingTypes; track readingType.id) {
+          @for (readingType of sensor.tiposDeLectura; track readingType.id) {
             <!-- Reading Type Section -->
             <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
               <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ readingType.name }}</h3>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ readingType.nombre }}</h3>
                 <span class="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 flex items-center gap-1">
                   <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
@@ -81,14 +81,14 @@
               </div>
               
               <div class="mb-4">
-                <p class="text-4xl font-bold text-blue-500">45.2 <span class="text-2xl">{{ readingType.unit }}</span></p>
+                <p class="text-4xl font-bold text-blue-500">45.2 <span class="text-2xl">{{ readingType.unidad }}</span></p>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Last updated: Dec 29, 2025, 9:12:24 PM</p>
               </div>
 
               <!-- Chart Placeholder -->
               <div class="h-64 bg-gray-50 dark:bg-gray-700 rounded-lg flex items-center justify-center border border-gray-200 dark:border-gray-600">
                 <div class="text-center text-gray-500 dark:text-gray-400">
-                  <p class="text-sm">Chart visualization for {{ readingType.name }}</p>
+                  <p class="text-sm">Chart visualization for {{ readingType.nombre }}</p>
                   <p class="text-xs mt-1">Actual / Predicted / Hypothetical</p>
                 </div>
               </div>
@@ -116,11 +116,11 @@
       <!-- Threshold Tab -->
       @if (activeTab() === 'threshold') {
         @if (sensorDetails(); as sensor) {
-          @for (readingType of sensor.readingTypes; track readingType.id) {
+          @for (readingType of sensor.tiposDeLectura; track readingType.id) {
             <div class="space-y-6 mb-6">
               <!-- Reading Type Header -->
               <div class="flex items-center justify-between">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ readingType.name }}</h3>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ readingType.nombre }}</h3>
                 <button class="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors">
                   <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -141,15 +141,15 @@
                   <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Minimum</label>
                     <div class="flex items-center gap-2">
-                      <input type="number" [value]="readingType.thresholds?.min || 0" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
-                      <span class="text-gray-600 dark:text-gray-400">{{ readingType.unit }}</span>
+                      <input type="number" [value]="readingType.umbrales.min || 0" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                      <span class="text-gray-600 dark:text-gray-400">{{ readingType.unidad }}</span>
                     </div>
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Maximum</label>
                     <div class="flex items-center gap-2">
-                      <input type="number" [value]="readingType.thresholds?.max || 100" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
-                      <span class="text-gray-600 dark:text-gray-400">{{ readingType.unit }}</span>
+                      <input type="number" [value]="readingType.umbrales.max || 100" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                      <span class="text-gray-600 dark:text-gray-400">{{ readingType.unidad }}</span>
                     </div>
                   </div>
                 </div>
@@ -168,15 +168,15 @@
                   <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Minimum</label>
                     <div class="flex items-center gap-2">
-                      <input type="number" [value]="readingType.thresholds?.warningMin || 0" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
-                      <span class="text-gray-600 dark:text-gray-400">{{ readingType.unit }}</span>
+                      <input type="number" [value]="readingType.umbrales?.warningMin || 0" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                      <span class="text-gray-600 dark:text-gray-400">{{ readingType.unidad }}</span>
                     </div>
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Maximum</label>
                     <div class="flex items-center gap-2">
-                      <input type="number" [value]="readingType.thresholds?.warningMax || 100" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
-                      <span class="text-gray-600 dark:text-gray-400">{{ readingType.unit }}</span>
+                      <input type="number" [value]="readingType.umbrales?.warningMax || 100" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                      <span class="text-gray-600 dark:text-gray-400">{{ readingType.unidad }}</span>
                     </div>
                   </div>
                 </div>
@@ -226,10 +226,10 @@
           </div>
 
           <!-- Chart Section for each readingType -->
-          @for (readingType of sensor.readingTypes; track readingType.id) {
+          @for (readingType of sensor.tiposDeLectura; track readingType.id) {
             <div class="space-y-6 mb-6">
               <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{{ readingType.name }}</h3>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{{ readingType.nombre }}</h3>
             <!-- Chart Placeholder -->
             <div class="h-64 bg-gray-50 dark:bg-gray-700 rounded-lg flex items-center justify-center border border-gray-200 dark:border-gray-600">
               <div class="text-center text-gray-500 dark:text-gray-400">
