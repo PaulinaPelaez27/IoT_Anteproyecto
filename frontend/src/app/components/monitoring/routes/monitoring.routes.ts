@@ -1,11 +1,11 @@
 import { Routes } from '@angular/router';
-import { ProjectView } from '../project-view/project-view';
+import { ProyectoView } from '../proyecto-view/proyecto-view';
 import { ProjectFormModal } from '../project-form-modal/project-form-modal';
 
 export const MONITORING_ROUTES: Routes = [
   {
     path: '',
-    component: ProjectView,
+    component: ProyectoView,
   },
 ];
 

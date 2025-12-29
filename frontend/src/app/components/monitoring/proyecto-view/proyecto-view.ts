@@ -12,9 +12,9 @@ import { ModalService } from '../../../shared/ui/modal/modal.service';
 @Component({
   selector: 'app-project-view',
   imports: [CommonModule, RouterModule, Button, LucideAngularModule],
-  templateUrl: './project-view.html',
+  templateUrl: './proyecto-view.html',
 })
-export class ProjectView {
+export class ProyectoView {
   proyectoService = inject(ProyectoService);
   nodoService = inject(NodoService);
   sensorService = inject(SensorService);
