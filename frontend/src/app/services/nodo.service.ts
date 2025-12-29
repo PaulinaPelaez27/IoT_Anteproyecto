@@ -80,13 +80,13 @@ export class NodoService {
       ...node,
       id: `node-${Date.now()}`,
     };
-    console.log('NodeService: Creating node', newNode);
+    console.log('NodoService: Creating node', newNode);
     this.nodesSignal.update((nodes) => [...nodes, newNode]);
     return newNode;
   }
 
   update(id: string, updates: Partial<Nodo>): Nodo | undefined {
-    console.log('NodeService: Updating node', id, updates);
+    console.log('NodoService: Updating node', id, updates);
     const node = this.getById(id);
     if (!node) return undefined;
 
@@ -96,7 +96,7 @@ export class NodoService {
   }
 
   delete(id: string): boolean {
-    console.log('NodeService: Deleting node', id);
+    console.log('NodoService: Deleting node', id);
     const exists = this.getById(id) !== undefined;
     if (exists) {
       this.nodesSignal.update((nodes) => nodes.filter((n) => n.id !== id));
