@@ -33,10 +33,10 @@ export class ProyectoService {
   // TODO: for now we use mock data; replace with real backend calls later
   // when real data, no data with differents companies will be loaded together
   private projectsSignal = signal<Proyecto[]>(MOCK_PROJECTS);
-  private selectedProjectIdSignal = signal<string | null>(null);
+  private selectedProyectoIdSignal = signal<string | null>(null);
 
   projects = this.projectsSignal.asReadonly();
-  selectedProjectId = this.selectedProjectIdSignal.asReadonly();
+  selectedProyectoId = this.selectedProyectoIdSignal.asReadonly();
 
   getAll(): Proyecto[] {
     return this.projects();
@@ -44,7 +44,7 @@ export class ProyectoService {
 
   selectProyecto(proyectoId: string): void {
     console.log('ProjectService: Selecting project', proyectoId);
-    this.selectedProjectIdSignal.set(proyectoId);
+    this.selectedProyectoIdSignal.set(proyectoId);
   }
 
   getByEmpresaId(empresaId: string): Proyecto[] {

@@ -54,8 +54,14 @@ const MOCK_NODES: Nodo[] = [
 })
 export class NodoService {
   private nodesSignal = signal<Nodo[]>(MOCK_NODES);
+  private selectedNodoIdSignal = signal<string | null>(null);
 
   nodes = this.nodesSignal.asReadonly();
+  selectedNodoId = this.selectedNodoIdSignal.asReadonly();
+
+  selectNode(id: string | null): void {
+    this.selectedNodoIdSignal.set(id);
+  }
 
   getAll(): Nodo[] {
     return this.nodes();

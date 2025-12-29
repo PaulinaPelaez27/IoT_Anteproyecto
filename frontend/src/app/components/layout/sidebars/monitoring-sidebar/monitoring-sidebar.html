@@ -30,12 +30,12 @@
           <div
             (click)="selectProject(project.id)"
             class="block p-3 rounded-lg cursor-pointer transition-colors"
-            [class.bg-white]="project.id === selectedProjectId()"
-            [class.dark:bg-gray-800]="project.id === selectedProjectId()"
-            [class.border-l-4]="project.id === selectedProjectId()"
-            [class.border-primary]="project.id === selectedProjectId()"
-            [class.hover:bg-white]="project.id !== selectedProjectId()"
-            [class.dark:hover:bg-gray-800]="project.id !== selectedProjectId()"
+            [class.bg-white]="project.id === selectedProyectoId()"
+            [class.dark:bg-gray-800]="project.id === selectedProyectoId()"
+            [class.border-l-4]="project.id === selectedProyectoId()"
+            [class.border-primary]="project.id === selectedProyectoId()"
+            [class.hover:bg-white]="project.id !== selectedProyectoId()"
+            [class.dark:hover:bg-gray-800]="project.id !== selectedProyectoId()"
           >
             <h3 class="font-medium text-gray-900 dark:text-gray-100">
               {{ project.nombre }}

@@ -22,7 +22,7 @@ export class ProyectoView {
   router = inject(Router);
   modal = inject(ModalService);
 
-  projectId = this.proyectoService.selectedProjectId;
+  projectId = this.proyectoService.selectedProyectoId;
   selectedNodeId = signal<string | null>(null);
 
   // icons

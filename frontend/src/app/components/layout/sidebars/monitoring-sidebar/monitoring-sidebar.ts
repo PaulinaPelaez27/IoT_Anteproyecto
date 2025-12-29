@@ -25,7 +25,7 @@ export class MonitoringSidebar {
   loading = signal(false);
   isAdmin = inject(AuthService).isAdmin();
 
-  selectedProjectId = this.proyectoService.selectedProjectId;
+  selectedProyectoId = this.proyectoService.selectedProyectoId;
 
   private lastCompanyId: string | null = null;
 
@@ -46,7 +46,7 @@ export class MonitoringSidebar {
     const projects = this.proyectoService.getByEmpresaId(companyId);
     this.projects.set(projects);
 
-    const current = this.proyectoService.selectedProjectId();
+    const current = this.proyectoService.selectedProyectoId();
     const stillExists = projects.find((p) => p.id === current);
 
     this.proyectoService.selectProyecto(stillExists ? stillExists.id : projects[0]?.id ?? null);
