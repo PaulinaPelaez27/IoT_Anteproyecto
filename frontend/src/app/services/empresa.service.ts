@@ -1,0 +1,85 @@
+import { Injectable, signal } from '@angular/core';
+import { Empresa } from '../models/company.model';
+
+const MOCK_COMPANIES: Empresa[] = [
+  {
+    id: 'company-1',
+    nombre: 'Acme Corporation',
+    descripcion: 'Leading industrial automation company',
+    email: 'contact@acme.com',
+    telefono: '+1234567890',
+    personaContacto: 'John Doe',
+    estado: true,
+  },
+  {
+    id: 'company-2',
+    nombre: 'Tech Solutions Inc',
+    descripcion: 'IoT and sensor solutions provider',
+    email: 'info@techsolutions.com',
+    telefono: '+0987654321',
+    personaContacto: 'Jane Smith',
+    estado: true,
+  },
+  {
+    id: 'company-3',
+    nombre: 'Global Sensors Ltd',
+    descripcion: 'Worldwide sensor network operator',
+    email: 'hello@globalsensors.com',
+    telefono: '+1122334455',
+    personaContacto: 'Bob Johnson',
+    estado: false,
+  },
+];
+
+@Injectable({
+  providedIn: 'root',
+})
+export class CompanyService {
+  private companiesSignal = signal<Empresa[]>(MOCK_COMPANIES);
+  private selectedCompanyIdSignal = signal<string>('company-1');
+
+  companies = this.companiesSignal.asReadonly();
+  selectedCompanyId = this.selectedCompanyIdSignal.asReadonly();
+
+  getAll(): Empresa[] {
+    return this.companies();
+  }
+
+  getById(id: string): Empresa | undefined {
+    return this.companies().find((c) => c.id === id);
+  }
+
+  selectCompany(companyId: string): void {
+    console.log('CompanyService: Selecting company', companyId);
+    this.selectedCompanyIdSignal.set(companyId);
+  }
+
+  create(company: Omit<Empresa, 'id'>): Empresa {
+    const newCompany: Empresa = {
+      ...company,
+      id: `company-${Date.now()}`,
+    };
+    console.log('CompanyService: Creating company', newCompany);
+    this.companiesSignal.update((companies) => [...companies, newCompany]);
+    return newCompany;
+  }
+
+  update(id: string, updates: Partial<Empresa>): Empresa | undefined {
+    console.log('CompanyService: Updating company', id, updates);
+    const company = this.getById(id);
+    if (!company) return undefined;
+
+    const updated = { ...company, ...updates };
+    this.companiesSignal.update((companies) => companies.map((c) => (c.id === id ? updated : c)));
+    return updated;
+  }
+
+  delete(id: string): boolean {
+    console.log('CompanyService: Deleting company', id);
+    const exists = this.getById(id) !== undefined;
+    if (exists) {
+      this.companiesSignal.update((companies) => companies.filter((c) => c.id !== id));
+    }
+    return exists;
+  }
+}

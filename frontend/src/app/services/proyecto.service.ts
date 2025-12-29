@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { Proyecto } from '../models/project.model';
+import { Proyecto } from '../models/proyecto.model';
 import { CreateProyectoDto } from '../components/monitoring/dtos/create-project.dto';
 
 const MOCK_PROJECTS: Proyecto[] = [

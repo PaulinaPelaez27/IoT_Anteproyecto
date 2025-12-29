@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CompanyService } from '../../../services/company.service';
+import { CompanyService } from '../../../services/empresa.service';
 
 @Component({
   selector: 'app-companies-view',
