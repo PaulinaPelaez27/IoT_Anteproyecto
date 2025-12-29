@@ -11,11 +11,19 @@ const MOCK_SENSORS: Sensor[] = [
     readingTypes: [
       {
         id: 'rt-1',
-        name: 'Temperature',
+        name: 'Temperatura',
         description: 'Ambient temperature',
         unit: '°C',
         varJson: 'temp',
         thresholds: { min: 15, max: 30, warningMin: 18, warningMax: 28 },
+      },
+      {
+        id: 'rt-1b',
+        name: 'Humedad',
+        description: 'Humedad ambiental',
+        unit: '%',
+        varJson: 'humidity',
+        thresholds: { min: 20, max: 100, warningMin: 30, warningMax: 100 },
       },
     ],
   },

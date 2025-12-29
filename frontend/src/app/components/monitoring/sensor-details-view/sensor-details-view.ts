@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SensorService } from '../../../services/sensor.service';
 import { ClickOutsideDirective } from '../../../shared/utils/click-outside.directive';
@@ -15,6 +15,20 @@ export class SensorDetailsView {
 
   sensorId = this.sensorService.selectedSensorId;
   activeTab = signal<'live-data' | 'threshold' | 'resume'>('live-data');
+
+  sensorDetails = computed(() => {
+    const id = this.sensorId();
+    return id ? this.sensorService.getById(id) : undefined;
+  });
+
+  constructor() {
+    effect(() => {
+      const id = this.sensorId();
+      const sensor = this.sensorDetails();
+      console.log('SensorDetailsView: selectedSensorId changed to:', id);
+      console.log('SensorDetailsView: sensorDetails:', sensor);
+    });
+  }
 
   //close the sensor details view
   closeDetailsView() {
