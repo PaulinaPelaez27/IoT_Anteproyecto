@@ -10,7 +10,7 @@ import { LucideAngularModule, Pencil, Trash, Battery } from 'lucide-angular';
 import { ModalService } from '../../../shared/ui/modal/modal.service';
 
 @Component({
-  selector: 'app-project-view',
+  selector: 'app-proyecto-view',
   imports: [CommonModule, RouterModule, Button, LucideAngularModule],
   templateUrl: './proyecto-view.html',
 })
