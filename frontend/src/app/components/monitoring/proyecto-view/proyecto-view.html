@@ -42,7 +42,7 @@
       <div class="flex space-x-2 -mb-px">
         @for (node of nodes(); track node.id) {
           <button
-            (click)="selectNode(node.id)"
+            (click)="nodoService.selectNodo(node.id)"
             [class.bg-white]="selectedNode()?.id === node.id"
             [class.dark:bg-gray-800]="selectedNode()?.id === node.id"
             [class.border-b-0]="selectedNode()?.id === node.id"

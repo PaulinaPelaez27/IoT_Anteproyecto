@@ -23,7 +23,7 @@ export class ProyectoView {
   modal = inject(ModalService);
 
   projectId = this.proyectoService.selectedProyectoId;
-  selectedNodeId = signal<string | null>(null);
+  selectedNodeId = this.nodoService.selectedNodoId;
 
   // icons
   readonly pencilIcon = Pencil;
@@ -49,10 +49,6 @@ export class ProyectoView {
     const node = this.selectedNode();
     return node ? this.sensorService.getByNodeId(node.id) : [];
   });
-
-  selectNode(nodeId: string): void {
-    this.selectedNodeId.set(nodeId);
-  }
 
   getStatusColor(status: string): string {
     switch (status) {

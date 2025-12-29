@@ -59,7 +59,7 @@ export class NodoService {
   nodes = this.nodesSignal.asReadonly();
   selectedNodoId = this.selectedNodoIdSignal.asReadonly();
 
-  selectNode(id: string | null): void {
+  selectNodo(id: string | null): void {
     this.selectedNodoIdSignal.set(id);
   }
 
