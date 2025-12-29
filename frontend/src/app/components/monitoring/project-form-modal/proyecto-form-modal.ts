@@ -1,6 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Button } from '../../../shared/ui/';
+import { Button } from '../../../shared/ui';
 import { ModalService } from '../../../shared/ui/modal/modal.service';
 import { ActivatedRoute } from '@angular/router';
 import { ProyectoService } from '../../../services/proyecto.service';
@@ -8,9 +8,9 @@ import { ProyectoService } from '../../../services/proyecto.service';
 @Component({
   standalone: true,
   imports: [ReactiveFormsModule, Button],
-  templateUrl: './project-form-modal.html',
+  templateUrl: './proyecto-form-modal.html',
 })
-export class ProjectFormModal {
+export class ProyectoFormModal {
   private fb = inject(FormBuilder);
   private modal = inject(ModalService);
   private proyectoService = inject(ProyectoService);

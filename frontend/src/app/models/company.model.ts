@@ -1,12 +1,9 @@
-export type CompanyStatus = 'active' | 'inactive' | 'suspended';
-
-export interface Company {
+export interface Empresa {
   id: string;
-  name: string;
-  description: string;
+  nombre: string;
+  descripcion: string;
   email: string;
-  phone: string;
-  contactPerson: string;
-  status: CompanyStatus;
-  logo?: string;
+  telefono: string;
+  personaContacto: string;
+  estado: boolean;
 }

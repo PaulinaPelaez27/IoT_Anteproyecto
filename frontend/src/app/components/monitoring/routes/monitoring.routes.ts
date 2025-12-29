@@ -1,11 +1,11 @@
 import { Routes } from '@angular/router';
-import { ProjectView } from '../project-view/project-view';
-import { ProjectFormModal } from '../project-form-modal/project-form-modal';
+import { ProyectoView } from '../proyecto-view/proyecto-view';
+import { ProyectoFormModal } from '../project-form-modal/proyecto-form-modal';
 
 export const MONITORING_ROUTES: Routes = [
   {
     path: '',
-    component: ProjectView,
+    component: ProyectoView,
   },
 ];
 
@@ -14,12 +14,12 @@ export const MONITORING_MODAL_ROUTES: Routes = [
   {
     path: 'project/edit/:id',
     outlet: 'modal',
-    component: ProjectFormModal,
+    component: ProyectoFormModal,
   },
   {
     path: 'project/create',
     outlet: 'modal',
-    component: ProjectFormModal,
+    component: ProyectoFormModal,
   },
   // Future modal routes:
   // { path: 'node/edit/:id', outlet: 'modal', component: NodeFormModal },

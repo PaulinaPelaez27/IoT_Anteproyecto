@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CompanyService } from '../../../services/company.service';
+import { EmpresaService } from '../../../services/empresa.service';
 
 @Component({
   selector: 'app-company-switcher',
@@ -8,5 +8,5 @@ import { CompanyService } from '../../../services/company.service';
   templateUrl: './company-switcher.html',
 })
 export class CompanySwitcher {
-  constructor(public companyService: CompanyService) {}
+  constructor(public empresaService: EmpresaService) {}
 }

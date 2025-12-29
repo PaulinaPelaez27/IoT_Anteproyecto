@@ -2,8 +2,8 @@ import { Component, effect, inject, signal } from '@angular/core';
 import { AuthService } from '../../../../services/auth.service';
 import { CompanySwitcher } from '../../company-switcher/company-switcher';
 import { ProyectoService } from '../../../../services/proyecto.service';
-import { CompanyService } from '../../../../services/company.service';
-import { Proyecto } from '../../../../models/project.model';
+import { EmpresaService } from '../../../../services/empresa.service';
+import { Proyecto } from '../../../../models/proyecto.model';
 import { Button } from '../../../../shared/ui';
 import { ModalService } from '../../../../shared/ui/modal/modal.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -16,7 +16,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class MonitoringSidebar {
   private proyectoService = inject(ProyectoService);
-  private companyService = inject(CompanyService);
+  private empresaService = inject(EmpresaService);
   private modalService = inject(ModalService);
   route = inject(ActivatedRoute);
   router = inject(Router);
@@ -25,28 +25,27 @@ export class MonitoringSidebar {
   loading = signal(false);
   isAdmin = inject(AuthService).isAdmin();
 
-  selectedProjectId = this.proyectoService.selectedProjectId;
+  selectedProyectoId = this.proyectoService.selectedProyectoId;
 
-  private lastCompanyId: string | null = null;
+  private lastEmpresaId: string | null = null;
 
   constructor() {
     effect(() => {
-      const companyId = this.companyService.selectedCompanyId();
+      const empresaId = this.empresaService.selectedEmpresaId();
+      if (!empresaId || empresaId === this.lastEmpresaId) return;
 
-      if (!companyId || companyId === this.lastCompanyId) return;
-
-      this.lastCompanyId = companyId;
-      this.loadProjects(companyId);
+      this.lastEmpresaId = empresaId;
+      this.loadProjects(empresaId);
     });
   }
 
-  private loadProjects(companyId: string) {
+  private loadProjects(empresaId: string) {
     this.loading.set(true);
 
-    const projects = this.proyectoService.getByEmpresaId(companyId);
+    const projects = this.proyectoService.getByEmpresaId(empresaId);
     this.projects.set(projects);
 
-    const current = this.proyectoService.selectedProjectId();
+    const current = this.proyectoService.selectedProyectoId();
     const stillExists = projects.find((p) => p.id === current);
 
     this.proyectoService.selectProyecto(stillExists ? stillExists.id : projects[0]?.id ?? null);

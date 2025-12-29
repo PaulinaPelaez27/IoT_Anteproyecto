@@ -9,7 +9,6 @@ import { SettingsSidebar } from '../sidebars/settings-sidebar/settings-sidebar';
   standalone: true,
   imports: [MonitoringSidebar, AdminSidebar, SettingsSidebar],
   templateUrl: './context-sidebar.html',
-  styleUrl: './context-sidebar.css',
 })
 export class ContextSidebar {
   constructor(public navService: NavigationService) {}

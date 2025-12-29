@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CompanyService } from '../../../services/company.service';
+import { EmpresaService } from '../../../services/empresa.service';
 
 @Component({
   selector: 'app-companies-view',
@@ -9,5 +9,5 @@ import { CompanyService } from '../../../services/company.service';
   styleUrl: './companies-view.css',
 })
 export class CompaniesView {
-  constructor(public companyService: CompanyService) {}
+  constructor(public empresaService: EmpresaService) {}
 }

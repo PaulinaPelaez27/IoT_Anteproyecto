@@ -1,34 +1,56 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { ProyectoService } from '../../../services/proyecto.service';
-import { NodeService } from '../../../services/node.service';
+import { NodoService } from '../../../services/nodo.service';
 import { SensorService } from '../../../services/sensor.service';
 import { Button } from '../../../shared/ui';
-import { LucideAngularModule, Pencil, Trash } from 'lucide-angular';
+import { LucideAngularModule, Pencil, Trash, Battery } from 'lucide-angular';
 // para usar modal
 import { ModalService } from '../../../shared/ui/modal/modal.service';
 
 @Component({
-  selector: 'app-project-view',
+  selector: 'app-proyecto-view',
   imports: [CommonModule, RouterModule, Button, LucideAngularModule],
-  templateUrl: './project-view.html',
-  styleUrls: ['./project-view.css'],
+  templateUrl: './proyecto-view.html',
 })
-export class ProjectView {
+export class ProyectoView {
   proyectoService = inject(ProyectoService);
-  nodeService = inject(NodeService);
+  nodoService = inject(NodoService);
   sensorService = inject(SensorService);
   route = inject(ActivatedRoute);
   router = inject(Router);
   modal = inject(ModalService);
 
-  projectId = this.proyectoService.selectedProjectId;
-  selectedNodeId = signal<string | null>(null);
+  projectId = this.proyectoService.selectedProyectoId;
+  selectedNodeId = this.nodoService.selectedNodoId;
+
+  constructor() {
+    // Al cargar nodes/sensors, selectiona el primer node disponible
+    effect(() => {
+      const nodes = this.nodes();
+      const currentSelectedId = this.selectedNodeId();
+
+      // Si no hay nodos, deseleccionar
+      if (nodes.length === 0) {
+        if (currentSelectedId !== null) {
+          this.nodoService.selectNodo(null);
+        }
+        return;
+      }
+
+      // Si el nodo seleccionado no existe, seleccionar el primero
+      const nodeExists = currentSelectedId && nodes.some((n) => n.id === currentSelectedId);
+      if (!nodeExists) {
+        this.nodoService.selectNodo(nodes[0].id);
+      }
+    });
+  }
 
   // icons
   readonly pencilIcon = Pencil;
   readonly trashIcon = Trash;
+  readonly batteryIcon = Battery;
 
   project = computed(() => {
     const id = this.projectId();
@@ -37,22 +59,18 @@ export class ProjectView {
 
   nodes = computed(() => {
     const id = this.projectId();
-    return id ? this.nodeService.getByProjectId(id) : [];
+    return id ? this.nodoService.getByProjectId(id) : [];
   });
 
   selectedNode = computed(() => {
     const nodeId = this.selectedNodeId();
-    return nodeId ? this.nodeService.getById(nodeId) : this.nodes()[0];
+    return nodeId ? this.nodoService.getById(nodeId) : this.nodes()[0];
   });
 
   sensors = computed(() => {
     const node = this.selectedNode();
     return node ? this.sensorService.getByNodeId(node.id) : [];
   });
-
-  selectNode(nodeId: string): void {
-    this.selectedNodeId.set(nodeId);
-  }
 
   getStatusColor(status: string): string {
     switch (status) {
