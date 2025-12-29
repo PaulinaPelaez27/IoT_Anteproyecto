@@ -1,0 +1,68 @@
+@if (sensorId()) {
+  <!-- Backdrop -->
+  <div
+    class="sensor-panel-backdrop fixed inset-0 bg-black bg-opacity-50 z-40"
+    (click)="closeDetailsView()"
+  ></div>
+
+  <!-- Slide-in Panel -->
+  <div class="sensor-panel-slide fixed right-0 top-0 h-full w-1/2 bg-white dark:bg-gray-800 shadow-2xl z-50 overflow-y-auto flex flex-col">
+    <!-- Panel Header -->
+    <div class="sticky top-0 px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Sensor Details</h2>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Monitoring data and configuration</p>
+      </div>
+      <button
+        (click)="closeDetailsView()"
+        class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+        aria-label="Close panel"
+      >
+        <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Panel Content -->
+    <div class="flex-1 p-6 space-y-6">
+      <!-- Sensor Information Section -->
+      <div>
+        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Sensor Information</h3>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-600 dark:text-gray-400">Sensor ID:</span>
+            <span class="text-gray-900 dark:text-gray-100 font-medium">{{ sensorId() }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Placeholder for sensor data -->
+      <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Live Data</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Sensor readings will be displayed here</p>
+      </div>
+    </div>
+
+    <!-- Panel Footer -->
+    <div class="sticky bottom-0 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-6 py-4 flex gap-3">
+      <ui-button
+        type="button"
+        variant="secondary"
+        size="medium"
+        class="flex-1"
+        (click)="closeDetailsView()"
+      >
+        Close
+      </ui-button>
+      <ui-button
+        type="button"
+        variant="primary"
+        size="medium"
+        class="flex-1"
+      >
+        Edit
+      </ui-button>
+    </div>
+  </div>
+}

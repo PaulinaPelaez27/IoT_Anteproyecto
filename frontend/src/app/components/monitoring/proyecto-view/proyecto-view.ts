@@ -6,12 +6,13 @@ import { NodoService } from '../../../services/nodo.service';
 import { SensorService } from '../../../services/sensor.service';
 import { Button } from '../../../shared/ui';
 import { LucideAngularModule, Pencil, Trash, Battery } from 'lucide-angular';
+import { SensorDetailsView } from '../sensor-details-view/sensor-details-view';
 // para usar modal
 import { ModalService } from '../../../shared/ui/modal/modal.service';
 
 @Component({
   selector: 'app-proyecto-view',
-  imports: [CommonModule, RouterModule, Button, LucideAngularModule],
+  imports: [CommonModule, RouterModule, Button, LucideAngularModule, SensorDetailsView],
   templateUrl: './proyecto-view.html',
 })
 export class ProyectoView {
@@ -109,5 +110,14 @@ export class ProyectoView {
     this.modal.show('Cambios en el proyecto', 'medium');
 
     this.router.navigate([{ outlets: { modal: ['project', 'edit', project.id] } }]);
+  }
+
+  openSensorView(sensorId: string): void {
+    console.log('Opening sensor view for sensor ID:', sensorId);
+    this.sensorService.selectSensor(sensorId);
+  }
+
+  selectNode(nodeId: string): void {
+    this.nodoService.selectNodo(nodeId);
   }
 }

@@ -42,7 +42,7 @@
       <div class="flex space-x-2 -mb-px">
         @for (node of nodes(); track node.id) {
           <button
-            (click)="nodoService.selectNodo(node.id)"
+            (click)="selectNode(node.id)"
             [class.bg-white]="selectedNode()?.id === node.id"
             [class.dark:bg-gray-800]="selectedNode()?.id === node.id"
             [class.border-b-0]="selectedNode()?.id === node.id"
@@ -91,7 +91,7 @@
         <!-- Sensors Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           @for (sensor of sensors(); track sensor.id) {
-            <div [class]="'border-l-4 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer bg-white dark:bg-gray-800 ' + getSensorStatusColor(sensor.status)">
+            <div [class]="'border-l-4 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer bg-white dark:bg-gray-800 ' + getSensorStatusColor(sensor.status)" (click)="openSensorView(sensor.id)">
               <div class="flex items-start justify-between mb-4">
                 <div>
                   <h4 class="font-semibold text-gray-900 dark:text-gray-100">{{ sensor.name }}</h4>
@@ -119,4 +119,7 @@
       </div>
     </div>
   }
+
+  <!-- Sensor Details View Slide-in Panel -->
+  <app-sensor-details-view></app-sensor-details-view>
 </div>
