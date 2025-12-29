@@ -2,10 +2,10 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { ProyectoService } from '../../../services/proyecto.service';
-import { NodeService } from '../../../services/node.service';
+import { NodoService } from '../../../services/nodo.service';
 import { SensorService } from '../../../services/sensor.service';
 import { Button } from '../../../shared/ui';
-import { LucideAngularModule, Pencil, Trash } from 'lucide-angular';
+import { LucideAngularModule, Pencil, Trash, Battery } from 'lucide-angular';
 // para usar modal
 import { ModalService } from '../../../shared/ui/modal/modal.service';
 
@@ -13,11 +13,10 @@ import { ModalService } from '../../../shared/ui/modal/modal.service';
   selector: 'app-project-view',
   imports: [CommonModule, RouterModule, Button, LucideAngularModule],
   templateUrl: './project-view.html',
-  styleUrls: ['./project-view.css'],
 })
 export class ProjectView {
   proyectoService = inject(ProyectoService);
-  nodeService = inject(NodeService);
+  nodoService = inject(NodoService);
   sensorService = inject(SensorService);
   route = inject(ActivatedRoute);
   router = inject(Router);
@@ -29,6 +28,7 @@ export class ProjectView {
   // icons
   readonly pencilIcon = Pencil;
   readonly trashIcon = Trash;
+  readonly batteryIcon = Battery;
 
   project = computed(() => {
     const id = this.projectId();
@@ -37,12 +37,12 @@ export class ProjectView {
 
   nodes = computed(() => {
     const id = this.projectId();
-    return id ? this.nodeService.getByProjectId(id) : [];
+    return id ? this.nodoService.getByProjectId(id) : [];
   });
 
   selectedNode = computed(() => {
     const nodeId = this.selectedNodeId();
-    return nodeId ? this.nodeService.getById(nodeId) : this.nodes()[0];
+    return nodeId ? this.nodoService.getById(nodeId) : this.nodes()[0];
   });
 
   sensors = computed(() => {
