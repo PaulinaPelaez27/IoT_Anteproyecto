@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SensorService } from '../../../services/sensor.service';
 import { ClickOutsideDirective } from '../../../shared/utils/click-outside.directive';
@@ -14,9 +14,14 @@ export class SensorDetailsView {
   sensorService = inject(SensorService);
 
   sensorId = this.sensorService.selectedSensorId;
+  activeTab = signal<'live-data' | 'threshold' | 'resume'>('live-data');
 
   //close the sensor details view
   closeDetailsView() {
     this.sensorService.selectSensor(null);
+  }
+
+  setActiveTab(tab: 'live-data' | 'threshold' | 'resume') {
+    this.activeTab.set(tab);
   }
 }
