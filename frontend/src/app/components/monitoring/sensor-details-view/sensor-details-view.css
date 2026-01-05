@@ -1,0 +1,60 @@
+/* Slide-in Panel Animation */
+.sensor-panel-slide {
+  animation: slideInFromRight 0.3s ease-out;
+}
+
+.sensor-panel-backdrop {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.5;
+  }
+}
+
+/* Smooth scrolling inside panel */
+.sensor-panel-slide {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar for panel */
+.sensor-panel-slide::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sensor-panel-slide::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sensor-panel-slide::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 3px;
+}
+
+.sensor-panel-slide::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+.dark .sensor-panel-slide::-webkit-scrollbar-thumb {
+  background: #4a5568;
+}
+
+.dark .sensor-panel-slide::-webkit-scrollbar-thumb:hover {
+  background: #718096;
+}

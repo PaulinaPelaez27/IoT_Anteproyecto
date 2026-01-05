@@ -1,12 +1,10 @@
-export type SensorStatus = 'active' | 'warning' | 'error';
-
-export interface ReadingType {
+export interface TiposLectura {
   id: string;
-  name: string;
-  description: string;
-  unit: string;
+  nombre: string;
+  descripcion: string;
+  unidad: string;
   varJson: string;
-  thresholds: {
+  umbrales: {
     min: number;
     max: number;
     warningMin?: number;
@@ -14,17 +12,18 @@ export interface ReadingType {
   };
 }
 
-export interface Reading {
-  typeId: string;
-  value: number;
+export interface Lectura {
+  sensorId: string;
+  tipoId: string;
+  valor: number;
   timestamp: Date;
 }
 
 export interface Sensor {
   id: string;
-  name: string;
-  type: string;
-  status: SensorStatus;
-  nodeId: string;
-  readingTypes: ReadingType[];
+  nombre: string;
+  tipo: string;
+  estado: boolean;
+  nodoId: string;
+  tiposDeLectura: TiposLectura[];
 }
