@@ -1,15 +1,13 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SensorService } from '../../../services/sensor.service';
-import { ClickOutsideDirective } from '../../../shared/utils/click-outside.directive';
-import { Button } from '../../../shared/ui';
 import { TimeSeriesChart, ChartSeries } from '../time-series-chart/time-series-chart';
 
 @Component({
   selector: 'app-sensor-details-view',
   templateUrl: './sensor-details-view.html',
   styleUrls: ['./sensor-details-view.css'],
-  imports: [CommonModule, ClickOutsideDirective, Button, TimeSeriesChart],
+  imports: [CommonModule, TimeSeriesChart],
 })
 export class SensorDetailsView {
   sensorService = inject(SensorService);
@@ -27,16 +25,15 @@ export class SensorDetailsView {
       const sensor = this.sensorDetails();
       if (!sensor || !sensor.tiposDeLectura) return {};
 
-      // tipoDeLectura can be an array or a single value
-      const tipos = Array.isArray(sensor.tiposDeLectura)
-        ? sensor.tiposDeLectura
-        : [sensor.tiposDeLectura];
+      // tiposDeLectura is always an array per the Sensor interface
+      const tipos = sensor.tiposDeLectura;
 
-      const filteredTipos = tipoId ? tipos.filter((t) => String(t) === tipoId) : tipos;
-
+       const filteredTipos = tipoId ? tipos.filter((t) => t && t.id === tipoId) : tipos;
       const readings: Record<string, any[]> = {};
       for (const tipo of filteredTipos) {
-        readings[String(tipo)] = this.sensorService.getReadings(sensor.id, String(tipo)) || [];
+        const tipoIdKey = tipo?.id;
+        if (!tipoIdKey) continue;
+        readings[tipoIdKey] = this.sensorService.getReadings(sensor.id, tipoIdKey) || [];
       }
       console.log('readingsByTipo:', readings);
       return readings;
@@ -50,7 +47,10 @@ export class SensorDetailsView {
     return [
       {
         name: 'Actual',
-        data: data,
+        data: data.map((d: any) => ({
+          timestamp: d.timestamp,
+          value: d.valor * 1.05,
+        })),
         color: '#3b82f6',
         showArea: true,
       },
@@ -58,33 +58,15 @@ export class SensorDetailsView {
         name: 'Predicted',
         data: data.map((d: any) => ({
           timestamp: d.timestamp,
-          value: d.value * 1.05,
+          value: d.valor * 1.05,
         })),
         color: '#a855f7',
-        showArea: false,
-      },
-      {
-        name: 'Hypothetical',
-        data: data.map((d: any) => ({
-          timestamp: d.timestamp,
-          value: d.value * 0.95,
-        })),
-        color: '#10b981',
         showArea: false,
       },
     ];
   }
 
-  constructor() {
-    effect(() => {
-      const id = this.sensorId();
-      const sensor = this.sensorDetails();
-      console.log('SensorDetailsView: selectedSensorId changed to:', id);
-      console.log('SensorDetailsView: sensorDetails:', sensor);
-    });
-  }
-
-  //close the sensor details view
+  // close the sensor details view
   closeDetailsView() {
     this.sensorService.selectSensor(null);
   }

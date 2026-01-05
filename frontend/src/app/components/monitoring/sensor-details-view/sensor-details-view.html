@@ -123,16 +123,16 @@
                 
                 <div class="grid grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Minimum</label>
+                    <label for="min-threshold" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Minimum</label>
                     <div class="flex items-center gap-2">
-                      <input type="number" [value]="readingType.umbrales.min || 0" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                      <input id="min-threshold" type="number" [value]="readingType.umbrales.min || 0" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
                       <span class="text-gray-600 dark:text-gray-400">{{ readingType.unidad }}</span>
                     </div>
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Maximum</label>
+                    <label for="max-threshold" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Maximum</label>
                     <div class="flex items-center gap-2">
-                      <input type="number" [value]="readingType.umbrales.max || 100" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                      <input id="max-threshold" type="number" [value]="readingType.umbrales.max || 100" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
                       <span class="text-gray-600 dark:text-gray-400">{{ readingType.unidad }}</span>
                     </div>
                   </div>
@@ -152,14 +152,14 @@
                   <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Minimum</label>
                     <div class="flex items-center gap-2">
-                      <input type="number" [value]="readingType.umbrales?.warningMin || 0" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                      <input type="number" [value]="readingType.umbrales.warningMin || 0" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
                       <span class="text-gray-600 dark:text-gray-400">{{ readingType.unidad }}</span>
                     </div>
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Maximum</label>
                     <div class="flex items-center gap-2">
-                      <input type="number" [value]="readingType.umbrales?.warningMax || 100" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
+                      <input type="number" [value]="readingType.umbrales.warningMax || 100" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm">
                       <span class="text-gray-600 dark:text-gray-400">{{ readingType.unidad }}</span>
                     </div>
                   </div>
